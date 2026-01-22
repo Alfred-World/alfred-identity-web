@@ -20,6 +20,7 @@ import Divider from '@mui/material/Divider'
 import CircularProgress from '@mui/material/CircularProgress'
 
 // Third-party Imports
+import { signIn } from 'next-auth/react'
 import { Controller, useForm } from 'react-hook-form'
 import { valibotResolver } from '@hookform/resolvers/valibot'
 import { object, minLength, string, pipe, nonEmpty } from 'valibot'
@@ -80,6 +81,23 @@ const schema = object({
   )
 })
 
+/**
+ * Check if a URL is external (from another app/domain)
+ * External URLs start with http:// or https:// and are NOT on sso.test
+ */
+const isExternalUrl = (url: string | null): boolean => {
+  if (!url) return false
+  if (!url.startsWith('http://') && !url.startsWith('https://')) return false
+  
+  // Check if it's pointing to gateway (OAuth authorize endpoint)
+  const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'https://gateway.test'
+  if (url.startsWith(gatewayUrl)) return true
+  
+  // Check if it's NOT the current sso.test app
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://sso.test'
+  return !url.startsWith(appUrl)
+}
+
 const Login = ({ mode }: { mode: SystemMode }) => {
   // States
   const [isPasswordShown, setIsPasswordShown] = useState(false)
@@ -129,39 +147,57 @@ const Login = ({ mode }: { mode: SystemMode }) => {
     setErrorState(null)
 
     try {
-      // Get returnUrl from query params (if coming from another app like core.test)
+      // Get returnUrl from query params
       const returnUrl = searchParams.get('returnUrl') || searchParams.get('redirect_to') || searchParams.get('redirectTo')
-
-      // Use generated API for login - this returns an exchange URL instead of setting cookie directly
-      // Token Exchange Pattern: API → token → browser navigate with token → Gateway sets cookie
-      const { postIdentityAuthSsoLogin } = await import('@/generated')
       
-      const response = await postIdentityAuthSsoLogin({
-        identity: data.email,
+      // Determine if this is an external OAuth flow or local login
+      const isExternal = isExternalUrl(returnUrl)
+
+      if (isExternal && returnUrl) {
+        // EXTERNAL: OAuth flow from another app (core.test → gateway → sso.test)
+        // Call API to get exchange token URL on gateway.test domain
+        const { postIdentityAuthSsoLogin } = await import('@/generated')
+        
+        const response = await postIdentityAuthSsoLogin({
+          identity: data.email,
+          password: data.password,
+          rememberMe: true,
+          returnUrl: returnUrl // This is the full OAuth authorize URL
+        })
+
+        if (!response.success) {
+          setErrorState({ message: response.errors?.map(e => e.message) || ['Login failed'] })
+          setIsLoading(false)
+          return
+        }
+        
+        // API returns exchange URL: gateway.test/identity/auth/exchange-token?token=xxx&returnUrl=<authorize URL>
+        // Browser navigates to gateway.test → Gateway sets cookie → redirects to authorize URL → issues code → core.test callback
+        const exchangeUrl = response.result?.returnUrl
+        if (exchangeUrl) {
+          window.location.replace(exchangeUrl)
+          return
+        }
+      }
+
+      // LOCAL: Direct login on sso.test (no external returnUrl)
+      // Use NextAuth Credentials to set session cookie on sso.test
+      const result = await signIn('sso', {
+        email: data.email,
         password: data.password,
-        rememberMe: true,
-        returnUrl: returnUrl || undefined
+        redirect: false,
       })
 
-      if (!response.success) {
-        setErrorState({ message: response.errors?.map(e => e.message) || ['Login failed'] })
+      if (result?.error) {
+        setErrorState({ message: [result.error] })
         setIsLoading(false)
         return
       }
-      
-      // The API returns an exchange URL (gateway.test/identity/auth/exchange-token?token=xxx&returnUrl=yyy)
-      // Browser navigates to this URL, Gateway validates token, sets cookie (first-party context!), redirects to returnUrl
-      const exchangeUrl = response.result?.returnUrl
 
-      if (exchangeUrl) {
-        window.location.replace(exchangeUrl)
-        return
-      } else {
-        // Stay in identity app - trigger OIDC flow to get tokens for protected pages
-        const { login } = await import('@/libs/oidc-config')
-        await login('/dashboards/crm')
-        return
-      }
+      // Redirect to local path or dashboard
+      const localPath = returnUrl && !isExternal ? returnUrl : '/dashboards/crm'
+      router.push(localPath)
+      
     } catch (error: unknown) {
       console.error('Login error:', error)
       const errorMessage = error instanceof Error ? error.message : 'An error occurred during login'

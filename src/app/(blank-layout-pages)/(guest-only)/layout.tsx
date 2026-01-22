@@ -1,14 +1,10 @@
 import type { ChildrenType } from '@core/types'
 
-// HOC Imports
-import GuestOnlyRoute from '@/hocs/GuestOnlyRoute'
-
+// No longer need GuestOnlyRoute here - the logic is in page.tsx
 const Layout = async (props: ChildrenType) => {
   const { children } = props
 
-  // Type guard to ensure lang is a valid Locale
-
-  return <GuestOnlyRoute>{children}</GuestOnlyRoute>
+  return <>{children}</>
 }
 
 export default Layout

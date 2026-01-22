@@ -17,9 +17,9 @@ import '@/app/globals.css'
 import '@assets/iconify-icons/generated-icons.css'
 
 export const metadata = {
-  title: 'HSE',
+  title: 'Alfred Identity',
   description:
-    'Health, Safety, and Environment Management System Application',
+    'Alfred Identity Application',
 }
 
 const RootLayout = async (props: ChildrenType) => {

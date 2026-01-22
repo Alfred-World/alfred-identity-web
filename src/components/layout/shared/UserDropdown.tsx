@@ -66,43 +66,14 @@ const UserDropdown = () => {
   }
 
   const handleUserLogout = async () => {
-    try {
-      const GATEWAY_URL = process.env.NEXT_PUBLIC_GATEWAY_URL || 'https://gateway.test'
-      const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://sso.test'
-
-      // 1. Clear local OIDC tokens
-      localStorage.removeItem('oidc_access_token')
-      localStorage.removeItem('oidc_refresh_token')
-      localStorage.removeItem('oidc_id_token')
-      localStorage.removeItem('oidc_state')
-      localStorage.removeItem('oidc_return_url')
-      
-      // 2. Clear oidc-client-ts user (if any)
-      try {
-        const { logout: oidcLogout } = await import('@/libs/oidc-config')
-        await oidcLogout()
-        return // oidcLogout handles redirect
-      } catch {
-        // Fall through to manual logout
-      }
-
-      // 3. Logout from Gateway (clear SSO cookie)
-      try {
-        await fetch(`${GATEWAY_URL}/identity/auth/logout`, {
-          method: 'POST',
-          credentials: 'include',
-        })
-      } catch (e) {
-        console.warn('Gateway logout failed:', e)
-      }
-
-      // 4. Redirect to Gateway logout endpoint to clear server session
-      window.location.href = `${GATEWAY_URL}/connect/logout?post_logout_redirect_uri=${encodeURIComponent(APP_URL)}`
-    } catch (error) {
-      console.error('Logout error:', error)
-      // Fallback: just redirect to login
-      window.location.href = '/login'
-    }
+    const GATEWAY_URL = process.env.NEXT_PUBLIC_GATEWAY_URL || 'https://gateway.test'
+    const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://sso.test'
+    
+    // 1. Clear NextAuth session (local cookie)
+    await signOut({ redirect: false })
+    
+    // 2. Redirect to Gateway logout endpoint to clear SSO session, then redirect back to app
+    window.location.href = `${GATEWAY_URL}/connect/logout?post_logout_redirect_uri=${encodeURIComponent(APP_URL)}`
   }
 
   return (
