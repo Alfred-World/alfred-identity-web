@@ -139,7 +139,6 @@ const Login = ({ mode }: { mode: SystemMode }) => {
 
       // If SSO check returned error, just show login form
       if (ssoError) {
-        console.log('[SSO] SSO check returned error, showing login form')
         setIsCheckingSso(false)
         return
       }
@@ -147,8 +146,6 @@ const Login = ({ mode }: { mode: SystemMode }) => {
       // If we have an SSO token, exchange it for session
       if (ssoToken) {
         try {
-          console.log('[SSO] Got SSO token, exchanging for session...')
-
           // Use generated API function via sso-config for type safety
           const response = await validateSsoToken(ssoToken)
 
@@ -163,12 +160,10 @@ const Login = ({ mode }: { mode: SystemMode }) => {
             })
 
             if (result?.ok) {
-              console.log('[SSO] Token exchange successful, redirecting to:', redirectTo)
               router.replace(redirectTo)
               return
             }
           }
-          console.log('[SSO] Token exchange failed, showing login form')
         } catch (error) {
           console.error('[SSO] Error exchanging SSO token:', error)
         }

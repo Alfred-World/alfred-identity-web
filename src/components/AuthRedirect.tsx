@@ -30,7 +30,6 @@ const AuthRedirect = () => {
     // Redirect to Gateway SSO check
     const ssoCheckUrl = getSsoCheckUrl(callbackUrl)
 
-    console.log('[AuthRedirect] Redirecting to SSO check:', ssoCheckUrl)
     window.location.href = ssoCheckUrl
   }, [pathname])
 
