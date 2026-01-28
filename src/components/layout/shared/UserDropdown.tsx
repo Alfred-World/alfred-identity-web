@@ -66,14 +66,15 @@ const UserDropdown = () => {
   }
 
   const handleUserLogout = async () => {
-    const GATEWAY_URL = process.env.NEXT_PUBLIC_GATEWAY_URL || 'https://gateway.test'
-    const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://sso.test'
-    
-    // 1. Clear NextAuth session (local cookie)
-    await signOut({ redirect: false })
-    
-    // 2. Redirect to Gateway logout endpoint to clear SSO session, then redirect back to app
-    window.location.href = `${GATEWAY_URL}/connect/logout?post_logout_redirect_uri=${encodeURIComponent(APP_URL)}`
+    try {
+      // Sign out from the app
+      await signOut({ callbackUrl: process.env.NEXT_PUBLIC_APP_URL })
+    } catch (error) {
+      console.error(error)
+
+      // Show above error in a toast like following
+      // toastService.error((err as Error).message)
+    }
   }
 
   return (

@@ -17,13 +17,12 @@ import Checkbox from '@mui/material/Checkbox'
 import Button from '@mui/material/Button'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Divider from '@mui/material/Divider'
-import CircularProgress from '@mui/material/CircularProgress'
 
 // Third-party Imports
 import { signIn } from 'next-auth/react'
 import { Controller, useForm } from 'react-hook-form'
 import { valibotResolver } from '@hookform/resolvers/valibot'
-import { object, minLength, string, pipe, nonEmpty } from 'valibot'
+import { email, object, minLength, string, pipe, nonEmpty } from 'valibot'
 import type { SubmitHandler } from 'react-hook-form'
 import type { InferInput } from 'valibot'
 import classnames from 'classnames'
@@ -73,7 +72,7 @@ type ErrorType = {
 type FormData = InferInput<typeof schema>
 
 const schema = object({
-  email: pipe(string(), minLength(1, 'This field is required')),
+  email: pipe(string(), minLength(1, 'This field is required'), email('Email is invalid')),
   password: pipe(
     string(),
     nonEmpty('This field is required'),
@@ -81,27 +80,9 @@ const schema = object({
   )
 })
 
-/**
- * Check if a URL is external (from another app/domain)
- * External URLs start with http:// or https:// and are NOT on sso.test
- */
-const isExternalUrl = (url: string | null): boolean => {
-  if (!url) return false
-  if (!url.startsWith('http://') && !url.startsWith('https://')) return false
-  
-  // Check if it's pointing to gateway (OAuth authorize endpoint)
-  const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'https://gateway.test'
-  if (url.startsWith(gatewayUrl)) return true
-  
-  // Check if it's NOT the current sso.test app
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://sso.test'
-  return !url.startsWith(appUrl)
-}
-
 const Login = ({ mode }: { mode: SystemMode }) => {
   // States
   const [isPasswordShown, setIsPasswordShown] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
   const [errorState, setErrorState] = useState<ErrorType | null>(null)
 
   // Vars
@@ -127,7 +108,7 @@ const Login = ({ mode }: { mode: SystemMode }) => {
   } = useForm<FormData>({
     resolver: valibotResolver(schema),
     defaultValues: {
-      email: 'admin',
+      email: 'admin@gmail.com',
       password: 'Admin@123'
     }
   })
@@ -143,66 +124,23 @@ const Login = ({ mode }: { mode: SystemMode }) => {
   const handleClickShowPassword = () => setIsPasswordShown(show => !show)
 
   const onSubmit: SubmitHandler<FormData> = async (data: FormData) => {
-    setIsLoading(true)
-    setErrorState(null)
+    const res = await signIn('credentials', {
+      email: data.email,
+      password: data.password,
+      redirect: false
+    })
 
-    try {
-      // Get returnUrl from query params
-      const returnUrl = searchParams.get('returnUrl') || searchParams.get('redirect_to') || searchParams.get('redirectTo')
-      
-      // Determine if this is an external OAuth flow or local login
-      const isExternal = isExternalUrl(returnUrl)
+    if (res && res.ok && res.error === null) {
+      // Vars
+      const redirectURL = searchParams.get('redirectTo') ?? '/'
 
-      if (isExternal && returnUrl) {
-        // EXTERNAL: OAuth flow from another app (core.test → gateway → sso.test)
-        // Call API to get exchange token URL on gateway.test domain
-        const { postIdentityAuthSsoLogin } = await import('@/generated')
-        
-        const response = await postIdentityAuthSsoLogin({
-          identity: data.email,
-          password: data.password,
-          rememberMe: true,
-          returnUrl: returnUrl // This is the full OAuth authorize URL
-        })
+      router.replace(redirectURL)
+    } else {
+      if (res?.error) {
+        const error = JSON.parse(res.error)
 
-        if (!response.success) {
-          setErrorState({ message: response.errors?.map(e => e.message) || ['Login failed'] })
-          setIsLoading(false)
-          return
-        }
-        
-        // API returns exchange URL: gateway.test/identity/auth/exchange-token?token=xxx&returnUrl=<authorize URL>
-        // Browser navigates to gateway.test → Gateway sets cookie → redirects to authorize URL → issues code → core.test callback
-        const exchangeUrl = response.result?.returnUrl
-        if (exchangeUrl) {
-          window.location.replace(exchangeUrl)
-          return
-        }
+        setErrorState(error)
       }
-
-      // LOCAL: Direct login on sso.test (no external returnUrl)
-      // Use NextAuth Credentials to set session cookie on sso.test
-      const result = await signIn('sso', {
-        email: data.email,
-        password: data.password,
-        redirect: false,
-      })
-
-      if (result?.error) {
-        setErrorState({ message: [result.error] })
-        setIsLoading(false)
-        return
-      }
-
-      // Redirect to local path or dashboard
-      const localPath = returnUrl && !isExternal ? returnUrl : '/dashboards/crm'
-      router.push(localPath)
-      
-    } catch (error: unknown) {
-      console.error('Login error:', error)
-      const errorMessage = error instanceof Error ? error.message : 'An error occurred during login'
-      setErrorState({ message: [errorMessage] })
-      setIsLoading(false)
     }
   }
 
@@ -244,9 +182,9 @@ const Login = ({ mode }: { mode: SystemMode }) => {
                   {...field}
                   autoFocus
                   fullWidth
-                  type='text'
-                  label='Email or Username'
-                  placeholder='Enter your email or username'
+                  type='email'
+                  label='Email'
+                  placeholder='Enter your email'
                   onChange={e => {
                     field.onChange(e.target.value)
                     errorState !== null && setErrorState(null)
@@ -304,8 +242,8 @@ const Login = ({ mode }: { mode: SystemMode }) => {
                 Forgot password?
               </Typography>
             </div>
-            <Button fullWidth variant='contained' type='submit' disabled={isLoading}>
-              {isLoading ? <CircularProgress size={24} color="inherit" /> : 'Login'}
+            <Button fullWidth variant='contained' type='submit'>
+              Login
             </Button>
             <div className='flex justify-center items-center flex-wrap gap-2'>
               <Typography>New on our platform?</Typography>
@@ -314,14 +252,12 @@ const Login = ({ mode }: { mode: SystemMode }) => {
               </Typography>
             </div>
             <Divider className='gap-2'>or</Divider>
-            {/* TODO: Implement Google OAuth with OIDC */}
             <Button
               color='secondary'
               className='self-center text-textPrimary'
               startIcon={<img src='/images/logos/google.png' alt='Google' width={22} />}
               sx={{ '& .MuiButton-startIcon': { marginInlineEnd: 3 } }}
-              onClick={() => console.log('Google OAuth not yet implemented')}
-              disabled
+              onClick={() => signIn('google')}
             >
               Sign in with Google
             </Button>

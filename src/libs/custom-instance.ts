@@ -45,7 +45,6 @@ export type ToApiReturn<T> = T extends { result?: infer R | null } ? ApiReturn<N
  */
 export const AXIOS_INSTANCE = axios.create({
   baseURL: process.env.NEXT_PUBLIC_GATEWAY_URL,
-  withCredentials: true, // Important: include cookies for SSO
   paramsSerializer: params => {
     const searchParams = new URLSearchParams()
 
@@ -60,19 +59,11 @@ export const AXIOS_INSTANCE = axios.create({
 })
 
 // Add request interceptor for auth token
-// Always fetch fresh token from session to ensure we use refreshed tokens
-AXIOS_INSTANCE.interceptors.request.use(async config => {
-  if (typeof window !== 'undefined') {
-    try {
-      const { getSession } = await import('next-auth/react')
-      const session = await getSession()
+AXIOS_INSTANCE.interceptors.request.use(config => {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null
 
-      if (session?.accessToken) {
-        config.headers.Authorization = `Bearer ${session.accessToken}`
-      }
-    } catch {
-      // Ignore errors - request will proceed without token
-    }
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
   }
 
   return config

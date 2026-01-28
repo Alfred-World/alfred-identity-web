@@ -18,7 +18,7 @@ import VerticalFooter from '@components/layout/vertical/Footer'
 import HorizontalFooter from '@components/layout/horizontal/Footer'
 import Customizer from '@core/components/customizer'
 import ScrollToTop from '@core/components/scroll-to-top'
-import ClientAuthGuard from '@/hocs/ClientAuthGuard'
+import AuthGuard from '@/hocs/AuthGuard'
 
 // Util Imports
 import { getMode, getSystemMode } from '@core/utils/serverHelpers'
@@ -35,7 +35,7 @@ const Layout = async (props: ChildrenType) => {
 
   return (
     <Providers direction={direction}>
-      <ClientAuthGuard>
+      <AuthGuard>
         <LayoutWrapper
           systemMode={systemMode}
           verticalLayout={
@@ -58,7 +58,7 @@ const Layout = async (props: ChildrenType) => {
           </Button>
         </ScrollToTop>
         <Customizer dir={direction} disableDirection />
-      </ClientAuthGuard>
+      </AuthGuard>
     </Providers>
   )
 }
