@@ -15,6 +15,10 @@ declare module 'next-auth' {
       role?: string
       returnUrl?: string | null
     }
+    accessToken?: string
+    refreshToken?: string
+    error?: string
+    accessTokenExpires?: string
   }
 
   interface User {
@@ -34,5 +38,9 @@ declare module 'next-auth/jwt' {
     username?: string
     role?: string
     returnUrl?: string | null
+    accessToken?: string
+    refreshToken?: string
+    accessTokenExpires?: number
+    error?: string
   }
 }

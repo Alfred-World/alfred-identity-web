@@ -60,11 +60,19 @@ export const AXIOS_INSTANCE = axios.create({
 })
 
 // Add request interceptor for auth token
-AXIOS_INSTANCE.interceptors.request.use(config => {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null
+// Always fetch fresh token from session to ensure we use refreshed tokens
+AXIOS_INSTANCE.interceptors.request.use(async config => {
+  if (typeof window !== 'undefined') {
+    try {
+      const { getSession } = await import('next-auth/react')
+      const session = await getSession()
 
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
+      if (session?.accessToken) {
+        config.headers.Authorization = `Bearer ${session.accessToken}`
+      }
+    } catch {
+      // Ignore errors - request will proceed without token
+    }
   }
 
   return config
@@ -103,10 +111,10 @@ export const customInstance = <T>(
     .catch((error: AxiosError) => {
       const responseData = error.response?.data as
         | {
-            success?: boolean
-            message?: string
-            errors?: Array<{ message: string; code?: string }>
-          }
+          success?: boolean
+          message?: string
+          errors?: Array<{ message: string; code?: string }>
+        }
         | undefined
 
       // If BE already returned error format, use it
