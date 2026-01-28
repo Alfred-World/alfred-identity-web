@@ -1,7 +1,7 @@
 'use client'
 
 // React Imports
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 // Next Imports
 import Link from 'next/link'
@@ -40,6 +40,10 @@ import themeConfig from '@configs/themeConfig'
 // Hook Imports
 import { useImageVariant } from '@core/hooks/useImageVariant'
 import { useSettings } from '@core/hooks/useSettings'
+
+// SSO Imports
+import { validateSsoToken } from '@/libs/sso-config'
+import { postIdentityAuthSsoLogin } from '@/generated'
 
 // Styled Custom Components
 const LoginIllustration = styled('img')(({ theme }) => ({
@@ -83,6 +87,8 @@ const schema = object({
 const Login = ({ mode }: { mode: SystemMode }) => {
   // States
   const [isPasswordShown, setIsPasswordShown] = useState(false)
+  const [isCheckingSso, setIsCheckingSso] = useState(true)
+  const ssoCheckRef = useRef(false)
   const [errorState, setErrorState] = useState<ErrorType | null>(null)
 
   // Vars
@@ -121,27 +127,110 @@ const Login = ({ mode }: { mode: SystemMode }) => {
     borderedDarkIllustration
   )
 
+  // Handle SSO token from redirect flow (from AuthRedirect -> check-sso -> back here)
+  useEffect(() => {
+    if (ssoCheckRef.current) return
+    ssoCheckRef.current = true
+
+    const handleSsoToken = async () => {
+      const ssoToken = searchParams.get('sso_token')
+      const ssoError = searchParams.get('sso_error')
+      const redirectTo = searchParams.get('redirectTo') || '/dashboards/crm'
+
+      // If SSO check returned error, just show login form
+      if (ssoError) {
+        console.log('[SSO] SSO check returned error, showing login form')
+        setIsCheckingSso(false)
+        return
+      }
+
+      // If we have an SSO token, exchange it for session
+      if (ssoToken) {
+        try {
+          console.log('[SSO] Got SSO token, exchanging for session...')
+
+          // Use generated API function via sso-config for type safety
+          const response = await validateSsoToken(ssoToken)
+
+          if (response.success && response.result) {
+            // Sign in using SSO session
+            const user = response.result as { userId: string; email: string; fullName?: string; userName?: string }
+            const result = await signIn('sso-session', {
+              redirect: false,
+              userId: user.userId.toString(),
+              email: user.email,
+              name: user.fullName || user.userName || user.email,
+            })
+
+            if (result?.ok) {
+              console.log('[SSO] Token exchange successful, redirecting to:', redirectTo)
+              router.replace(redirectTo)
+              return
+            }
+          }
+          console.log('[SSO] Token exchange failed, showing login form')
+        } catch (error) {
+          console.error('[SSO] Error exchanging SSO token:', error)
+        }
+      }
+
+      setIsCheckingSso(false)
+    }
+
+    handleSsoToken()
+  }, [router, searchParams])
+
   const handleClickShowPassword = () => setIsPasswordShown(show => !show)
 
   const onSubmit: SubmitHandler<FormData> = async (data: FormData) => {
-    const res = await signIn('credentials', {
-      email: data.email,
-      password: data.password,
-      redirect: false
-    })
+    try {
 
-    if (res && res.ok && res.error === null) {
-      // Vars
-      const redirectURL = searchParams.get('redirectTo') ?? '/'
+      // Check if this is SSO flow (has returnUrl from Gateway) or direct login
+      const returnUrlParam = searchParams.get('returnUrl')
 
-      router.replace(redirectURL)
-    } else {
-      if (res?.error) {
-        const error = JSON.parse(res.error)
+      // For direct login, use sso.test dashboard as return destination
+      // SSO cookie will still be set on gateway.test for cross-site SSO
+      const ssoAppUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://sso.test'
+      const returnUrl = returnUrlParam || `${ssoAppUrl}/dashboards/crm`
 
-        setErrorState(error)
+      const response = await postIdentityAuthSsoLogin({
+        identity: data.email,
+        password: data.password,
+        rememberMe: true,
+        returnUrl: returnUrl
+      })
+
+      if (!response.success || !response.result) {
+        setErrorState({ message: [response.message || 'Login failed'] })
+        return
       }
+
+      const { returnUrl: exchangeUrl } = response.result
+
+      if (exchangeUrl) {
+        // Navigate to Gateway exchange-token to set SSO cookie
+        // This works for both SSO flow and direct login
+        window.location.href = exchangeUrl
+      } else {
+        setErrorState({ message: ['Exchange URL not received'] })
+      }
+    } catch (e: unknown) {
+      setErrorState({ message: [e instanceof Error ? e.message : 'Login failed'] })
     }
+  }
+
+  // Show loading while checking SSO session
+  if (isCheckingSso) {
+    return (
+      <div className='flex bs-full justify-center items-center min-bs-[100dvh]'>
+        <div className='flex flex-col items-center gap-4'>
+          <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-primary' />
+          <Typography variant='body1' color='text.secondary'>
+            Checking authentication...
+          </Typography>
+        </div>
+      </div>
+    )
   }
 
   return (
