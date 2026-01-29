@@ -33,6 +33,7 @@ import type { SystemMode } from '@core/types'
 // Component Imports
 import Logo from '@components/layout/shared/Logo'
 import CustomTextField from '@core/components/mui/TextField'
+import Loading from '@components/Loading'
 
 // Config Imports
 import themeConfig from '@configs/themeConfig'
@@ -216,16 +217,7 @@ const Login = ({ mode }: { mode: SystemMode }) => {
 
   // Show loading while checking SSO session
   if (isCheckingSso) {
-    return (
-      <div className='flex bs-full justify-center items-center min-bs-[100dvh]'>
-        <div className='flex flex-col items-center gap-4'>
-          <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-primary' />
-          <Typography variant='body1' color='text.secondary'>
-            Checking authentication...
-          </Typography>
-        </div>
-      </div>
-    )
+    return <Loading className='bs-full min-bs-[100dvh]' />
   }
 
   return (
