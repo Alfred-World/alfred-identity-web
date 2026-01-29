@@ -1,4 +1,5 @@
 import type { HorizontalMenuDataType } from '@/types/menuTypes'
+import { ROUTES } from '@/configs/routes'
 
 const horizontalMenuData = (): HorizontalMenuDataType[] => [
   {
@@ -8,10 +9,15 @@ const horizontalMenuData = (): HorizontalMenuDataType[] => [
       {
         label: 'crm',
         icon: 'tabler-chart-pie-2',
-        href: '/dashboards/crm'
+        href: ROUTES.DASHBOARDS.CRM
       }
     ]
   },
+  {
+    label: 'Applications',
+    icon: 'tabler-apps',
+    href: ROUTES.APPLICATIONS.LIST
+  }
 ]
 
 export default horizontalMenuData

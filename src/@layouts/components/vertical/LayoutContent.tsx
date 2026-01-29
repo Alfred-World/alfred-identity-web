@@ -15,6 +15,8 @@ import { verticalLayoutClasses } from '@layouts/utils/layoutClasses'
 // Styled Component Imports
 import StyledMain from '@layouts/styles/shared/StyledMain'
 
+import AppBreadcrumbs from '@core/components/mui/Breadcrumbs'
+
 const LayoutContent = ({ children }: ChildrenType) => {
   // Hooks
   const { settings } = useSettings()
@@ -31,6 +33,7 @@ const LayoutContent = ({ children }: ChildrenType) => {
         [verticalLayoutClasses.contentWide]: contentWide
       })}
     >
+      <AppBreadcrumbs />
       {children}
     </StyledMain>
   )

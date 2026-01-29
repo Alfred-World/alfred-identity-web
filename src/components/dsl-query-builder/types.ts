@@ -11,7 +11,7 @@ export interface EnumOption {
     value: number | string // Actual value to send in query (e.g. 0)
 }
 
-export interface FieldConfig<TData = any> {
+export interface FieldConfig<TData = unknown> {
     name: string // Display name (used as column header)
     key: string // Field key for query and data access
     dataType: DataType
@@ -26,7 +26,7 @@ export interface FieldConfig<TData = any> {
     // Table Column Properties (for AdvancedTable auto-generation)
     // ============================================================
 
-    /** Enable sorting on this column. Default: true */
+    /** Enable sorting on this column. Default: false */
     enableSorting?: boolean
 
     /** Hide from table but still filterable. Default: false */
@@ -44,7 +44,7 @@ export interface FieldConfig<TData = any> {
      * @param row - The entire row data
      * @returns React node to render
      */
-    renderCell?: (value: any, row: TData) => React.ReactNode
+    renderCell?: (value: unknown, row: TData) => React.ReactNode
 }
 
 export interface FilterCondition {
@@ -56,8 +56,8 @@ export interface FilterCondition {
     logicalOperator?: 'AND' | 'OR' // Connection to next condition
 }
 
-export interface DslQueryBuilderProps {
-    fields: FieldConfig[]
+export interface DslQueryBuilderProps<TData = unknown> {
+    fields: FieldConfig<TData>[]
     value?: FilterCondition[]
     onChange?: (conditions: FilterCondition[], dslQuery: string) => void
     onSearch?: (dslQuery: string) => void

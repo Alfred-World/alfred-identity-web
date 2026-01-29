@@ -12,14 +12,14 @@ import type { ApplicationDto } from '@/generated'
 
 // Unified field config - used by both DslQueryBuilder (filter) and AdvancedTable (columns)
 const subSiteFields: FieldConfig<ApplicationDto>[] = [
-    { name: 'ID', key: 'id', dataType: 'int' },
-    { name: 'Display Name', key: 'displayName', dataType: 'string' },
-    { name: 'Client ID', key: 'clientId', dataType: 'string', enableSorting: false },
-    { name: 'Permissions', key: 'permissions', dataType: 'string', enableSorting: false },
-    { name: 'Application Type', key: 'applicationType', dataType: 'string', enableSorting: false },
-    { name: 'Client Type', key: 'clientType', dataType: 'string', enableSorting: false },
-    { name: 'Is Active', key: 'isActive', dataType: 'bool', enableSorting: false },
-    { name: 'Created At', key: 'createdAt', dataType: 'date' },
+    { name: 'ID', key: 'id', dataType: 'int', enableSorting: true },
+    { name: 'Display Name', key: 'displayName', dataType: 'string', enableSorting: true },
+    { name: 'Client ID', key: 'clientId', dataType: 'string' },
+    { name: 'Permissions', key: 'permissions', dataType: 'string' },
+    { name: 'Application Type', key: 'applicationType', dataType: 'string' },
+    { name: 'Client Type', key: 'clientType', dataType: 'string' },
+    { name: 'Is Active', key: 'isActive', dataType: 'bool' },
+    { name: 'Created At', key: 'createdAt', dataType: 'date', enableSorting: true },
     { name: 'Updated At', key: 'updatedAt', dataType: 'date', hidden: true }
 ]
 

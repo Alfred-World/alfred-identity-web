@@ -28,6 +28,7 @@ import {
     getCoreRowModel,
     useReactTable,
     createColumnHelper,
+    type RowData
 } from '@tanstack/react-table'
 import type {
     ColumnDef,
@@ -38,6 +39,13 @@ import type {
     RowSelectionState,
     TableOptions,
 } from '@tanstack/react-table'
+
+declare module '@tanstack/table-core' {
+    interface ColumnMeta<TData extends RowData, TValue> {
+        align?: 'left' | 'center' | 'right'
+        width?: number | string
+    }
+}
 
 import { TableSkeleton } from './TableSkeleton'
 
@@ -76,7 +84,7 @@ export interface AdvancedTableProps<TData> {
      * Use this when you need full control over column rendering
      * If both fields and columns are provided, columns takes precedence
      */
-    columns?: ColumnDef<TData, any>[]
+    columns?: ColumnDef<TData, unknown>[]
 
     /** Total number of records (for server-side pagination) */
     total: number
@@ -180,16 +188,16 @@ function TablePagination<TData>({
 function generateColumnsFromFields<TData>(
     fields: FieldConfig<TData>[],
     columnHelper: ReturnType<typeof createColumnHelper<TData>>
-): ColumnDef<TData, any>[] {
+): ColumnDef<TData, unknown>[] {
     return fields
         .filter(field => !field.hidden)
         .map(field => {
-            return columnHelper.accessor(field.key as any, {
+            return columnHelper.accessor((row) => (row as Record<string, unknown>)[field.key], {
                 id: field.key,
                 header: field.name,
-                enableSorting: field.enableSorting !== false, // Default true
+                enableSorting: !!field.enableSorting, // Default false
                 cell: ({ row }) => {
-                    const value = (row.original as any)[field.key]
+                    const value = (row.original as Record<string, unknown>)[field.key]
 
                     // Use custom renderer if provided
                     if (field.renderCell) {
@@ -200,7 +208,9 @@ function generateColumnsFromFields<TData>(
                     if (field.dataType === 'date') {
                         return (
                             <Typography color='text.primary'>
-                                {value ? new Date(value).toLocaleDateString() : '-'}
+                                {typeof value === 'string' || typeof value === 'number' || value instanceof Date
+                                    ? new Date(value as string | number | Date).toLocaleDateString()
+                                    : '-'}
                             </Typography>
                         )
                     }
@@ -216,7 +226,7 @@ function generateColumnsFromFields<TData>(
                     // Default text rendering
                     return (
                         <Typography color='text.primary'>
-                            {value ?? '-'}
+                            {(value as string | number | null) ?? '-'}
                         </Typography>
                     )
                 },
@@ -253,7 +263,7 @@ export function AdvancedTable<TData>({
     // ============================================================
     const columnHelper = createColumnHelper<TData>()
 
-    const generatedColumns = useMemo<ColumnDef<TData, any>[]>(() => {
+    const generatedColumns = useMemo<ColumnDef<TData, unknown>[]>(() => {
         // If userColumns provided, use them directly
         if (userColumns && userColumns.length > 0) {
             return userColumns
@@ -271,10 +281,10 @@ export function AdvancedTable<TData>({
     // ============================================================
     // Build columns with optional selection column
     // ============================================================
-    const columns = useMemo<ColumnDef<TData, any>[]>(() => {
+    const columns = useMemo<ColumnDef<TData, unknown>[]>(() => {
         if (!enableRowSelection) return generatedColumns
 
-        const selectionColumn: ColumnDef<TData, any> = {
+        const selectionColumn: ColumnDef<TData, unknown> = {
             id: 'select',
             header: ({ table }) => (
                 <Checkbox
@@ -575,9 +585,12 @@ export function AdvancedTable<TData>({
                                         {header.isPlaceholder ? null : (
                                             <div
                                                 className={classnames(
-                                                    'flex items-center justify-between w-full',
+                                                    'flex items-center gap-2 w-full',
                                                     {
-                                                        'cursor-pointer select-none': header.column.getCanSort()
+                                                        'cursor-pointer select-none': header.column.getCanSort(),
+                                                        'justify-start': header.column.columnDef.meta?.align === 'left' || !header.column.columnDef.meta?.align,
+                                                        'justify-center': header.column.columnDef.meta?.align === 'center',
+                                                        'justify-end': header.column.columnDef.meta?.align === 'right',
                                                     }
                                                 )}
                                                 onClick={header.column.getToggleSortingHandler()}

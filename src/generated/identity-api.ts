@@ -54,16 +54,19 @@ export interface ApplicationDto {
   clientId?: string;
 
   /** @nullable */
+  clientSecret?: string | null;
+
+  /** @nullable */
   displayName?: string | null;
 
   /** @nullable */
-  redirectUris?: string | null;
+  redirectUris?: string[] | null;
 
   /** @nullable */
-  postLogoutRedirectUris?: string | null;
+  postLogoutRedirectUris?: string[] | null;
 
   /** @nullable */
-  permissions?: string | null;
+  permissions?: string[] | null;
 
   /** @nullable */
   applicationType?: string | null;
@@ -122,6 +125,32 @@ export interface ApplicationDtoPageResult {
   readonly nextPage?: number | null;
 }
 
+export interface ApplicationMetadataDto {
+  applicationTypes?: string[];
+  clientTypes?: string[];
+  grantTypes?: string[];
+  scopes?: string[];
+  endpoints?: string[];
+}
+
+/**
+ * @nullable
+ */
+export type ApplicationMetadataDtoApiSuccessResponseResult = ApplicationMetadataDto | null;
+
+/**
+ * Standard API response wrapper for successful responses
+ */
+export interface ApplicationMetadataDtoApiSuccessResponse {
+  success: boolean;
+
+  /** @nullable */
+  message?: string | null;
+
+  /** @nullable */
+  result?: ApplicationMetadataDtoApiSuccessResponseResult;
+}
+
 export interface AssignRolesToUserResult {
   success?: boolean;
 
@@ -151,13 +180,6 @@ export interface CreateApplicationRequest {
    * @maxLength 100
    */
   clientId: string;
-
-  /**
-   * Client secret for confidential clients
-   * @minLength 0
-   * @maxLength 256
-   */
-  clientSecret: string;
 
   /**
    * Display name for the application
@@ -476,6 +498,19 @@ export interface SsoSessionResponseApiSuccessResponse {
 }
 
 /**
+ * Standard API response wrapper for successful responses
+ */
+export interface StringApiSuccessResponse {
+  success: boolean;
+
+  /** @nullable */
+  message?: string | null;
+
+  /** @nullable */
+  result?: string | null;
+}
+
+/**
  * Request model for updating an OAuth2 client application
  */
 export interface UpdateApplicationRequest {
@@ -504,6 +539,10 @@ export interface UpdateApplicationRequest {
    * @nullable
    */
   permissions?: string | null;
+}
+
+export interface UpdateApplicationStatusRequest {
+  isActive?: boolean;
 }
 
 export interface UpdateRoleCommand {
@@ -989,6 +1028,100 @@ export const usePostApplications = <TError = ApiErrorResponse,
     }
     
 /**
+ * @summary Get application metadata (types, permissions)
+ */
+export const getApplicationsMetadata = (
+    
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<ApplicationMetadataDtoApiSuccessResponse>(
+      {url: `/applications/metadata`, method: 'GET', signal
+    },
+      options);
+    }
+  
+
+
+
+export const getGetApplicationsMetadataQueryKey = () => {
+    return [
+    `/applications/metadata`
+    ] as const;
+    }
+
+    
+export const getGetApplicationsMetadataQueryOptions = <TData = Awaited<ReturnType<typeof getApplicationsMetadata>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplicationsMetadata>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetApplicationsMetadataQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApplicationsMetadata>>> = ({ signal }) => getApplicationsMetadata(requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn,   staleTime: 10000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getApplicationsMetadata>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetApplicationsMetadataQueryResult = NonNullable<Awaited<ReturnType<typeof getApplicationsMetadata>>>
+export type GetApplicationsMetadataQueryError = unknown
+
+
+export function useGetApplicationsMetadata<TData = Awaited<ReturnType<typeof getApplicationsMetadata>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplicationsMetadata>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApplicationsMetadata>>,
+          TError,
+          Awaited<ReturnType<typeof getApplicationsMetadata>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApplicationsMetadata<TData = Awaited<ReturnType<typeof getApplicationsMetadata>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplicationsMetadata>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApplicationsMetadata>>,
+          TError,
+          Awaited<ReturnType<typeof getApplicationsMetadata>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApplicationsMetadata<TData = Awaited<ReturnType<typeof getApplicationsMetadata>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplicationsMetadata>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+/**
+ * @summary Get application metadata (types, permissions)
+ */
+
+export function useGetApplicationsMetadata<TData = Awaited<ReturnType<typeof getApplicationsMetadata>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplicationsMetadata>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetApplicationsMetadataQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
  * @summary Get application by ID
  */
 export const getApplicationsId = (
@@ -1207,6 +1340,136 @@ export const useDeleteApplicationsId = <TError = ApiErrorResponse,
       > => {
 
       const mutationOptions = getDeleteApplicationsIdMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary Update application status (activate/deactivate)
+ */
+export const patchApplicationsIdStatus = (
+    id: number,
+    updateApplicationStatusRequest: UpdateApplicationStatusRequest,
+ options?: SecondParameter<typeof customInstance>,) => {
+      
+      
+      return customInstance<BooleanApiSuccessResponse>(
+      {url: `/applications/${id}/status`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: updateApplicationStatusRequest
+    },
+      options);
+    }
+  
+
+
+export const getPatchApplicationsIdStatusMutationOptions = <TError = ApiErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchApplicationsIdStatus>>, TError,{id: number;data: UpdateApplicationStatusRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof patchApplicationsIdStatus>>, TError,{id: number;data: UpdateApplicationStatusRequest}, TContext> => {
+
+const mutationKey = ['patchApplicationsIdStatus'];
+
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof patchApplicationsIdStatus>>, {id: number;data: UpdateApplicationStatusRequest}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  patchApplicationsIdStatus(id,data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PatchApplicationsIdStatusMutationResult = NonNullable<Awaited<ReturnType<typeof patchApplicationsIdStatus>>>
+    export type PatchApplicationsIdStatusMutationBody = UpdateApplicationStatusRequest
+    export type PatchApplicationsIdStatusMutationError = ApiErrorResponse
+
+    /**
+ * @summary Update application status (activate/deactivate)
+ */
+export const usePatchApplicationsIdStatus = <TError = ApiErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchApplicationsIdStatus>>, TError,{id: number;data: UpdateApplicationStatusRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof patchApplicationsIdStatus>>,
+        TError,
+        {id: number;data: UpdateApplicationStatusRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getPatchApplicationsIdStatusMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary Regenerate client secret (returns the new raw secret)
+ */
+export const postApplicationsIdSecretRegenerate = (
+    id: number,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<StringApiSuccessResponse>(
+      {url: `/applications/${id}/secret/regenerate`, method: 'POST', signal
+    },
+      options);
+    }
+  
+
+
+export const getPostApplicationsIdSecretRegenerateMutationOptions = <TError = ApiErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApplicationsIdSecretRegenerate>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof postApplicationsIdSecretRegenerate>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['postApplicationsIdSecretRegenerate'];
+
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postApplicationsIdSecretRegenerate>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  postApplicationsIdSecretRegenerate(id,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostApplicationsIdSecretRegenerateMutationResult = NonNullable<Awaited<ReturnType<typeof postApplicationsIdSecretRegenerate>>>
+    
+    export type PostApplicationsIdSecretRegenerateMutationError = ApiErrorResponse
+
+    /**
+ * @summary Regenerate client secret (returns the new raw secret)
+ */
+export const usePostApplicationsIdSecretRegenerate = <TError = ApiErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApplicationsIdSecretRegenerate>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postApplicationsIdSecretRegenerate>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+
+      const mutationOptions = getPostApplicationsIdSecretRegenerateMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }

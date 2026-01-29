@@ -33,7 +33,7 @@ function hasValidValue(
     return true
 }
 
-export function buildDslQuery(conditions: FilterCondition[], fields: FieldConfig[]): string {
+export function buildDslQuery<TData = unknown>(conditions: FilterCondition[], fields: FieldConfig<TData>[]): string {
     if (!conditions || conditions.length === 0) return ''
 
     const fieldMap = new Map(fields.map(f => [f.key, f]))
@@ -146,14 +146,14 @@ export function buildDslQuery(conditions: FilterCondition[], fields: FieldConfig
     return query.build()
 }
 
-function parseMultiValue(val: any): string[] {
-    return String(val)
+function parseMultiValue(val: unknown): string[] {
+    return String(val ?? '')
         .split(',')
         .map(v => v.trim())
         .filter(v => v !== '')
 }
 
-function parseMultiNumber(val: any): number[] {
+function parseMultiNumber(val: unknown): number[] {
     return parseMultiValue(val).map(Number).filter(n => !isNaN(n))
 }
 

@@ -19,9 +19,9 @@ import {
 import type { FilterCondition, FieldConfig, DataType } from './types'
 import { getOperatorsForDataType, getOperatorConfig } from './operators'
 
-interface FilterRowProps {
+interface FilterRowProps<TData = unknown> {
     condition: FilterCondition
-    fields: FieldConfig[]
+    fields: FieldConfig<TData>[]
     showOrButton: boolean // Whether to show OR button
     onChange: (id: string, updates: Partial<FilterCondition>) => void
     onRemove: (id: string) => void
@@ -29,7 +29,7 @@ interface FilterRowProps {
     canRemove?: boolean
 }
 
-export const FilterRow = memo(function FilterRow({
+const FilterRowInner = <TData,>({
     condition,
     fields,
     showOrButton,
@@ -37,7 +37,7 @@ export const FilterRow = memo(function FilterRow({
     onRemove,
     onAddAfter,
     canRemove = true
-}: FilterRowProps) {
+}: FilterRowProps<TData>) => {
     const theme = useTheme()
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
@@ -355,4 +355,6 @@ export const FilterRow = memo(function FilterRow({
             )}
         </Box>
     )
-})
+}
+
+export const FilterRow = memo(FilterRowInner) as typeof FilterRowInner

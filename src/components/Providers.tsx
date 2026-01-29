@@ -15,6 +15,8 @@ import AppReactToastify from '@/libs/styles/AppReactToastify'
 import { getMode, getSettingsFromCookie, getSystemMode } from '@core/utils/serverHelpers'
 import QueryProvider from '@/providers/query-provider'
 
+import { BreadcrumbsProvider } from '@/contexts/BreadcrumbsContext'
+
 type Props = ChildrenType & {
   direction: Direction
 }
@@ -34,7 +36,9 @@ const Providers = async (props: Props) => {
         <SettingsProvider settingsCookie={settingsCookie} mode={mode}>
           <ThemeProvider direction={direction} systemMode={systemMode}>
             <QueryProvider>
-              <ReduxProvider>{children}</ReduxProvider>
+              <BreadcrumbsProvider>
+                <ReduxProvider>{children}</ReduxProvider>
+              </BreadcrumbsProvider>
               <AppReactToastify direction={direction} hideProgressBar />
             </QueryProvider>
           </ThemeProvider>
