@@ -11,6 +11,15 @@ if (process.env.NODE_ENV === 'development') {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 }
 
+// Helper to decode JWT without external library validation (we trust our backend)
+function parseJwt(token: string) {
+  try {
+    return JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString())
+  } catch (e) {
+    return null
+  }
+}
+
 /**
  * Refresh access token using refresh_token grant
  */
@@ -36,18 +45,28 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
     const refreshedTokens = await response.json()
 
     if (!response.ok) {
+      console.error('[AUTH] Refresh failed:', refreshedTokens)
       throw refreshedTokens
+    }
+
+    // Calculate new expiresAt
+    let expiresAt = Date.now() / 1000 + refreshedTokens.expires_in
+    if (refreshedTokens.access_token) {
+      const decoded = parseJwt(refreshedTokens.access_token)
+      if (decoded && decoded.exp) {
+        expiresAt = decoded.exp
+      }
     }
 
     return {
       ...token,
       accessToken: refreshedTokens.access_token,
       refreshToken: refreshedTokens.refresh_token ?? token.refreshToken,
-      expiresAt: Date.now() / 1000 + refreshedTokens.expires_in,
+      expiresAt: expiresAt,
       error: undefined,
     }
   } catch (error) {
-    console.error('Error refreshing access token', error)
+    console.error('[AUTH] Error refreshing access token', error)
     return {
       ...token,
       error: 'RefreshAccessTokenError',
@@ -165,11 +184,20 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user, account }) {
       // Initial sign in with OAuth - store tokens
       if (account && account.access_token) {
+        // Calculate expiresAt ourselves using expires_in (default to 900s if missing)
+        let expiresAt = Math.floor(Date.now() / 1000) + (typeof account.expires_in === 'number' ? account.expires_in : 900)
+
+        // Try to get exact exp from token
+        const decoded = parseJwt(account.access_token)
+        if (decoded && decoded.exp) {
+          expiresAt = decoded.exp
+        }
+
         return {
           ...token,
           accessToken: account.access_token,
           refreshToken: account.refresh_token,
-          expiresAt: account.expires_at,
+          expiresAt: expiresAt,
         }
       }
 
@@ -182,7 +210,10 @@ export const authOptions: NextAuthOptions = {
       }
 
       // Return previous token if not expired (with 10s buffer)
-      if (token.expiresAt && Date.now() / 1000 < (token.expiresAt as number) - 10) {
+      const now = Math.floor(Date.now() / 1000)
+      const expiresAt = token.expiresAt as number
+
+      if (token.expiresAt && now < expiresAt - 10) {
         return token
       }
 
@@ -194,6 +225,7 @@ export const authOptions: NextAuthOptions = {
       // No refresh token available, just return token as-is
       return token
     },
+
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string || token.sub as string

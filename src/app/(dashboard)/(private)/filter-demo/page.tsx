@@ -15,8 +15,6 @@ const subSiteFields: FieldConfig<ApplicationDto>[] = [
     { name: 'ID', key: 'id', dataType: 'int' },
     { name: 'Display Name', key: 'displayName', dataType: 'string' },
     { name: 'Client ID', key: 'clientId', dataType: 'string', enableSorting: false },
-    { name: 'Redirect URIs', key: 'redirectUris', dataType: 'string', enableSorting: false },
-    { name: 'Post Logout Redirect URIs', key: 'postLogoutRedirectUris', dataType: 'string', enableSorting: false },
     { name: 'Permissions', key: 'permissions', dataType: 'string', enableSorting: false },
     { name: 'Application Type', key: 'applicationType', dataType: 'string', enableSorting: false },
     { name: 'Client Type', key: 'clientType', dataType: 'string', enableSorting: false },
