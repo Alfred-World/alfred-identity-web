@@ -8,5 +8,8 @@ export const ROUTES = {
     LIST: '/applications',
     CREATE: '/applications/create',
     EDIT: (id: string | number) => `/applications/${id}`
+  },
+  ROLES: {
+    LIST: '/roles'
   }
 }

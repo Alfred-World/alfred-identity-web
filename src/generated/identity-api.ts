@@ -215,6 +215,9 @@ export interface CreateApplicationRequest {
 
 export interface CreateRoleCommand {
   name?: string;
+
+  /** @nullable */
+  icon?: string | null;
 }
 
 export interface CreateRoleResult {
@@ -339,6 +342,9 @@ export interface RoleDto {
   isImmutable?: boolean;
   isSystem?: boolean;
   createdAt?: string;
+
+  /** @nullable */
+  icon?: string | null;
 }
 
 /**
@@ -548,6 +554,9 @@ export interface UpdateApplicationStatusRequest {
 export interface UpdateRoleCommand {
   id?: number;
   name?: string;
+
+  /** @nullable */
+  icon?: string | null;
 }
 
 export interface UpdateRoleResult {

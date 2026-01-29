@@ -67,7 +67,8 @@ async function generateIconsCSS() {
   const sources: BundleScriptConfig = {
     json: [
       // Iconify JSON file (@iconify/json is a package name, /json/ is directory where files are, then filename)
-      require.resolve('@iconify/json/json/tabler.json')
+      require.resolve('@iconify/json/json/tabler.json'),
+      require.resolve('@iconify/json/json/solar.json'),
 
       // Custom file with only few icons
       /* {
@@ -238,6 +239,17 @@ async function generateIconsCSS() {
   await fs.writeFile(target, cssContent, 'utf8')
 
   console.log(`Saved CSS to ${target}!`)
+
+  // Generate JSON with all icon names in public folder
+  const iconNames = allIcons.flatMap(iconSet =>
+    Object.keys(iconSet.icons).map(name => `${iconSet.prefix || 'icon'}-${name}`)
+  )
+
+  const publicDir = join(__dirname, '../../../public')
+  const jsonTarget = join(publicDir, 'icons.json')
+  await fs.writeFile(jsonTarget, JSON.stringify(iconNames), 'utf8')
+
+  console.log(`Saved JSON to ${jsonTarget}!`)
 }
 
 generateIconsCSS().catch(err => {

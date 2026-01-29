@@ -23,6 +23,11 @@ const verticalMenuData = (): VerticalMenuDataType[] => [
     label: 'Applications',
     icon: 'tabler-apps',
     href: ROUTES.APPLICATIONS.LIST
+  },
+  {
+    label: 'Roles & Permissions',
+    icon: 'tabler-lock',
+    href: ROUTES.ROLES.LIST
   }
 ]
 
