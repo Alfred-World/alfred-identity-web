@@ -129,6 +129,7 @@ const Login = ({ mode }: { mode: SystemMode }) => {
   )
 
   // Handle SSO token from redirect flow (from AuthRedirect -> check-sso -> back here)
+  // Also handle start_oauth param to trigger OAuth flow after SSO login
   useEffect(() => {
     if (ssoCheckRef.current) return
     ssoCheckRef.current = true
@@ -136,7 +137,18 @@ const Login = ({ mode }: { mode: SystemMode }) => {
     const handleSsoToken = async () => {
       const ssoToken = searchParams.get('sso_token')
       const ssoError = searchParams.get('sso_error')
+      const startOAuth = searchParams.get('start_oauth')
+      const callbackUrl = searchParams.get('callbackUrl') || '/dashboards/crm'
       const redirectTo = searchParams.get('redirectTo') || '/dashboards/crm'
+
+      // If start_oauth=true, trigger OAuth flow to get access tokens
+      // This happens after SSO login sets the cookie
+      if (startOAuth === 'true') {
+        // Call signIn with sso-oauth provider - this will redirect to Gateway
+        // Gateway will see SSO cookie and auto-approve, returning with tokens
+        signIn('sso-oauth', { callbackUrl })
+        return
+      }
 
       // If SSO check returned error, just show login form
       if (ssoError) {
@@ -165,8 +177,8 @@ const Login = ({ mode }: { mode: SystemMode }) => {
               return
             }
           }
-        } catch (error) {
-          console.error('[SSO] Error exchanging SSO token:', error)
+        } catch {
+          // SSO token exchange failed, show login form
         }
       }
 
@@ -180,14 +192,13 @@ const Login = ({ mode }: { mode: SystemMode }) => {
 
   const onSubmit: SubmitHandler<FormData> = async (data: FormData) => {
     try {
-
-      // Check if this is SSO flow (has returnUrl from Gateway) or direct login
-      const returnUrlParam = searchParams.get('returnUrl')
-
-      // For direct login, use sso.test dashboard as return destination
-      // SSO cookie will still be set on gateway.test for cross-site SSO
+      // Build return URL that will trigger OAuth after SSO cookie is set
       const ssoAppUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://sso.test'
-      const returnUrl = returnUrlParam || `${ssoAppUrl}/dashboards/crm`
+      const finalDestination = searchParams.get('returnUrl') || '/dashboards/crm'
+
+      // After exchange-token, redirect to login with start_oauth=true
+      // This will trigger signIn('sso-oauth') to complete the OAuth flow
+      const returnUrl = `${ssoAppUrl}/login?start_oauth=true&callbackUrl=${encodeURIComponent(finalDestination)}`
 
       const response = await postIdentityAuthSsoLogin({
         identity: data.email,
@@ -205,7 +216,7 @@ const Login = ({ mode }: { mode: SystemMode }) => {
 
       if (exchangeUrl) {
         // Navigate to Gateway exchange-token to set SSO cookie
-        // This works for both SSO flow and direct login
+        // After that, will redirect back with start_oauth=true
         window.location.href = exchangeUrl
       } else {
         setErrorState({ message: ['Exchange URL not received'] })
