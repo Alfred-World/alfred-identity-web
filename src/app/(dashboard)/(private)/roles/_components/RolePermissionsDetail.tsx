@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
+
 import {
   useInfiniteQuery,
   type InfiniteData,
@@ -43,7 +44,9 @@ const getItemsFromPage = (page: ApiReturn<PermissionDtoPageResult>) => {
   if (page.success && page.result?.items) {
     return page.result.items
   }
-  return []
+
+  
+return []
 }
 
 const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) => {
@@ -73,7 +76,9 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
       if (lastPage.success && lastPage.result?.hasNextPage) {
         return (lastPage.result.page || 0) + 1
       }
-      return undefined
+
+      
+return undefined
     }
   })
 
@@ -83,12 +88,13 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
   }, [infiniteData])
 
   // -- 2. Current Role Permissions --
-  const [selectedPermissionIds, setSelectedPermissionIds] = useState<number[]>([])
+  const [selectedPermissionIds, setSelectedPermissionIds] = useState<string[]>([])
 
   // Sync state with role permissions
   useEffect(() => {
     if (role?.permissions && Array.isArray(role.permissions)) {
       const newIds = role.permissions.map(p => p.id!).filter(id => id !== undefined)
+
       setSelectedPermissionIds(newIds)
     }
   }, [role])
@@ -100,6 +106,7 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
       onSuccess: (data: any) => {
         if (data.success) {
           toast.success('Permissions updated successfully')
+
           // Force a reload of the current page to get updated role data (including permissions)
           window.location.reload()
         } else {
@@ -113,6 +120,7 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
   // -- 4. Infinite Scroll Observer --
   const handleObserver = useCallback((entries: IntersectionObserverEntry[]) => {
     const target = entries[0]
+
     if (target.isIntersecting && hasNextPage && !isFetchingNextPage) {
       fetchNextPage()
     }
@@ -142,6 +150,7 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
 
     allPermissions.forEach(p => {
       const resource = p.resource || 'Other'
+
       if (!groups[resource]) groups[resource] = []
       groups[resource].push(p)
     })
@@ -152,7 +161,7 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
 
   // -- 6. Action Handlers --
 
-  const handleToggle = (id: number) => {
+  const handleToggle = (id: string) => {
     setSelectedPermissionIds(prev =>
       prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
     )
@@ -164,7 +173,9 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
     setSelectedPermissionIds(prev => {
       // Add only IDs that aren't already selected
       const newIds = idsToSelect.filter(id => !prev.includes(id))
-      return [...prev, ...newIds]
+
+      
+return [...prev, ...newIds]
     })
   }
 
@@ -184,6 +195,7 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
   const handleReset = () => {
     if (role?.permissions && Array.isArray(role.permissions)) {
       const newIds = role.permissions.map(p => p.id!).filter(id => id !== undefined)
+
       if (newIds.length > 0) {
         setSelectedPermissionIds(newIds)
       } else {

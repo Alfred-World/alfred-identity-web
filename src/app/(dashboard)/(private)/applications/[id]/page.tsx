@@ -1,8 +1,10 @@
 'use client'
 
 import { use } from 'react'
-import { Box, Typography, CircularProgress } from '@mui/material'
+
 import { useRouter } from 'next/navigation'
+
+import { Box, Typography, CircularProgress } from '@mui/material'
 import { toast } from 'react-toastify'
 
 import { useGetApplicationsId, usePutApplicationsId, type UpdateApplicationRequest, type ApplicationDto } from '@/generated'
@@ -12,10 +14,11 @@ import { ROUTES } from '@/configs/routes'
 
 export default function EditApplicationPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params)
-  const id = parseInt(resolvedParams.id)
+  const id = resolvedParams.id
   const router = useRouter()
 
   const { data: applicationData, isLoading: isFetching } = useGetApplicationsId(id)
+
   const { mutate: updateApplication, isPending: isUpdating } = usePutApplicationsId({
     mutation: {
       onSuccess: (data) => {
@@ -24,6 +27,7 @@ export default function EditApplicationPage({ params }: { params: Promise<{ id: 
           router.push(ROUTES.APPLICATIONS.LIST)
         } else {
           const errors = (data as ApiReturnFailure)?.errors
+
           if (errors && Array.isArray(errors)) {
             errors.forEach((err) => toast.error(err.message))
           } else {
@@ -34,6 +38,7 @@ export default function EditApplicationPage({ params }: { params: Promise<{ id: 
       onError: (e: unknown) => {
         const error = e as { response?: { data?: ApiReturnFailure | { title?: string; errors?: Record<string, string[]> } }; message?: string }
         const errorData = error.response?.data
+
         if (errorData && 'errors' in errorData && typeof errorData.errors === 'object') {
           Object.values(errorData.errors as Record<string, string[]>).flat().forEach((msg) => toast.error(String(msg)))
         } else {
@@ -69,6 +74,7 @@ export default function EditApplicationPage({ params }: { params: Promise<{ id: 
       postLogoutRedirectUris: data.postLogoutRedirectUris || null,
       permissions: data.permissions || null
     }
+
     updateApplication({ id, data: payload })
   }
 

@@ -13,7 +13,7 @@ import { useGetRoles, useDeleteRolesId } from '@/generated/identity-api'
 import type { RoleDto } from '@/generated/identity-api'
 
 const RolesPage = () => {
-  const [selectedRoleId, setSelectedRoleId] = useState<number | null>(null)
+  const [selectedRoleId, setSelectedRoleId] = useState<string | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [editingRole, setEditingRole] = useState<RoleDto | null>(null)
@@ -47,6 +47,7 @@ const RolesPage = () => {
           refetchRoles()
           setIsDeleteDialogOpen(false)
           setRoleToDelete(null)
+
           // If deleted role was selected, clear selection
           if (selectedRoleId) setSelectedRoleId(null)
         } else {

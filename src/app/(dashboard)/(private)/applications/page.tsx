@@ -1,7 +1,9 @@
 'use client'
 
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo , useEffect } from 'react'
+
 import Link from 'next/link'
+
 import { Box, Grid, Typography, Button } from '@mui/material'
 
 import { DslQueryBuilder, type FieldConfig, type FilterCondition } from '@/components/dsl-query-builder'
@@ -12,7 +14,6 @@ import type { ApplicationDto } from '@/generated'
 
 import { ApplicationListActions } from './_components/ApplicationListActions'
 import { useBreadcrumbs } from '@/contexts/BreadcrumbsContext'
-import { useEffect } from 'react'
 import { ROUTES } from '@/configs/routes'
 
 export default function ApplicationsPage() {
@@ -43,27 +44,6 @@ export default function ApplicationsPage() {
 
   // Field config for Applications - memoized to include refetch in actions
   const applicationFields: FieldConfig<ApplicationDto>[] = useMemo(() => [
-    {
-      name: 'ID',
-      key: 'id',
-      dataType: 'int',
-      width: 80,
-      enableSorting: true,
-      renderCell: (value) => (
-        <Typography
-          component={Link}
-          href={ROUTES.APPLICATIONS.EDIT(value as number)}
-          color="primary"
-          sx={{
-            textDecoration: 'none',
-            fontWeight: 600,
-            '&:hover': { textDecoration: 'underline', color: 'primary.dark' }
-          }}
-        >
-          #{value as number}
-        </Typography>
-      )
-    },
     {
       name: 'Display Name',
       key: 'displayName',

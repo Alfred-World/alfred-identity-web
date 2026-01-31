@@ -12,7 +12,7 @@ import { toast } from 'react-toastify'
 import { useDeleteApplicationsId } from '@/generated'
 
 interface ApplicationListActionsProps {
-  id: number
+  id: string
   displayName: string
   onDeleteSuccess?: () => void
 }
@@ -32,6 +32,7 @@ export const ApplicationListActions = ({ id, displayName, onDeleteSuccess }: App
       },
       onError: (error) => {
         const message = error.errors[0].message || 'Failed to delete application'
+
         toast.error(message)
       }
     }
@@ -104,7 +105,11 @@ export const ApplicationListActions = ({ id, displayName, onDeleteSuccess }: App
           <ListItemIcon>
             <i className='tabler-trash text-xl text-error' />
           </ListItemIcon>
-          <ListItemText primaryTypographyProps={{ color: 'error' }}>Delete</ListItemText>
+          <ListItemText slotProps={{
+            primary: {
+              color: 'error'
+            }
+          }}>Delete</ListItemText>
         </MenuItem>
       </Menu>
 

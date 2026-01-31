@@ -26,8 +26,8 @@ import type { RoleDto } from '@/generated/identity-api'
 
 interface RoleListProps {
   roles: RoleDto[]
-  selectedRoleId: number | null
-  onSelectRole: (id: number) => void
+  selectedRoleId: string | null
+  onSelectRole: (id: string) => void
   onAddClick: () => void
   onEditRole: (role: RoleDto) => void
   onDeleteRole: (role: RoleDto) => void

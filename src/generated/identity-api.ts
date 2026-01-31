@@ -68,7 +68,7 @@ export interface ApiErrorResponse {
 }
 
 export interface ApplicationDto {
-  id?: number;
+  id?: string;
   clientId?: string;
 
   /** @nullable */
@@ -260,7 +260,7 @@ export interface CreateRoleResult {
   success?: boolean;
 
   /** @nullable */
-  roleId?: number | null;
+  roleId?: string | null;
 
   /** @nullable */
   error?: string | null;
@@ -319,7 +319,7 @@ export interface ObjectApiSuccessResponse {
 }
 
 export interface PermissionDto {
-  id?: number;
+  id?: string;
   code?: string;
   name?: string;
 
@@ -427,7 +427,7 @@ export interface RevokeRolesFromUserResultApiSuccessResponse {
 }
 
 export interface RoleDto {
-  id?: number;
+  id?: string;
 
   /** @nullable */
   name?: string | null;
@@ -513,8 +513,8 @@ export interface RotateSigningKeyResult {
  */
 export interface SessionUserInfoDto {
 
-  /** User ID (long/int64 - matches DB schema) */
-  id?: number;
+  /** User ID (Guid - matches DB schema) */
+  id?: string;
   email?: string;
 
   /** @nullable */
@@ -678,7 +678,7 @@ export interface UpdateApplicationStatusRequest {
 }
 
 export interface UpdateRoleCommand {
-  id?: number;
+  id?: string;
   name?: string;
 
   /** @nullable */
@@ -711,7 +711,7 @@ export interface UpdateRoleResultApiSuccessResponse {
 }
 
 export interface UserDto {
-  id?: number;
+  id?: string;
   userName?: string;
   email?: string;
   fullName?: string;
@@ -748,7 +748,7 @@ export interface UserDtoPageResult {
 }
 
 export interface UserInfo {
-  id?: number;
+  id?: string;
   email?: string;
 
   /** @nullable */
@@ -1278,7 +1278,7 @@ export function useGetApplicationsMetadata<TData = Awaited<ReturnType<typeof get
  * @summary Get application by ID
  */
 export const getApplicationsId = (
-    id: number,
+    id: string,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
       
@@ -1292,14 +1292,14 @@ export const getApplicationsId = (
 
 
 
-export const getGetApplicationsIdQueryKey = (id?: number,) => {
+export const getGetApplicationsIdQueryKey = (id?: string,) => {
     return [
     `/applications/${id}`
     ] as const;
     }
 
     
-export const getGetApplicationsIdQueryOptions = <TData = Awaited<ReturnType<typeof getApplicationsId>>, TError = ApiErrorResponse>(id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplicationsId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getGetApplicationsIdQueryOptions = <TData = Awaited<ReturnType<typeof getApplicationsId>>, TError = ApiErrorResponse>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplicationsId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -1322,7 +1322,7 @@ export type GetApplicationsIdQueryError = ApiErrorResponse
 
 
 export function useGetApplicationsId<TData = Awaited<ReturnType<typeof getApplicationsId>>, TError = ApiErrorResponse>(
- id: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplicationsId>>, TError, TData>> & Pick<
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplicationsId>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getApplicationsId>>,
           TError,
@@ -1332,7 +1332,7 @@ export function useGetApplicationsId<TData = Awaited<ReturnType<typeof getApplic
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetApplicationsId<TData = Awaited<ReturnType<typeof getApplicationsId>>, TError = ApiErrorResponse>(
- id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplicationsId>>, TError, TData>> & Pick<
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplicationsId>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getApplicationsId>>,
           TError,
@@ -1342,7 +1342,7 @@ export function useGetApplicationsId<TData = Awaited<ReturnType<typeof getApplic
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetApplicationsId<TData = Awaited<ReturnType<typeof getApplicationsId>>, TError = ApiErrorResponse>(
- id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplicationsId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplicationsId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
@@ -1351,7 +1351,7 @@ export function useGetApplicationsId<TData = Awaited<ReturnType<typeof getApplic
  */
 
 export function useGetApplicationsId<TData = Awaited<ReturnType<typeof getApplicationsId>>, TError = ApiErrorResponse>(
- id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplicationsId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplicationsId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -1372,7 +1372,7 @@ export function useGetApplicationsId<TData = Awaited<ReturnType<typeof getApplic
  * @summary Update an existing application
  */
 export const putApplicationsId = (
-    id: number,
+    id: string,
     updateApplicationRequest: UpdateApplicationRequest,
  options?: SecondParameter<typeof customInstance>,) => {
       
@@ -1388,8 +1388,8 @@ export const putApplicationsId = (
 
 
 export const getPutApplicationsIdMutationOptions = <TError = ApiErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putApplicationsId>>, TError,{id: number;data: UpdateApplicationRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof putApplicationsId>>, TError,{id: number;data: UpdateApplicationRequest}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putApplicationsId>>, TError,{id: string;data: UpdateApplicationRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof putApplicationsId>>, TError,{id: string;data: UpdateApplicationRequest}, TContext> => {
 
 const mutationKey = ['putApplicationsId'];
 
@@ -1402,7 +1402,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putApplicationsId>>, {id: number;data: UpdateApplicationRequest}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putApplicationsId>>, {id: string;data: UpdateApplicationRequest}> = (props) => {
           const {id,data} = props ?? {};
 
           return  putApplicationsId(id,data,requestOptions)
@@ -1421,11 +1421,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
  * @summary Update an existing application
  */
 export const usePutApplicationsId = <TError = ApiErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putApplicationsId>>, TError,{id: number;data: UpdateApplicationRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putApplicationsId>>, TError,{id: string;data: UpdateApplicationRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof putApplicationsId>>,
         TError,
-        {id: number;data: UpdateApplicationRequest},
+        {id: string;data: UpdateApplicationRequest},
         TContext
       > => {
 
@@ -1438,7 +1438,7 @@ export const usePutApplicationsId = <TError = ApiErrorResponse,
  * @summary Delete an application
  */
 export const deleteApplicationsId = (
-    id: number,
+    id: string,
  options?: SecondParameter<typeof customInstance>,) => {
       
       
@@ -1451,8 +1451,8 @@ export const deleteApplicationsId = (
 
 
 export const getDeleteApplicationsIdMutationOptions = <TError = ApiErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteApplicationsId>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof deleteApplicationsId>>, TError,{id: number}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteApplicationsId>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteApplicationsId>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['deleteApplicationsId'];
 
@@ -1465,7 +1465,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteApplicationsId>>, {id: number}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteApplicationsId>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
           return  deleteApplicationsId(id,requestOptions)
@@ -1484,11 +1484,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
  * @summary Delete an application
  */
 export const useDeleteApplicationsId = <TError = ApiErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteApplicationsId>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteApplicationsId>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof deleteApplicationsId>>,
         TError,
-        {id: number},
+        {id: string},
         TContext
       > => {
 
@@ -1501,7 +1501,7 @@ export const useDeleteApplicationsId = <TError = ApiErrorResponse,
  * @summary Update application status (activate/deactivate)
  */
 export const patchApplicationsIdStatus = (
-    id: number,
+    id: string,
     updateApplicationStatusRequest: UpdateApplicationStatusRequest,
  options?: SecondParameter<typeof customInstance>,) => {
       
@@ -1517,8 +1517,8 @@ export const patchApplicationsIdStatus = (
 
 
 export const getPatchApplicationsIdStatusMutationOptions = <TError = ApiErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchApplicationsIdStatus>>, TError,{id: number;data: UpdateApplicationStatusRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof patchApplicationsIdStatus>>, TError,{id: number;data: UpdateApplicationStatusRequest}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchApplicationsIdStatus>>, TError,{id: string;data: UpdateApplicationStatusRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof patchApplicationsIdStatus>>, TError,{id: string;data: UpdateApplicationStatusRequest}, TContext> => {
 
 const mutationKey = ['patchApplicationsIdStatus'];
 
@@ -1531,7 +1531,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof patchApplicationsIdStatus>>, {id: number;data: UpdateApplicationStatusRequest}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof patchApplicationsIdStatus>>, {id: string;data: UpdateApplicationStatusRequest}> = (props) => {
           const {id,data} = props ?? {};
 
           return  patchApplicationsIdStatus(id,data,requestOptions)
@@ -1550,11 +1550,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
  * @summary Update application status (activate/deactivate)
  */
 export const usePatchApplicationsIdStatus = <TError = ApiErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchApplicationsIdStatus>>, TError,{id: number;data: UpdateApplicationStatusRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchApplicationsIdStatus>>, TError,{id: string;data: UpdateApplicationStatusRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof patchApplicationsIdStatus>>,
         TError,
-        {id: number;data: UpdateApplicationStatusRequest},
+        {id: string;data: UpdateApplicationStatusRequest},
         TContext
       > => {
 
@@ -1567,7 +1567,7 @@ export const usePatchApplicationsIdStatus = <TError = ApiErrorResponse,
  * @summary Regenerate client secret (returns the new raw secret)
  */
 export const postApplicationsIdSecretRegenerate = (
-    id: number,
+    id: string,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
       
@@ -1581,8 +1581,8 @@ export const postApplicationsIdSecretRegenerate = (
 
 
 export const getPostApplicationsIdSecretRegenerateMutationOptions = <TError = ApiErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApplicationsIdSecretRegenerate>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof postApplicationsIdSecretRegenerate>>, TError,{id: number}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApplicationsIdSecretRegenerate>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof postApplicationsIdSecretRegenerate>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['postApplicationsIdSecretRegenerate'];
 
@@ -1595,7 +1595,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postApplicationsIdSecretRegenerate>>, {id: number}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postApplicationsIdSecretRegenerate>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
           return  postApplicationsIdSecretRegenerate(id,requestOptions)
@@ -1614,11 +1614,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
  * @summary Regenerate client secret (returns the new raw secret)
  */
 export const usePostApplicationsIdSecretRegenerate = <TError = ApiErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApplicationsIdSecretRegenerate>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApplicationsIdSecretRegenerate>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof postApplicationsIdSecretRegenerate>>,
         TError,
-        {id: number},
+        {id: string},
         TContext
       > => {
 
@@ -3029,7 +3029,7 @@ export const usePostRoles = <TError = ProblemDetails,
  * @summary Get role by ID
  */
 export const getRolesId = (
-    id: number,
+    id: string,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
       
@@ -3043,14 +3043,14 @@ export const getRolesId = (
 
 
 
-export const getGetRolesIdQueryKey = (id?: number,) => {
+export const getGetRolesIdQueryKey = (id?: string,) => {
     return [
     `/roles/${id}`
     ] as const;
     }
 
     
-export const getGetRolesIdQueryOptions = <TData = Awaited<ReturnType<typeof getRolesId>>, TError = ProblemDetails>(id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRolesId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getGetRolesIdQueryOptions = <TData = Awaited<ReturnType<typeof getRolesId>>, TError = ProblemDetails>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRolesId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -3073,7 +3073,7 @@ export type GetRolesIdQueryError = ProblemDetails
 
 
 export function useGetRolesId<TData = Awaited<ReturnType<typeof getRolesId>>, TError = ProblemDetails>(
- id: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRolesId>>, TError, TData>> & Pick<
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRolesId>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getRolesId>>,
           TError,
@@ -3083,7 +3083,7 @@ export function useGetRolesId<TData = Awaited<ReturnType<typeof getRolesId>>, TE
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetRolesId<TData = Awaited<ReturnType<typeof getRolesId>>, TError = ProblemDetails>(
- id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRolesId>>, TError, TData>> & Pick<
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRolesId>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getRolesId>>,
           TError,
@@ -3093,7 +3093,7 @@ export function useGetRolesId<TData = Awaited<ReturnType<typeof getRolesId>>, TE
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetRolesId<TData = Awaited<ReturnType<typeof getRolesId>>, TError = ProblemDetails>(
- id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRolesId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRolesId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
@@ -3102,7 +3102,7 @@ export function useGetRolesId<TData = Awaited<ReturnType<typeof getRolesId>>, TE
  */
 
 export function useGetRolesId<TData = Awaited<ReturnType<typeof getRolesId>>, TError = ProblemDetails>(
- id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRolesId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRolesId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -3123,7 +3123,7 @@ export function useGetRolesId<TData = Awaited<ReturnType<typeof getRolesId>>, TE
  * @summary Update an existing role
  */
 export const putRolesId = (
-    id: number,
+    id: string,
     updateRoleCommand: UpdateRoleCommand,
  options?: SecondParameter<typeof customInstance>,) => {
       
@@ -3139,8 +3139,8 @@ export const putRolesId = (
 
 
 export const getPutRolesIdMutationOptions = <TError = ProblemDetails,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putRolesId>>, TError,{id: number;data: UpdateRoleCommand}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof putRolesId>>, TError,{id: number;data: UpdateRoleCommand}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putRolesId>>, TError,{id: string;data: UpdateRoleCommand}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof putRolesId>>, TError,{id: string;data: UpdateRoleCommand}, TContext> => {
 
 const mutationKey = ['putRolesId'];
 
@@ -3153,7 +3153,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putRolesId>>, {id: number;data: UpdateRoleCommand}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putRolesId>>, {id: string;data: UpdateRoleCommand}> = (props) => {
           const {id,data} = props ?? {};
 
           return  putRolesId(id,data,requestOptions)
@@ -3172,11 +3172,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
  * @summary Update an existing role
  */
 export const usePutRolesId = <TError = ProblemDetails,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putRolesId>>, TError,{id: number;data: UpdateRoleCommand}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putRolesId>>, TError,{id: string;data: UpdateRoleCommand}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof putRolesId>>,
         TError,
-        {id: number;data: UpdateRoleCommand},
+        {id: string;data: UpdateRoleCommand},
         TContext
       > => {
 
@@ -3189,7 +3189,7 @@ export const usePutRolesId = <TError = ProblemDetails,
  * @summary Delete a role
  */
 export const deleteRolesId = (
-    id: number,
+    id: string,
  options?: SecondParameter<typeof customInstance>,) => {
       
       
@@ -3202,8 +3202,8 @@ export const deleteRolesId = (
 
 
 export const getDeleteRolesIdMutationOptions = <TError = ProblemDetails,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteRolesId>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof deleteRolesId>>, TError,{id: number}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteRolesId>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteRolesId>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['deleteRolesId'];
 
@@ -3216,7 +3216,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteRolesId>>, {id: number}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteRolesId>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
           return  deleteRolesId(id,requestOptions)
@@ -3235,11 +3235,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
  * @summary Delete a role
  */
 export const useDeleteRolesId = <TError = ProblemDetails,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteRolesId>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteRolesId>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof deleteRolesId>>,
         TError,
-        {id: number},
+        {id: string},
         TContext
       > => {
 
@@ -3252,8 +3252,8 @@ export const useDeleteRolesId = <TError = ProblemDetails,
  * @summary Assign permissions to a role
  */
 export const postRolesIdPermissions = (
-    id: number,
-    postRolesIdPermissionsBody: number[],
+    id: string,
+    postRolesIdPermissionsBody: string[],
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
       
@@ -3269,8 +3269,8 @@ export const postRolesIdPermissions = (
 
 
 export const getPostRolesIdPermissionsMutationOptions = <TError = ProblemDetails,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postRolesIdPermissions>>, TError,{id: number;data: number[]}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof postRolesIdPermissions>>, TError,{id: number;data: number[]}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postRolesIdPermissions>>, TError,{id: string;data: string[]}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof postRolesIdPermissions>>, TError,{id: string;data: string[]}, TContext> => {
 
 const mutationKey = ['postRolesIdPermissions'];
 
@@ -3283,7 +3283,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postRolesIdPermissions>>, {id: number;data: number[]}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postRolesIdPermissions>>, {id: string;data: string[]}> = (props) => {
           const {id,data} = props ?? {};
 
           return  postRolesIdPermissions(id,data,requestOptions)
@@ -3295,18 +3295,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type PostRolesIdPermissionsMutationResult = NonNullable<Awaited<ReturnType<typeof postRolesIdPermissions>>>
-    export type PostRolesIdPermissionsMutationBody = number[]
+    export type PostRolesIdPermissionsMutationBody = string[]
     export type PostRolesIdPermissionsMutationError = ProblemDetails
 
     /**
  * @summary Assign permissions to a role
  */
 export const usePostRolesIdPermissions = <TError = ProblemDetails,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postRolesIdPermissions>>, TError,{id: number;data: number[]}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postRolesIdPermissions>>, TError,{id: string;data: string[]}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof postRolesIdPermissions>>,
         TError,
-        {id: number;data: number[]},
+        {id: string;data: string[]},
         TContext
       > => {
 
@@ -3319,8 +3319,8 @@ export const usePostRolesIdPermissions = <TError = ProblemDetails,
  * @summary Remove permissions from a role
  */
 export const deleteRolesIdPermissions = (
-    id: number,
-    deleteRolesIdPermissionsBody: number[],
+    id: string,
+    deleteRolesIdPermissionsBody: string[],
  options?: SecondParameter<typeof customInstance>,) => {
       
       
@@ -3335,8 +3335,8 @@ export const deleteRolesIdPermissions = (
 
 
 export const getDeleteRolesIdPermissionsMutationOptions = <TError = ProblemDetails,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteRolesIdPermissions>>, TError,{id: number;data: number[]}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof deleteRolesIdPermissions>>, TError,{id: number;data: number[]}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteRolesIdPermissions>>, TError,{id: string;data: string[]}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteRolesIdPermissions>>, TError,{id: string;data: string[]}, TContext> => {
 
 const mutationKey = ['deleteRolesIdPermissions'];
 
@@ -3349,7 +3349,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteRolesIdPermissions>>, {id: number;data: number[]}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteRolesIdPermissions>>, {id: string;data: string[]}> = (props) => {
           const {id,data} = props ?? {};
 
           return  deleteRolesIdPermissions(id,data,requestOptions)
@@ -3361,18 +3361,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type DeleteRolesIdPermissionsMutationResult = NonNullable<Awaited<ReturnType<typeof deleteRolesIdPermissions>>>
-    export type DeleteRolesIdPermissionsMutationBody = number[]
+    export type DeleteRolesIdPermissionsMutationBody = string[]
     export type DeleteRolesIdPermissionsMutationError = ProblemDetails
 
     /**
  * @summary Remove permissions from a role
  */
 export const useDeleteRolesIdPermissions = <TError = ProblemDetails,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteRolesIdPermissions>>, TError,{id: number;data: number[]}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteRolesIdPermissions>>, TError,{id: string;data: string[]}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof deleteRolesIdPermissions>>,
         TError,
-        {id: number;data: number[]},
+        {id: string;data: string[]},
         TContext
       > => {
 
@@ -3481,8 +3481,8 @@ export function useGetUsers<TData = Awaited<ReturnType<typeof getUsers>>, TError
  * @summary Assign roles to a user
  */
 export const postUsersUserIdRoles = (
-    userId: number,
-    postUsersUserIdRolesBody: number[],
+    userId: string,
+    postUsersUserIdRolesBody: string[],
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
       
@@ -3498,8 +3498,8 @@ export const postUsersUserIdRoles = (
 
 
 export const getPostUsersUserIdRolesMutationOptions = <TError = ProblemDetails,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postUsersUserIdRoles>>, TError,{userId: number;data: number[]}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof postUsersUserIdRoles>>, TError,{userId: number;data: number[]}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postUsersUserIdRoles>>, TError,{userId: string;data: string[]}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof postUsersUserIdRoles>>, TError,{userId: string;data: string[]}, TContext> => {
 
 const mutationKey = ['postUsersUserIdRoles'];
 
@@ -3512,7 +3512,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postUsersUserIdRoles>>, {userId: number;data: number[]}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postUsersUserIdRoles>>, {userId: string;data: string[]}> = (props) => {
           const {userId,data} = props ?? {};
 
           return  postUsersUserIdRoles(userId,data,requestOptions)
@@ -3524,18 +3524,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type PostUsersUserIdRolesMutationResult = NonNullable<Awaited<ReturnType<typeof postUsersUserIdRoles>>>
-    export type PostUsersUserIdRolesMutationBody = number[]
+    export type PostUsersUserIdRolesMutationBody = string[]
     export type PostUsersUserIdRolesMutationError = ProblemDetails
 
     /**
  * @summary Assign roles to a user
  */
 export const usePostUsersUserIdRoles = <TError = ProblemDetails,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postUsersUserIdRoles>>, TError,{userId: number;data: number[]}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postUsersUserIdRoles>>, TError,{userId: string;data: string[]}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof postUsersUserIdRoles>>,
         TError,
-        {userId: number;data: number[]},
+        {userId: string;data: string[]},
         TContext
       > => {
 
@@ -3548,8 +3548,8 @@ export const usePostUsersUserIdRoles = <TError = ProblemDetails,
  * @summary Revoke roles from a user
  */
 export const deleteUsersUserIdRoles = (
-    userId: number,
-    deleteUsersUserIdRolesBody: number[],
+    userId: string,
+    deleteUsersUserIdRolesBody: string[],
  options?: SecondParameter<typeof customInstance>,) => {
       
       
@@ -3564,8 +3564,8 @@ export const deleteUsersUserIdRoles = (
 
 
 export const getDeleteUsersUserIdRolesMutationOptions = <TError = ProblemDetails,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteUsersUserIdRoles>>, TError,{userId: number;data: number[]}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof deleteUsersUserIdRoles>>, TError,{userId: number;data: number[]}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteUsersUserIdRoles>>, TError,{userId: string;data: string[]}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteUsersUserIdRoles>>, TError,{userId: string;data: string[]}, TContext> => {
 
 const mutationKey = ['deleteUsersUserIdRoles'];
 
@@ -3578,7 +3578,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteUsersUserIdRoles>>, {userId: number;data: number[]}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteUsersUserIdRoles>>, {userId: string;data: string[]}> = (props) => {
           const {userId,data} = props ?? {};
 
           return  deleteUsersUserIdRoles(userId,data,requestOptions)
@@ -3590,18 +3590,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type DeleteUsersUserIdRolesMutationResult = NonNullable<Awaited<ReturnType<typeof deleteUsersUserIdRoles>>>
-    export type DeleteUsersUserIdRolesMutationBody = number[]
+    export type DeleteUsersUserIdRolesMutationBody = string[]
     export type DeleteUsersUserIdRolesMutationError = ProblemDetails
 
     /**
  * @summary Revoke roles from a user
  */
 export const useDeleteUsersUserIdRoles = <TError = ProblemDetails,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteUsersUserIdRoles>>, TError,{userId: number;data: number[]}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteUsersUserIdRoles>>, TError,{userId: string;data: string[]}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof deleteUsersUserIdRoles>>,
         TError,
-        {userId: number;data: number[]},
+        {userId: string;data: string[]},
         TContext
       > => {
 
