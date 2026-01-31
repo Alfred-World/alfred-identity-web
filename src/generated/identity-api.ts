@@ -34,6 +34,24 @@ export interface AddPermissionsToRoleResult {
 }
 
 /**
+ * @nullable
+ */
+export type AddPermissionsToRoleResultApiSuccessResponseResult = AddPermissionsToRoleResult | null;
+
+/**
+ * Standard API response wrapper for successful responses
+ */
+export interface AddPermissionsToRoleResultApiSuccessResponse {
+  success: boolean;
+
+  /** @nullable */
+  message?: string | null;
+
+  /** @nullable */
+  result?: AddPermissionsToRoleResultApiSuccessResponseResult;
+}
+
+/**
  * Error detail with message and i18n code
  */
 export interface ApiError {
@@ -159,6 +177,24 @@ export interface AssignRolesToUserResult {
 }
 
 /**
+ * @nullable
+ */
+export type AssignRolesToUserResultApiSuccessResponseResult = AssignRolesToUserResult | null;
+
+/**
+ * Standard API response wrapper for successful responses
+ */
+export interface AssignRolesToUserResultApiSuccessResponse {
+  success: boolean;
+
+  /** @nullable */
+  message?: string | null;
+
+  /** @nullable */
+  result?: AssignRolesToUserResultApiSuccessResponseResult;
+}
+
+/**
  * Standard API response wrapper for successful responses
  */
 export interface BooleanApiSuccessResponse {
@@ -235,6 +271,24 @@ export interface DeleteRoleResult {
 
   /** @nullable */
   error?: string | null;
+}
+
+/**
+ * @nullable
+ */
+export type DeleteRoleResultApiSuccessResponseResult = DeleteRoleResult | null;
+
+/**
+ * Standard API response wrapper for successful responses
+ */
+export interface DeleteRoleResultApiSuccessResponse {
+  success: boolean;
+
+  /** @nullable */
+  message?: string | null;
+
+  /** @nullable */
+  result?: DeleteRoleResultApiSuccessResponseResult;
 }
 
 export type HttpValidationProblemDetailsAllOfErrors = {[key: string]: string[]};
@@ -329,6 +383,24 @@ export interface RemovePermissionsFromRoleResult {
   error?: string | null;
 }
 
+/**
+ * @nullable
+ */
+export type RemovePermissionsFromRoleResultApiSuccessResponseResult = RemovePermissionsFromRoleResult | null;
+
+/**
+ * Standard API response wrapper for successful responses
+ */
+export interface RemovePermissionsFromRoleResultApiSuccessResponse {
+  success: boolean;
+
+  /** @nullable */
+  message?: string | null;
+
+  /** @nullable */
+  result?: RemovePermissionsFromRoleResultApiSuccessResponseResult;
+}
+
 export interface RevokeRolesFromUserResult {
   success?: boolean;
 
@@ -336,15 +408,51 @@ export interface RevokeRolesFromUserResult {
   error?: string | null;
 }
 
+/**
+ * @nullable
+ */
+export type RevokeRolesFromUserResultApiSuccessResponseResult = RevokeRolesFromUserResult | null;
+
+/**
+ * Standard API response wrapper for successful responses
+ */
+export interface RevokeRolesFromUserResultApiSuccessResponse {
+  success: boolean;
+
+  /** @nullable */
+  message?: string | null;
+
+  /** @nullable */
+  result?: RevokeRolesFromUserResultApiSuccessResponseResult;
+}
+
 export interface RoleDto {
   id?: number;
-  name?: string;
-  isImmutable?: boolean;
-  isSystem?: boolean;
-  createdAt?: string;
+
+  /** @nullable */
+  name?: string | null;
+
+  /** @nullable */
+  normalizedName?: string | null;
+
+  /** @nullable */
+  isImmutable?: boolean | null;
+
+  /** @nullable */
+  isSystem?: boolean | null;
 
   /** @nullable */
   icon?: string | null;
+
+  /** @nullable */
+  isDeleted?: boolean | null;
+
+  /** @nullable */
+  createdAt?: string | null;
+
+  /** @nullable */
+  updatedAt?: string | null;
+  permissions?: PermissionDto[];
 }
 
 /**
@@ -356,6 +464,24 @@ export interface RoleDtoApiPagedResponse {
   /** @nullable */
   message?: string | null;
   result?: RoleDtoPageResult;
+}
+
+/**
+ * @nullable
+ */
+export type RoleDtoApiSuccessResponseResult = RoleDto | null;
+
+/**
+ * Standard API response wrapper for successful responses
+ */
+export interface RoleDtoApiSuccessResponse {
+  success: boolean;
+
+  /** @nullable */
+  message?: string | null;
+
+  /** @nullable */
+  result?: RoleDtoApiSuccessResponseResult;
 }
 
 export interface RoleDtoPageResult {
@@ -566,6 +692,24 @@ export interface UpdateRoleResult {
   error?: string | null;
 }
 
+/**
+ * @nullable
+ */
+export type UpdateRoleResultApiSuccessResponseResult = UpdateRoleResult | null;
+
+/**
+ * Standard API response wrapper for successful responses
+ */
+export interface UpdateRoleResultApiSuccessResponse {
+  success: boolean;
+
+  /** @nullable */
+  message?: string | null;
+
+  /** @nullable */
+  result?: UpdateRoleResultApiSuccessResponseResult;
+}
+
 export interface UserDto {
   id?: number;
   userName?: string;
@@ -639,10 +783,10 @@ Example: "name,-createdAt" (ascending by name, descending by createdAt)
 sort?: string;
 
 /**
- * Related entities to include (comma-separated)
-Example: "createdBy,updatedBy"
+ * View name to determine which fields to return.
+Available views depend on the endpoint (e.g., "list", "detail", "minimal").
  */
-include?: string;
+view?: string;
 };
 
 export type GetIdentityAuthExchangeTokenParams = {
@@ -803,10 +947,10 @@ Example: "name,-createdAt" (ascending by name, descending by createdAt)
 sort?: string;
 
 /**
- * Related entities to include (comma-separated)
-Example: "createdBy,updatedBy"
+ * View name to determine which fields to return.
+Available views depend on the endpoint (e.g., "list", "detail", "minimal").
  */
-include?: string;
+view?: string;
 };
 
 export type GetRolesParams = {
@@ -834,10 +978,10 @@ Example: "name,-createdAt" (ascending by name, descending by createdAt)
 sort?: string;
 
 /**
- * Related entities to include (comma-separated)
-Example: "createdBy,updatedBy"
+ * View name to determine which fields to return.
+Available views depend on the endpoint (e.g., "list", "detail", "minimal").
  */
-include?: string;
+view?: string;
 };
 
 export type GetUsersParams = {
@@ -865,10 +1009,10 @@ Example: "name,-createdAt" (ascending by name, descending by createdAt)
 sort?: string;
 
 /**
- * Related entities to include (comma-separated)
-Example: "createdBy,updatedBy"
+ * View name to determine which fields to return.
+Available views depend on the endpoint (e.g., "list", "detail", "minimal").
  */
-include?: string;
+view?: string;
 };
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
@@ -2890,7 +3034,7 @@ export const getRolesId = (
 ) => {
       
       
-      return customInstance<RoleDto>(
+      return customInstance<RoleDtoApiSuccessResponse>(
       {url: `/roles/${id}`, method: 'GET', signal
     },
       options);
@@ -2984,7 +3128,7 @@ export const putRolesId = (
  options?: SecondParameter<typeof customInstance>,) => {
       
       
-      return customInstance<UpdateRoleResult>(
+      return customInstance<UpdateRoleResultApiSuccessResponse>(
       {url: `/roles/${id}`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
       data: updateRoleCommand
@@ -3049,7 +3193,7 @@ export const deleteRolesId = (
  options?: SecondParameter<typeof customInstance>,) => {
       
       
-      return customInstance<DeleteRoleResult>(
+      return customInstance<DeleteRoleResultApiSuccessResponse>(
       {url: `/roles/${id}`, method: 'DELETE'
     },
       options);
@@ -3105,100 +3249,6 @@ export const useDeleteRolesId = <TError = ProblemDetails,
     }
     
 /**
- * @summary Get permissions assigned to a role
- */
-export const getRolesIdPermissions = (
-    id: number,
- options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
-) => {
-      
-      
-      return customInstance<PermissionDto[]>(
-      {url: `/roles/${id}/permissions`, method: 'GET', signal
-    },
-      options);
-    }
-  
-
-
-
-export const getGetRolesIdPermissionsQueryKey = (id?: number,) => {
-    return [
-    `/roles/${id}/permissions`
-    ] as const;
-    }
-
-    
-export const getGetRolesIdPermissionsQueryOptions = <TData = Awaited<ReturnType<typeof getRolesIdPermissions>>, TError = ProblemDetails>(id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRolesIdPermissions>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getGetRolesIdPermissionsQueryKey(id);
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getRolesIdPermissions>>> = ({ signal }) => getRolesIdPermissions(id, requestOptions, signal);
-
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(id),  staleTime: 10000,  ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getRolesIdPermissions>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetRolesIdPermissionsQueryResult = NonNullable<Awaited<ReturnType<typeof getRolesIdPermissions>>>
-export type GetRolesIdPermissionsQueryError = ProblemDetails
-
-
-export function useGetRolesIdPermissions<TData = Awaited<ReturnType<typeof getRolesIdPermissions>>, TError = ProblemDetails>(
- id: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRolesIdPermissions>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getRolesIdPermissions>>,
-          TError,
-          Awaited<ReturnType<typeof getRolesIdPermissions>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetRolesIdPermissions<TData = Awaited<ReturnType<typeof getRolesIdPermissions>>, TError = ProblemDetails>(
- id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRolesIdPermissions>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getRolesIdPermissions>>,
-          TError,
-          Awaited<ReturnType<typeof getRolesIdPermissions>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetRolesIdPermissions<TData = Awaited<ReturnType<typeof getRolesIdPermissions>>, TError = ProblemDetails>(
- id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRolesIdPermissions>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
-/**
- * @summary Get permissions assigned to a role
- */
-
-export function useGetRolesIdPermissions<TData = Awaited<ReturnType<typeof getRolesIdPermissions>>, TError = ProblemDetails>(
- id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRolesIdPermissions>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getGetRolesIdPermissionsQueryOptions(id,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
-
-  return query;
-}
-
-
-
-
-
-/**
  * @summary Assign permissions to a role
  */
 export const postRolesIdPermissions = (
@@ -3208,7 +3258,7 @@ export const postRolesIdPermissions = (
 ) => {
       
       
-      return customInstance<AddPermissionsToRoleResult>(
+      return customInstance<AddPermissionsToRoleResultApiSuccessResponse>(
       {url: `/roles/${id}/permissions`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: postRolesIdPermissionsBody, signal
@@ -3274,7 +3324,7 @@ export const deleteRolesIdPermissions = (
  options?: SecondParameter<typeof customInstance>,) => {
       
       
-      return customInstance<RemovePermissionsFromRoleResult>(
+      return customInstance<RemovePermissionsFromRoleResultApiSuccessResponse>(
       {url: `/roles/${id}/permissions`, method: 'DELETE',
       headers: {'Content-Type': 'application/json', },
       data: deleteRolesIdPermissionsBody
@@ -3437,7 +3487,7 @@ export const postUsersUserIdRoles = (
 ) => {
       
       
-      return customInstance<AssignRolesToUserResult>(
+      return customInstance<AssignRolesToUserResultApiSuccessResponse>(
       {url: `/users/${userId}/roles`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: postUsersUserIdRolesBody, signal
@@ -3503,7 +3553,7 @@ export const deleteUsersUserIdRoles = (
  options?: SecondParameter<typeof customInstance>,) => {
       
       
-      return customInstance<RevokeRolesFromUserResult>(
+      return customInstance<RevokeRolesFromUserResultApiSuccessResponse>(
       {url: `/users/${userId}/roles`, method: 'DELETE',
       headers: {'Content-Type': 'application/json', },
       data: deleteUsersUserIdRolesBody

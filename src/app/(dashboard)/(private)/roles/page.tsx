@@ -19,7 +19,11 @@ const RolesPage = () => {
   const [editingRole, setEditingRole] = useState<RoleDto | null>(null)
   const [roleToDelete, setRoleToDelete] = useState<RoleDto | null>(null)
 
-  const { data: rolesResponse, isLoading: isLoadingRoles, refetch: refetchRoles } = useGetRoles()
+  const { data: rolesResponse, isLoading: isLoadingRoles, refetch: refetchRoles } = useGetRoles(
+    {
+      view: "detail"
+    }
+  )
 
   const roles = useMemo(() => (rolesResponse?.success ? rolesResponse.result.items || [] : []), [rolesResponse])
 

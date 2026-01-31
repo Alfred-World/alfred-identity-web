@@ -45,12 +45,6 @@ const RoleList = ({ roles, selectedRoleId, onSelectRole, onAddClick, onEditRole,
   const getRoleIcon = (role: RoleDto) => {
     if (role.icon) return role.icon
 
-    const name = role.name?.toLowerCase() || ''
-
-    if (name.includes('admin')) return 'tabler-shield-lock'
-    if (name.includes('editor')) return 'tabler-edit'
-    if (name.includes('support')) return 'tabler-headset'
-
     return 'tabler-user'
   }
 
@@ -115,7 +109,7 @@ const RoleList = ({ roles, selectedRoleId, onSelectRole, onAddClick, onEditRole,
             {filteredRoles.map(role => {
               const isSelected = role.id === selectedRoleId
               const icon = getRoleIcon(role)
-              const accessType = getAccessDescription(role.name)
+              const accessType = getAccessDescription(role.name || '')
 
               return (
                 <ListItemButton
@@ -182,7 +176,7 @@ const RoleList = ({ roles, selectedRoleId, onSelectRole, onAddClick, onEditRole,
                       size="small"
                       color="primary"
                       onClick={() => onEditRole(role)}
-                      disabled={role.isImmutable}
+                      disabled={!!role.isImmutable}
                     >
                       <i className="tabler-edit" />
                     </IconButton>
@@ -190,7 +184,7 @@ const RoleList = ({ roles, selectedRoleId, onSelectRole, onAddClick, onEditRole,
                       size="small"
                       color="error"
                       onClick={() => onDeleteRole(role)}
-                      disabled={role.isImmutable}
+                      disabled={!!role.isImmutable}
                     >
                       <i className="tabler-trash" />
                     </IconButton>

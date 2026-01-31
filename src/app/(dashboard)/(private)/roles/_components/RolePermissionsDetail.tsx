@@ -22,7 +22,6 @@ import { alpha, useTheme } from '@mui/material/styles'
 import { toast } from 'react-toastify'
 
 import {
-  useGetRolesIdPermissions,
   usePostRolesIdPermissions,
   getPermissions
 } from '@/generated/identity-api'
@@ -84,37 +83,15 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
   }, [infiniteData])
 
   // -- 2. Current Role Permissions --
-  const {
-    data: rolePermissionsResponse,
-    isLoading: isLoadingRolePerms,
-    refetch: refetchRolePerms
-  } = useGetRolesIdPermissions(role?.id!, {
-    query: {
-      enabled: !!role?.id,
-      refetchOnWindowFocus: false,
-      staleTime: Infinity
-    }
-  })
-
   const [selectedPermissionIds, setSelectedPermissionIds] = useState<number[]>([])
 
-  // Sync state with fetching role permissions
+  // Sync state with role permissions
   useEffect(() => {
-    let newIds: number[] = []
-
-    if (Array.isArray(rolePermissionsResponse)) {
-      newIds = (rolePermissionsResponse as PermissionDto[]).map(p => p.id!)
-    } else if (rolePermissionsResponse?.success && rolePermissionsResponse.result) {
-      newIds = rolePermissionsResponse.result.map(p => p.id!)
-    }
-
-    // Only update if we have new data. If empty, only clear if we aren't loading.
-    if (newIds.length > 0) {
+    if (role?.permissions && Array.isArray(role.permissions)) {
+      const newIds = role.permissions.map(p => p.id!).filter(id => id !== undefined)
       setSelectedPermissionIds(newIds)
-    } else if (!isLoadingRolePerms && rolePermissionsResponse) {
-      setSelectedPermissionIds([])
     }
-  }, [rolePermissionsResponse, isLoadingRolePerms])
+  }, [role])
 
   // -- 3. Mutations --
   /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -123,7 +100,8 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
       onSuccess: (data: any) => {
         if (data.success) {
           toast.success('Permissions updated successfully')
-          refetchRolePerms()
+          // Force a reload of the current page to get updated role data (including permissions)
+          window.location.reload()
         } else {
           toast.error(data.errors?.[0]?.message || 'Failed to update permissions')
         }
@@ -200,14 +178,19 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
 
   const handleSave = () => {
     if (!role?.id) return
-    console.log('Saving permissions for Role:', role.id)
-    console.log('Payload Data (selectedPermissionIds):', selectedPermissionIds)
     updatePermissions({ id: role.id, data: selectedPermissionIds })
   }
 
   const handleReset = () => {
-    if (rolePermissionsResponse?.success && rolePermissionsResponse.result) {
-      setSelectedPermissionIds(rolePermissionsResponse.result.map(p => p.id!))
+    if (role?.permissions && Array.isArray(role.permissions)) {
+      const newIds = role.permissions.map(p => p.id!).filter(id => id !== undefined)
+      if (newIds.length > 0) {
+        setSelectedPermissionIds(newIds)
+      } else {
+        setSelectedPermissionIds([])
+      }
+    } else {
+      setSelectedPermissionIds([])
     }
   }
 
@@ -265,7 +248,7 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
               variant="text"
               color="secondary"
               onClick={handleReset}
-              disabled={isUpdating || role.isImmutable}
+              disabled={isUpdating || !!role.isImmutable}
             >
               Reset
             </Button>
@@ -273,7 +256,7 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
               variant="contained"
               startIcon={isUpdating ? <CircularProgress size={20} color="inherit" /> : <i className="tabler-device-floppy" />}
               onClick={handleSave}
-              disabled={isUpdating || role.isImmutable}
+              disabled={isUpdating || !!role.isImmutable}
               sx={{
                 bgcolor: role.isImmutable ? 'action.disabledBackground' : 'info.main',
                 '&:hover': { bgcolor: role.isImmutable ? 'action.disabledBackground' : 'info.dark' },
@@ -385,7 +368,7 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
                             checked={isSelected}
                             onChange={() => handleToggle(perm.id!)}
                             size="small"
-                            disabled={role.isImmutable}
+                            disabled={!!role.isImmutable}
                           />
                         </Box>
                       </Grid>
