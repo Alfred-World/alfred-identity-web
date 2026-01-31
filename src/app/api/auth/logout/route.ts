@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
+import { NextResponse } from 'next/server'
 
 /**
  * Custom logout endpoint that clears NextAuth session without confirmation page
@@ -27,14 +28,14 @@ export async function GET(request: NextRequest) {
     'authjs.session-token',
     '__Secure-authjs.session-token',
     'authjs.csrf-token',
-    'authjs.callback-url',
+    'authjs.callback-url'
   ]
 
   for (const cookieName of cookiesToDelete) {
     // Delete with various path options to ensure removal
     response.cookies.set(cookieName, '', {
       expires: new Date(0),
-      path: '/',
+      path: '/'
     })
 
     // Also try deleting with secure flag for __Secure- prefixed cookies
@@ -43,11 +44,10 @@ export async function GET(request: NextRequest) {
         expires: new Date(0),
         path: '/',
         secure: true,
-        httpOnly: true,
+        httpOnly: true
       })
     }
   }
 
   return response
 }
-

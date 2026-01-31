@@ -1,17 +1,14 @@
 /**
  * SSO Configuration - Uses Generated API for Type Safety
- * 
+ *
  * For JSON API calls: use generated functions directly
  * For redirect endpoints: use generated QueryKey to extract URL path
- * 
+ *
  * This ensures if backend changes URLs, regenerating API will catch issues
  */
 
 import { AXIOS_INSTANCE } from './custom-instance'
-import {
-  getIdentityAuthValidateToken,
-  getGetIdentityAuthCheckSsoQueryKey,
-} from '@/generated/identity-api'
+import { getIdentityAuthValidateToken, getGetIdentityAuthCheckSsoQueryKey } from '@/generated/identity-api'
 
 /**
  * Gateway base URL - same as generated API client
@@ -36,6 +33,7 @@ export const OAUTH_CLIENT_ID = process.env.NEXT_PUBLIC_OAUTH_CLIENT_ID || 'sso_w
 export const getSsoCheckUrl = (returnUrl: string) => {
   // Get URL path from generated QueryKey
   const [urlPath] = getGetIdentityAuthCheckSsoQueryKey({ returnUrl })
+
   return `${GATEWAY_URL}${urlPath}?returnUrl=${encodeURIComponent(returnUrl)}`
 }
 
@@ -56,4 +54,3 @@ export const getSsoLogoutUrl = (postLogoutRedirectUri: string = `${APP_URL}/logi
 export const validateSsoToken = (token: string) => {
   return getIdentityAuthValidateToken({ token })
 }
-

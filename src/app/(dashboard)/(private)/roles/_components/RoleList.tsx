@@ -5,7 +5,6 @@ import { useState } from 'react'
 import {
   Box,
   Card,
-  CardContent,
   Typography,
   TextField,
   InputAdornment,
@@ -34,13 +33,19 @@ interface RoleListProps {
   isLoading?: boolean
 }
 
-const RoleList = ({ roles, selectedRoleId, onSelectRole, onAddClick, onEditRole, onDeleteRole, isLoading }: RoleListProps) => {
+const RoleList = ({
+  roles,
+  selectedRoleId,
+  onSelectRole,
+  onAddClick,
+  onEditRole,
+  onDeleteRole,
+  isLoading
+}: RoleListProps) => {
   const [search, setSearch] = useState('')
   const theme = useTheme()
 
-  const filteredRoles = roles.filter(role =>
-    role.name?.toLowerCase().includes(search.toLowerCase())
-  )
+  const filteredRoles = roles.filter(role => role.name?.toLowerCase().includes(search.toLowerCase()))
 
   const getRoleIcon = (role: RoleDto) => {
     if (role.icon) return role.icon
@@ -62,29 +67,29 @@ const RoleList = ({ roles, selectedRoleId, onSelectRole, onAddClick, onEditRole,
     <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', bgcolor: 'background.paper' }}>
       <Box sx={{ p: 4, pb: 2 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-          <Typography variant="h5" fontWeight={600}>
+          <Typography variant='h5' fontWeight={600}>
             Roles
           </Typography>
           <Chip
             label={`${roles.length} Total`}
-            size="small"
-            variant="tonal"
-            color="secondary"
+            size='small'
+            variant='tonal'
+            color='secondary'
             sx={{ fontWeight: 500 }}
           />
         </Box>
 
         <TextField
           fullWidth
-          size="small"
-          placeholder="Search roles..."
+          size='small'
+          placeholder='Search roles...'
           value={search}
           onChange={e => setSearch(e.target.value)}
           slotProps={{
             input: {
               startAdornment: (
-                <InputAdornment position="start">
-                  <i className="tabler-search text-secondary" />
+                <InputAdornment position='start'>
+                  <i className='tabler-search text-secondary' />
                 </InputAdornment>
               )
             }
@@ -100,12 +105,12 @@ const RoleList = ({ roles, selectedRoleId, onSelectRole, onAddClick, onEditRole,
           <List>
             {[1, 2, 3, 4].map(i => (
               <Box key={i} sx={{ mb: 2 }}>
-                <Skeleton variant="rounded" height={70} />
+                <Skeleton variant='rounded' height={70} />
               </Box>
             ))}
           </List>
         ) : (
-          <List component="nav" sx={{ p: 0 }}>
+          <List component='nav' sx={{ p: 0 }}>
             {filteredRoles.map(role => {
               const isSelected = role.id === selectedRoleId
               const icon = getRoleIcon(role)
@@ -137,7 +142,9 @@ const RoleList = ({ roles, selectedRoleId, onSelectRole, onAddClick, onEditRole,
                     sx={{
                       minWidth: 40,
                       color: isSelected ? 'primary.main' : 'text.secondary',
-                      bgcolor: isSelected ? alpha(theme.palette.primary.main, 0.1) : alpha(theme.palette.secondary.main, 0.05),
+                      bgcolor: isSelected
+                        ? alpha(theme.palette.primary.main, 0.1)
+                        : alpha(theme.palette.secondary.main, 0.05),
                       p: 1.5,
                       borderRadius: 1,
                       mr: 2,
@@ -151,42 +158,46 @@ const RoleList = ({ roles, selectedRoleId, onSelectRole, onAddClick, onEditRole,
 
                   <ListItemText
                     primary={
-                      <Typography variant="body1" fontWeight={isSelected ? 600 : 500} color={isSelected ? 'primary.main' : 'text.primary'}>
+                      <Typography
+                        variant='body1'
+                        fontWeight={isSelected ? 600 : 500}
+                        color={isSelected ? 'primary.main' : 'text.primary'}
+                      >
                         {role.name}
                       </Typography>
                     }
                     secondary={
-                      <Typography variant="caption" color="text.secondary">
+                      <Typography variant='caption' color='text.secondary'>
                         {accessType}
                       </Typography>
                     }
                   />
 
                   <Box
-                    className="actions"
+                    className='actions'
                     sx={{
                       display: 'flex',
                       gap: 0.5,
                       opacity: isSelected ? 1 : 0,
-                      transition: 'opacity 0.2s',
+                      transition: 'opacity 0.2s'
                     }}
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={e => e.stopPropagation()}
                   >
                     <IconButton
-                      size="small"
-                      color="primary"
+                      size='small'
+                      color='primary'
                       onClick={() => onEditRole(role)}
                       disabled={!!role.isImmutable}
                     >
-                      <i className="tabler-edit" />
+                      <i className='tabler-edit' />
                     </IconButton>
                     <IconButton
-                      size="small"
-                      color="error"
+                      size='small'
+                      color='error'
                       onClick={() => onDeleteRole(role)}
                       disabled={!!role.isImmutable}
                     >
-                      <i className="tabler-trash" />
+                      <i className='tabler-trash' />
                     </IconButton>
                   </Box>
                 </ListItemButton>
@@ -201,8 +212,8 @@ const RoleList = ({ roles, selectedRoleId, onSelectRole, onAddClick, onEditRole,
       <Box sx={{ p: 4 }}>
         <Button
           fullWidth
-          variant="outlined"
-          startIcon={<i className="tabler-plus" />}
+          variant='outlined'
+          startIcon={<i className='tabler-plus' />}
           sx={{ py: 2, borderRadius: 1 }}
           onClick={onAddClick}
         >

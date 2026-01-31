@@ -12,93 +12,93 @@ import type { ApplicationDto } from '@/generated'
 
 // Unified field config - used by both DslQueryBuilder (filter) and AdvancedTable (columns)
 const subSiteFields: FieldConfig<ApplicationDto>[] = [
-    { name: 'ID', key: 'id', dataType: 'int', enableSorting: true },
-    { name: 'Display Name', key: 'displayName', dataType: 'string', enableSorting: true },
-    { name: 'Client ID', key: 'clientId', dataType: 'string' },
-    { name: 'Permissions', key: 'permissions', dataType: 'string' },
-    { name: 'Application Type', key: 'applicationType', dataType: 'string' },
-    { name: 'Client Type', key: 'clientType', dataType: 'string' },
-    { name: 'Is Active', key: 'isActive', dataType: 'bool' },
-    { name: 'Created At', key: 'createdAt', dataType: 'date', enableSorting: true },
-    { name: 'Updated At', key: 'updatedAt', dataType: 'date', hidden: true }
+  { name: 'ID', key: 'id', dataType: 'int', enableSorting: true },
+  { name: 'Display Name', key: 'displayName', dataType: 'string', enableSorting: true },
+  { name: 'Client ID', key: 'clientId', dataType: 'string' },
+  { name: 'Permissions', key: 'permissions', dataType: 'string' },
+  { name: 'Application Type', key: 'applicationType', dataType: 'string' },
+  { name: 'Client Type', key: 'clientType', dataType: 'string' },
+  { name: 'Is Active', key: 'isActive', dataType: 'bool' },
+  { name: 'Created At', key: 'createdAt', dataType: 'date', enableSorting: true },
+  { name: 'Updated At', key: 'updatedAt', dataType: 'date', hidden: true }
 ]
 
 export default function SubSitesFilterDemo() {
-    const [appliedQuery, setAppliedQuery] = useState('')
+  const [appliedQuery, setAppliedQuery] = useState('')
 
-    // Get pagination from URL
-    const { page, pageSize, setPage, setPageSize, resetPage } = useUrlPagination()
-    const { sort, sorting, setSorting } = useUrlSorting('-createdAt') // Default sort by newest
+  // Get pagination from URL
+  const { page, pageSize, setPage, setPageSize, resetPage } = useUrlPagination()
+  const { sort, sorting, setSorting } = useUrlSorting('-createdAt') // Default sort by newest
 
-    // Fetch sub sites with the DSL filter and pagination
-    const { data, isLoading, error } = useGetApplications({
-        filter: appliedQuery || undefined,
-        page,
-        pageSize,
-        sort
-    })
+  // Fetch sub sites with the DSL filter and pagination
+  const { data, isLoading, error } = useGetApplications({
+    filter: appliedQuery || undefined,
+    page,
+    pageSize,
+    sort
+  })
 
-    const result = data?.success ? data.result : null
+  const result = data?.success ? data.result : null
 
-    const handleSearch = useCallback(
-        (query: string) => {
-            setAppliedQuery(query)
-            resetPage() // Reset to first page on new search
-        },
-        [resetPage]
-    )
+  const handleSearch = useCallback(
+    (query: string) => {
+      setAppliedQuery(query)
+      resetPage() // Reset to first page on new search
+    },
+    [resetPage]
+  )
 
-    const handleReset = useCallback(() => {
-        setAppliedQuery('')
-        resetPage()
-    }, [resetPage])
+  const handleReset = useCallback(() => {
+    setAppliedQuery('')
+    resetPage()
+  }, [resetPage])
 
-    const handleChange = useCallback((_conditions: FilterCondition[], _query: string) => {
-        // Optional: track changes without triggering search
-    }, [])
+  const handleChange = useCallback((_conditions: FilterCondition[], _query: string) => {
+    // Optional: track changes without triggering search
+  }, [])
 
-    if (error) {
-        return <Typography color="error">Error loading data: {String(error)}</Typography>
-    }
+  if (error) {
+    return <Typography color='error'>Error loading data: {String(error)}</Typography>
+  }
 
-    return (
-        <Box sx={{ p: 3 }}>
-            <Typography variant="h4" sx={{ mb: 3 }}>
-                Sub Sites Filter Demo
-            </Typography>
+  return (
+    <Box sx={{ p: 3 }}>
+      <Typography variant='h4' sx={{ mb: 3 }}>
+        Sub Sites Filter Demo
+      </Typography>
 
-            <Grid container spacing={3}>
-                {/* Filter Builder */}
-                <Grid size={{ xs: 12 }}>
-                    <DslQueryBuilder
-                        fields={subSiteFields}
-                        onChange={handleChange}
-                        onSearch={handleSearch}
-                        onReset={handleReset}
-                        onInitialLoad={handleSearch}
-                        title="Filter Sub Sites..."
-                        syncWithUrl={true}
-                    />
-                </Grid>
+      <Grid container spacing={3}>
+        {/* Filter Builder */}
+        <Grid size={{ xs: 12 }}>
+          <DslQueryBuilder
+            fields={subSiteFields}
+            onChange={handleChange}
+            onSearch={handleSearch}
+            onReset={handleReset}
+            onInitialLoad={handleSearch}
+            title='Filter Sub Sites...'
+            syncWithUrl={true}
+          />
+        </Grid>
 
-                {/* SubSites Table - uses same fields config */}
-                <Grid size={{ xs: 12 }}>
-                    <AdvancedTable<ApplicationDto>
-                        fields={subSiteFields}
-                        data={result?.items || []}
-                        total={result?.total || 0}
-                        page={page}
-                        pageSize={pageSize}
-                        sorting={sorting}
-                        onPageChange={setPage}
-                        onPageSizeChange={setPageSize}
-                        onSortingChange={setSorting}
-                        isLoading={isLoading}
-                        enableRowSelection={true}
-                        getRowId={(row) => String(row.id)}
-                    />
-                </Grid>
-            </Grid>
-        </Box>
-    )
+        {/* SubSites Table - uses same fields config */}
+        <Grid size={{ xs: 12 }}>
+          <AdvancedTable<ApplicationDto>
+            fields={subSiteFields}
+            data={result?.items || []}
+            total={result?.total || 0}
+            page={page}
+            pageSize={pageSize}
+            sorting={sorting}
+            onPageChange={setPage}
+            onPageSizeChange={setPageSize}
+            onSortingChange={setSorting}
+            isLoading={isLoading}
+            enableRowSelection={true}
+            getRowId={row => String(row.id)}
+          />
+        </Grid>
+      </Grid>
+    </Box>
+  )
 }

@@ -147,12 +147,14 @@ const Login = ({ mode }: { mode: SystemMode }) => {
         // Call signIn with sso-oauth provider - this will redirect to Gateway
         // Gateway will see SSO cookie and auto-approve, returning with tokens
         signIn('sso-oauth', { callbackUrl })
+
         return
       }
 
       // If SSO check returned error, just show login form
       if (ssoError) {
         setIsCheckingSso(false)
+
         return
       }
 
@@ -165,15 +167,17 @@ const Login = ({ mode }: { mode: SystemMode }) => {
           if (response.success && response.result) {
             // Sign in using SSO session
             const user = response.result as { userId: string; email: string; fullName?: string; userName?: string }
+
             const result = await signIn('sso-session', {
               redirect: false,
               userId: user.userId.toString(),
               email: user.email,
-              name: user.fullName || user.userName || user.email,
+              name: user.fullName || user.userName || user.email
             })
 
             if (result?.ok) {
               router.replace(redirectTo)
+
               return
             }
           }
@@ -209,6 +213,7 @@ const Login = ({ mode }: { mode: SystemMode }) => {
 
       if (!response.success || !response.result) {
         setErrorState({ message: [response.message || 'Login failed'] })
+
         return
       }
 
@@ -256,7 +261,7 @@ const Login = ({ mode }: { mode: SystemMode }) => {
           <form
             noValidate
             autoComplete='off'
-            action={() => { }}
+            action={() => {}}
             onSubmit={handleSubmit(onSubmit)}
             className='flex flex-col gap-6'
           >
@@ -320,12 +325,7 @@ const Login = ({ mode }: { mode: SystemMode }) => {
             />
             <div className='flex justify-between items-center gap-x-3 gap-y-1 flex-wrap'>
               <FormControlLabel control={<Checkbox defaultChecked />} label='Remember me' />
-              <Typography
-                className='text-end'
-                color='primary.main'
-                component={Link}
-                href='/forgot-password'
-              >
+              <Typography className='text-end' color='primary.main' component={Link} href='/forgot-password'>
                 Forgot password?
               </Typography>
             </div>

@@ -84,7 +84,7 @@ const RoleDialog = ({ open, onClose, role, onSuccess }: RoleDialogProps) => {
 
   const { mutate: createRole, isPending: isCreating } = usePostRoles({
     mutation: {
-      onSuccess: (data) => {
+      onSuccess: data => {
         if (data.success) {
           toast.success('Role created successfully')
           handleClose()
@@ -98,7 +98,7 @@ const RoleDialog = ({ open, onClose, role, onSuccess }: RoleDialogProps) => {
 
   const { mutate: updateRole, isPending: isUpdating } = usePutRolesId({
     mutation: {
-      onSuccess: (data) => {
+      onSuccess: data => {
         if (data.success) {
           toast.success('Role updated successfully')
           handleClose()
@@ -130,17 +130,17 @@ const RoleDialog = ({ open, onClose, role, onSuccess }: RoleDialogProps) => {
       open={open}
       onClose={handleClose}
       fullWidth
-      maxWidth="sm"
+      maxWidth='sm'
       sx={{ '& .MuiDialog-paper': { overflow: 'visible' } }}
     >
-      <DialogTitle variant="h4" sx={{ textAlign: 'center', p: 5 }}>
+      <DialogTitle variant='h4' sx={{ textAlign: 'center', p: 5 }}>
         {isEdit ? 'Edit Role' : 'Add New Role'}
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+        <Typography variant='body2' color='text.secondary' sx={{ mt: 1 }}>
           {isEdit ? 'Update the details of the existing role.' : 'Create a new role to assign permissions.'}
         </Typography>
       </DialogTitle>
 
-      <CustomCloseButton aria-label="close" onClick={handleClose}>
+      <CustomCloseButton aria-label='close' onClick={handleClose}>
         <i className='tabler-x' />
       </CustomCloseButton>
 
@@ -148,14 +148,14 @@ const RoleDialog = ({ open, onClose, role, onSuccess }: RoleDialogProps) => {
         <DialogContent sx={{ p: 5 }}>
           <Box sx={{ mb: 4 }}>
             <Controller
-              name="name"
+              name='name'
               control={control}
               render={({ field }) => (
                 <TextField
                   {...field}
                   fullWidth
-                  label="Role Name"
-                  placeholder="e.g. Administrator"
+                  label='Role Name'
+                  placeholder='e.g. Administrator'
                   error={!!errors.name}
                   helperText={errors.name?.message}
                 />
@@ -164,7 +164,7 @@ const RoleDialog = ({ open, onClose, role, onSuccess }: RoleDialogProps) => {
           </Box>
           <Box sx={{ mb: 4 }}>
             <Controller
-              name="icon"
+              name='icon'
               control={control}
               render={({ field: { value, onChange } }) => (
                 <RoleIconPicker
@@ -178,14 +178,14 @@ const RoleDialog = ({ open, onClose, role, onSuccess }: RoleDialogProps) => {
           </Box>
         </DialogContent>
         <DialogActions sx={{ p: 5, pt: 0, justifyContent: 'center' }}>
-          <Button variant="outlined" color="secondary" onClick={handleClose} sx={{ mr: 2 }}>
+          <Button variant='outlined' color='secondary' onClick={handleClose} sx={{ mr: 2 }}>
             Discard
           </Button>
           <Button
-            type="submit"
-            variant="contained"
+            type='submit'
+            variant='contained'
             disabled={isLoading}
-            startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : null}
+            startIcon={isLoading ? <CircularProgress size={20} color='inherit' /> : null}
           >
             {isEdit ? 'Save Changes' : 'Create Role'}
           </Button>

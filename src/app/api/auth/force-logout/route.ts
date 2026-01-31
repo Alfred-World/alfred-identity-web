@@ -1,9 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
+import { NextResponse } from 'next/server'
 
 /**
  * Force logout endpoint - clears NextAuth session and redirects
  * Used when global SSO logout happens from another app
- * 
+ *
  * GET /api/auth/force-logout?callbackUrl=<url>
  */
 export async function GET(request: NextRequest) {
@@ -30,18 +31,19 @@ export async function GET(request: NextRequest) {
     '__Secure-authjs.session-token',
     'authjs.csrf-token',
     'authjs.callback-url',
+
     // Also clear PKCE state cookies
     'next-auth.pkce.code_verifier',
     '__Secure-next-auth.pkce.code_verifier',
     'next-auth.state',
-    '__Secure-next-auth.state',
+    '__Secure-next-auth.state'
   ]
 
   for (const cookieName of cookiesToDelete) {
     // Delete with various path options to ensure removal
     response.cookies.set(cookieName, '', {
       expires: new Date(0),
-      path: '/',
+      path: '/'
     })
 
     // Also try deleting with secure flag for __Secure- prefixed cookies
@@ -50,7 +52,7 @@ export async function GET(request: NextRequest) {
         expires: new Date(0),
         path: '/',
         secure: true,
-        httpOnly: true,
+        httpOnly: true
       })
     }
   }

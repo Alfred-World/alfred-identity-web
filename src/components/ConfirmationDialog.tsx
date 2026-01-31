@@ -37,24 +37,24 @@ const ConfirmationDialog = ({
     <Dialog
       open={open}
       onClose={onClose}
-      aria-labelledby="alert-dialog-title"
-      aria-describedby="alert-dialog-description"
+      aria-labelledby='alert-dialog-title'
+      aria-describedby='alert-dialog-description'
       sx={{ '& .MuiDialog-paper': { width: '100%', maxWidth: 450 } }}
     >
-      <DialogTitle id="alert-dialog-title" sx={{ fontSize: '1.25rem' }}>
+      <DialogTitle id='alert-dialog-title' sx={{ fontSize: '1.25rem' }}>
         {title}
       </DialogTitle>
       <DialogContent>
-        <DialogContentText id="alert-dialog-description" sx={{ color: 'text.secondary' }}>
+        <DialogContentText id='alert-dialog-description' sx={{ color: 'text.secondary' }}>
           {content}
         </DialogContentText>
       </DialogContent>
       <DialogActions sx={{ p: 3, pt: 0 }}>
-        <Button variant="outlined" color="secondary" onClick={onClose} disabled={loading}>
+        <Button variant='outlined' color='secondary' onClick={onClose} disabled={loading}>
           {cancelText}
         </Button>
         <Button
-          variant="contained"
+          variant='contained'
           onClick={onConfirm}
           color={color}
           autoFocus

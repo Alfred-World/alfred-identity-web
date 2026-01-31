@@ -22,17 +22,15 @@ export const BreadcrumbsProvider = ({ children }: { children: ReactNode }) => {
     setBreadcrumbsState(items)
   }, [])
 
-  return (
-    <BreadcrumbsContext.Provider value={{ breadcrumbs, setBreadcrumbs }}>
-      {children}
-    </BreadcrumbsContext.Provider>
-  )
+  return <BreadcrumbsContext.Provider value={{ breadcrumbs, setBreadcrumbs }}>{children}</BreadcrumbsContext.Provider>
 }
 
 export const useBreadcrumbs = () => {
   const context = useContext(BreadcrumbsContext)
+
   if (!context) {
     throw new Error('useBreadcrumbs must be used within a BreadcrumbsProvider')
   }
+
   return context
 }

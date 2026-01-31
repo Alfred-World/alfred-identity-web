@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useMemo , useEffect } from 'react'
+import { useState, useCallback, useMemo, useEffect } from 'react'
 
 import Link from 'next/link'
 
@@ -20,10 +20,7 @@ export default function ApplicationsPage() {
   const { setBreadcrumbs } = useBreadcrumbs()
 
   useEffect(() => {
-    setBreadcrumbs([
-      { title: 'Dashboards', href: ROUTES.DASHBOARDS.ROOT },
-      { title: 'Applications' }
-    ])
+    setBreadcrumbs([{ title: 'Dashboards', href: ROUTES.DASHBOARDS.ROOT }, { title: 'Applications' }])
   }, [setBreadcrumbs])
 
   const [appliedQuery, setAppliedQuery] = useState('')
@@ -43,48 +40,51 @@ export default function ApplicationsPage() {
   const result = data?.success ? data.result : null
 
   // Field config for Applications - memoized to include refetch in actions
-  const applicationFields: FieldConfig<ApplicationDto>[] = useMemo(() => [
-    {
-      name: 'Display Name',
-      key: 'displayName',
-      dataType: 'string',
-      width: 200,
-      enableSorting: true,
-      renderCell: (value, row) => (
-        <Typography
-          component={Link}
-          href={ROUTES.APPLICATIONS.EDIT(row.id!)}
-          color="primary"
-          sx={{
-            textDecoration: 'none',
-            fontWeight: 600,
-            '&:hover': { textDecoration: 'underline', color: 'primary.dark' }
-          }}
-        >
-          {value as string}
-        </Typography>
-      )
-    },
-    { name: 'Client ID', key: 'clientId', dataType: 'string', width: 250 },
-    { name: 'Type', key: 'applicationType', dataType: 'string', width: 120 },
-    { name: 'Active', key: 'isActive', dataType: 'bool', width: 100 },
-    { name: 'Permissions', key: 'permissions', dataType: 'string', hidden: true },
-    { name: 'Created At', key: 'createdAt', dataType: 'date', enableSorting: true, width: 180 },
-    { name: 'Updated At', key: 'updatedAt', dataType: 'date', enableSorting: true, hidden: true },
-    {
-      name: 'Actions',
-      key: 'actions',
-      dataType: 'string',
-      width: 100,
-      renderCell: (_value, row) => (
-        <ApplicationListActions
-          id={row.id!}
-          displayName={row.displayName || 'Unnamed Application'}
-          onDeleteSuccess={() => refetch()}
-        />
-      )
-    }
-  ], [refetch]) as FieldConfig<ApplicationDto>[]
+  const applicationFields: FieldConfig<ApplicationDto>[] = useMemo(
+    () => [
+      {
+        name: 'Display Name',
+        key: 'displayName',
+        dataType: 'string',
+        width: 200,
+        enableSorting: true,
+        renderCell: (value, row) => (
+          <Typography
+            component={Link}
+            href={ROUTES.APPLICATIONS.EDIT(row.id!)}
+            color='primary'
+            sx={{
+              textDecoration: 'none',
+              fontWeight: 600,
+              '&:hover': { textDecoration: 'underline', color: 'primary.dark' }
+            }}
+          >
+            {value as string}
+          </Typography>
+        )
+      },
+      { name: 'Client ID', key: 'clientId', dataType: 'string', width: 250 },
+      { name: 'Type', key: 'applicationType', dataType: 'string', width: 120 },
+      { name: 'Active', key: 'isActive', dataType: 'bool', width: 100 },
+      { name: 'Permissions', key: 'permissions', dataType: 'string', hidden: true },
+      { name: 'Created At', key: 'createdAt', dataType: 'date', enableSorting: true, width: 180 },
+      { name: 'Updated At', key: 'updatedAt', dataType: 'date', enableSorting: true, hidden: true },
+      {
+        name: 'Actions',
+        key: 'actions',
+        dataType: 'string',
+        width: 100,
+        renderCell: (_value, row) => (
+          <ApplicationListActions
+            id={row.id!}
+            displayName={row.displayName || 'Unnamed Application'}
+            onDeleteSuccess={() => refetch()}
+          />
+        )
+      }
+    ],
+    [refetch]
+  ) as FieldConfig<ApplicationDto>[]
 
   const handleSearch = useCallback(
     (query: string) => {
@@ -104,19 +104,17 @@ export default function ApplicationsPage() {
   }, [])
 
   if (error) {
-    return <Typography color="error">Error loading data: {String(error)}</Typography>
+    return <Typography color='error'>Error loading data: {String(error)}</Typography>
   }
 
   return (
     <Box sx={{ p: 3 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4">
-          Applications
-        </Typography>
+        <Typography variant='h4'>Applications</Typography>
         <Button
           component={Link}
           href={ROUTES.APPLICATIONS.CREATE}
-          variant="contained"
+          variant='contained'
           startIcon={<i className='tabler-plus' />}
         >
           Create Application
@@ -132,7 +130,7 @@ export default function ApplicationsPage() {
             onSearch={handleSearch}
             onReset={handleReset}
             onInitialLoad={handleSearch}
-            title="Filter Applications..."
+            title='Filter Applications...'
             syncWithUrl={true}
           />
         </Grid>
@@ -151,7 +149,7 @@ export default function ApplicationsPage() {
             onSortingChange={setSorting}
             isLoading={isLoading}
             enableRowSelection={false}
-            getRowId={(row) => String(row.id)}
+            getRowId={row => String(row.id)}
           />
         </Grid>
       </Grid>

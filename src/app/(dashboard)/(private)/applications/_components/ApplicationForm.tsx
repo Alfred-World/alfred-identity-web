@@ -1,10 +1,12 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+
 import { useRouter } from 'next/navigation'
+
 import { useForm, Controller } from 'react-hook-form'
 import { valibotResolver } from '@hookform/resolvers/valibot'
-import { object, string, optional, maxLength, pipe, nonEmpty, array, minLength } from 'valibot'
+import { object, string, maxLength, pipe, nonEmpty, array, minLength } from 'valibot'
 import type { InferInput } from 'valibot'
 import {
   Box,
@@ -20,7 +22,6 @@ import {
   IconButton,
   InputAdornment,
   Chip,
-  Divider,
   Autocomplete,
   Paper,
   alpha,
@@ -29,16 +30,18 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
-  Alert,
   Tooltip
 } from '@mui/material'
 import Grid from '@mui/material/Grid'
 import { LoadingButton } from '@mui/lab'
 import { toast } from 'react-toastify'
 
-
 import type { ApplicationDto } from '@/generated'
-import { useGetApplicationsMetadata, usePatchApplicationsIdStatus, usePostApplicationsIdSecretRegenerate } from '@/generated'
+import {
+  useGetApplicationsMetadata,
+  usePatchApplicationsIdStatus,
+  usePostApplicationsIdSecretRegenerate
+} from '@/generated'
 import { useBreadcrumbs } from '@/contexts/BreadcrumbsContext'
 import { ROUTES } from '@/configs/routes'
 
@@ -61,7 +64,7 @@ interface ApplicationFormProps {
 
 export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false, onSubmit }: ApplicationFormProps) => {
   const router = useRouter()
-  const [showSecret, setShowSecret] = useState(false)
+  const [_showSecret, _setShowSecret] = useState(false)
 
   // New State for features
   const [isActive, setIsActive] = useState(true)
@@ -70,6 +73,7 @@ export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false
   const [newSecret, setNewSecret] = useState('')
   const [copiedSecret, setCopiedSecret] = useState(false)
   const [isTogglingStatus, setIsTogglingStatus] = useState(false)
+
   const [confirmState, setConfirmState] = useState<{
     open: boolean
     title: string
@@ -79,7 +83,7 @@ export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false
     open: false,
     title: '',
     message: '',
-    onConfirm: () => { }
+    onConfirm: () => {}
   })
 
   // Helper for custom confirmation
@@ -150,6 +154,7 @@ export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false
       setValue('postLogoutRedirectUris', initialData.postLogoutRedirectUris || [])
 
       const permissions = initialData.permissions || []
+
       // Normalize permissions: keep the prefix (gt:, scp:, ept:) if it exists, otherwise assume scp: or just keep as is
       setValue('scopes', permissions)
 
@@ -164,6 +169,7 @@ export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false
     // Ensure all scopes have a prefix if they don't already
     const processedPermissions = data.scopes.map((s: string) => {
       if (s.startsWith('scp:') || s.startsWith('gt:') || s.startsWith('ept:')) return s
+
       return `scp:${s}` // Default to scp: for custom/unprefixed ones
     })
 
@@ -173,6 +179,7 @@ export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false
       postLogoutRedirectUris: data.postLogoutRedirectUris.join(','),
       permissions: processedPermissions.join(' ')
     }
+
     const result = await onSubmit(submissionData)
 
     if (result && result.clientSecret) {
@@ -189,13 +196,18 @@ export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false
 
   const handleCopyClientId = () => {
     const clientId = watch('clientId')
+
     navigator.clipboard.writeText(clientId)
   }
 
   const handleToggleScope = (scope: string) => {
     const current = [...selectedScopes]
+
     if (current.includes(scope)) {
-      setValue('scopes', current.filter(s => s !== scope))
+      setValue(
+        'scopes',
+        current.filter(s => s !== scope)
+      )
     } else {
       setValue('scopes', [...current, scope])
     }
@@ -228,6 +240,7 @@ export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false
 
   const handleRegenerateSecret = async () => {
     const id = initialData?.id
+
     if (!id) return
 
     requestConfirm(
@@ -274,7 +287,7 @@ export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false
     if (!copiedSecret) {
       requestConfirm(
         'Secret Not Copied',
-        'You haven\'t copied the new secret yet. You won\'t be able to see it again after closing this window. Are you sure you want to close?',
+        "You haven't copied the new secret yet. You won't be able to see it again after closing this window. Are you sure you want to close?",
         close
       )
     } else {
@@ -299,7 +312,9 @@ export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false
       >
         <i className={icon} style={{ color: 'white', fontSize: 18 }} />
       </Box>
-      <Typography variant='h6' fontWeight='600' sx={{ color: 'text.primary' }}>{title}</Typography>
+      <Typography variant='h6' fontWeight='600' sx={{ color: 'text.primary' }}>
+        {title}
+      </Typography>
     </Box>
   )
 
@@ -308,7 +323,17 @@ export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false
 
     return (
       <Box sx={{ mb: 4 }}>
-        <Typography variant='body2' sx={{ mb: 2, color: 'text.secondary', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+        <Typography
+          variant='body2'
+          sx={{
+            mb: 2,
+            color: 'text.secondary',
+            fontWeight: 600,
+            fontSize: '0.75rem',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px'
+          }}
+        >
           {title}
         </Typography>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>
@@ -323,22 +348,24 @@ export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false
                 onClick={() => handleToggleScope(item)}
                 icon={isSelected ? <i className='tabler-check' style={{ fontSize: 16 }} /> : undefined}
                 variant={isSelected ? 'filled' : 'outlined'}
-                sx={(theme) => ({
+                sx={_theme => ({
                   borderRadius: 2,
                   px: 0.5,
                   py: 0.5,
                   transition: 'all 0.2s',
-                  ...(isSelected ? {
-                    bgcolor: activeColor,
-                    color: 'white',
-                    borderColor: activeColor,
-                    '& .MuiChip-icon': { color: 'white' },
-                    '&:hover': { bgcolor: alpha(activeColor, 0.8) }
-                  } : {
-                    borderColor: 'divider',
-                    color: 'text.secondary',
-                    '&:hover': { bgcolor: 'action.hover', borderColor: activeColor }
-                  })
+                  ...(isSelected
+                    ? {
+                        bgcolor: activeColor,
+                        color: 'white',
+                        borderColor: activeColor,
+                        '& .MuiChip-icon': { color: 'white' },
+                        '&:hover': { bgcolor: alpha(activeColor, 0.8) }
+                      }
+                    : {
+                        borderColor: 'divider',
+                        color: 'text.secondary',
+                        '&:hover': { bgcolor: 'action.hover', borderColor: activeColor }
+                      })
                 })}
               />
             )
@@ -354,7 +381,13 @@ export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false
         <Button
           startIcon={<i className='tabler-chevron-left' />}
           onClick={() => router.push(ROUTES.APPLICATIONS.LIST)}
-          sx={{ color: 'text.secondary', textTransform: 'none', mb: 1, p: 0, '&:hover': { bgcolor: 'transparent', color: 'text.primary' } }}
+          sx={{
+            color: 'text.secondary',
+            textTransform: 'none',
+            mb: 1,
+            p: 0,
+            '&:hover': { bgcolor: 'transparent', color: 'text.primary' }
+          }}
         >
           Back
         </Button>
@@ -372,7 +405,6 @@ export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false
         }}
       >
         <CardContent sx={{ p: { xs: 4, md: 6 } }}>
-
           {/* General Information Section */}
           <Box sx={{ mb: 8 }}>
             {sectionHeader('General Information', 'tabler-info-circle', '#00CFE8')}
@@ -411,7 +443,7 @@ export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false
                               <i className='tabler-copy' />
                             </IconButton>
                           </InputAdornment>
-                        ),
+                        )
                       }}
                     />
                   )}
@@ -493,6 +525,7 @@ export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false
                       renderTags={(value: string[], getTagProps) =>
                         value.map((option: string, index: number) => {
                           const { key, ...tagProps } = getTagProps({ index })
+
                           return (
                             <Chip
                               key={key}
@@ -509,13 +542,16 @@ export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false
                           )
                         })
                       }
-                      renderInput={(params) => (
+                      renderInput={params => (
                         <TextField
                           {...params}
                           label='Redirect URIs'
                           placeholder='Add URI...'
                           error={!!errors.redirectUris}
-                          helperText={errors.redirectUris?.message || 'Callbacks after authentication. Enter a valid URI and press Enter.'}
+                          helperText={
+                            errors.redirectUris?.message ||
+                            'Callbacks after authentication. Enter a valid URI and press Enter.'
+                          }
                           slotProps={{
                             formHelperText: {
                               sx: { mt: 2 }
@@ -542,6 +578,7 @@ export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false
                       renderValue={(value: string[], getTagProps) =>
                         value.map((option: string, index: number) => {
                           const { key, ...tagProps } = getTagProps({ index })
+
                           return (
                             <Chip
                               key={key}
@@ -554,7 +591,7 @@ export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false
                           )
                         })
                       }
-                      renderInput={(params) => (
+                      renderInput={params => (
                         <TextField
                           {...params}
                           label='Post Logout Redirect URIs'
@@ -597,13 +634,20 @@ export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false
 
               {/* Endpoints */}
               {renderChipGroup('Endpoints', metadata?.endpoints || [], 'ept', '#00CFE8')}
-
             </Paper>
           </Box>
 
           {/* Form Actions */}
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pt: 6, flexWrap: 'wrap', gap: 2 }}>
-
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              pt: 6,
+              flexWrap: 'wrap',
+              gap: 2
+            }}
+          >
             {/* Left Side: Danger Zone / Status */}
             {isEdit && (
               <Box sx={{ display: 'flex', gap: 2 }}>
@@ -650,7 +694,7 @@ export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false
                   py: 1.5,
                   borderRadius: 2,
                   fontWeight: 600,
-                  boxShadow: `0 4px 14px 0 ${alpha('#14b8a6', 0.39)}`,
+                  boxShadow: `0 4px 14px 0 ${alpha('#14b8a6', 0.39)}`
                 }}
               >
                 {isEdit ? 'Update Application' : 'Create Application'}
@@ -663,12 +707,12 @@ export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false
       {/* Secret Regeneration Modal */}
       <Dialog
         open={openSecretModal}
-        onClose={() => { }} // Disable backdrop click
-        maxWidth="sm"
+        onClose={() => {}} // Disable backdrop click
+        maxWidth='sm'
         fullWidth
       >
         <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <i className="tabler-alert-triangle text-warning" />
+          <i className='tabler-alert-triangle text-warning' />
           New Client Secret
         </DialogTitle>
         <DialogContent>
@@ -692,7 +736,7 @@ export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false
             }}
           >
             {newSecret}
-            <Tooltip title={copiedSecret ? "Copied!" : "Copy to clipboard"}>
+            <Tooltip title={copiedSecret ? 'Copied!' : 'Copy to clipboard'}>
               <IconButton
                 onClick={() => {
                   navigator.clipboard.writeText(newSecret)
@@ -700,18 +744,18 @@ export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false
                   toast.success('Copied to clipboard')
                 }}
                 sx={{ position: 'absolute', top: 8, right: 8 }}
-                color={copiedSecret ? "success" : "default"}
+                color={copiedSecret ? 'success' : 'default'}
               >
-                <i className={copiedSecret ? "tabler-check" : "tabler-copy"} />
+                <i className={copiedSecret ? 'tabler-check' : 'tabler-copy'} />
               </IconButton>
             </Tooltip>
           </Box>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 3 }}>
           <Button
-            variant="contained"
+            variant='contained'
             onClick={handleCloseSecretModal}
-            color={copiedSecret ? "success" : "primary"}
+            color={copiedSecret ? 'success' : 'primary'}
             disabled={!copiedSecret} // Force copy
           >
             {copiedSecret ? 'I have saved it' : 'Copy to continue'}
@@ -723,32 +767,28 @@ export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false
       <Dialog
         open={confirmState.open}
         onClose={() => setConfirmState(prev => ({ ...prev, open: false }))}
-        maxWidth="xs"
+        maxWidth='xs'
         fullWidth
         PaperProps={{
           sx: { borderRadius: 3, p: 2 }
         }}
       >
-        <DialogTitle sx={{ fontWeight: 600 }}>
-          {confirmState.title}
-        </DialogTitle>
+        <DialogTitle sx={{ fontWeight: 600 }}>{confirmState.title}</DialogTitle>
         <DialogContent>
-          <DialogContentText sx={{ color: 'text.primary' }}>
-            {confirmState.message}
-          </DialogContentText>
+          <DialogContentText sx={{ color: 'text.primary' }}>{confirmState.message}</DialogContentText>
         </DialogContent>
         <DialogActions sx={{ gap: 2, pb: 2, px: 3 }}>
           <Button
-            variant="outlined"
-            color="secondary"
+            variant='outlined'
+            color='secondary'
             onClick={() => setConfirmState(prev => ({ ...prev, open: false }))}
             sx={{ borderRadius: 2, px: 4 }}
           >
             Cancel
           </Button>
           <Button
-            variant="contained"
-            color="primary"
+            variant='contained'
+            color='primary'
             onClick={() => {
               setConfirmState(prev => ({ ...prev, open: false }))
               confirmState.onConfirm()
@@ -764,6 +804,6 @@ export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false
           </Button>
         </DialogActions>
       </Dialog>
-    </form >
+    </form>
   )
 }

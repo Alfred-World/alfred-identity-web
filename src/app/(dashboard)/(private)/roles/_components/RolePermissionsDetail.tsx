@@ -2,11 +2,7 @@
 
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 
-import {
-  useInfiniteQuery,
-  type InfiniteData,
-  type UseInfiniteQueryResult
-} from '@tanstack/react-query'
+import { useInfiniteQuery } from '@tanstack/react-query'
 
 import Grid from '@mui/material/Grid'
 import Card from '@mui/material/Card'
@@ -22,16 +18,8 @@ import { alpha, useTheme } from '@mui/material/styles'
 
 import { toast } from 'react-toastify'
 
-import {
-  usePostRolesIdPermissions,
-  getPermissions
-} from '@/generated/identity-api'
-import type {
-  RoleDto,
-  PermissionDto,
-  PermissionDtoApiPagedResponse,
-  PermissionDtoPageResult
-} from '@/generated/identity-api'
+import { usePostRolesIdPermissions, getPermissions } from '@/generated/identity-api'
+import type { RoleDto, PermissionDto, PermissionDtoPageResult } from '@/generated/identity-api'
 import { type ApiReturn } from '@/libs/custom-instance'
 
 interface RolePermissionsDetailProps {
@@ -45,8 +33,7 @@ const getItemsFromPage = (page: ApiReturn<PermissionDtoPageResult>) => {
     return page.result.items
   }
 
-  
-return []
+  return []
 }
 
 const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) => {
@@ -71,14 +58,13 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
         sort: 'resource,action' // Server sort by resource then action
       })
     },
-    getNextPageParam: (lastPage) => {
+    getNextPageParam: lastPage => {
       // Check for API success and pagination info
       if (lastPage.success && lastPage.result?.hasNextPage) {
         return (lastPage.result.page || 0) + 1
       }
 
-      
-return undefined
+      return undefined
     }
   })
 
@@ -118,13 +104,16 @@ return undefined
   /* eslint-enable @typescript-eslint/no-explicit-any */
 
   // -- 4. Infinite Scroll Observer --
-  const handleObserver = useCallback((entries: IntersectionObserverEntry[]) => {
-    const target = entries[0]
+  const handleObserver = useCallback(
+    (entries: IntersectionObserverEntry[]) => {
+      const target = entries[0]
 
-    if (target.isIntersecting && hasNextPage && !isFetchingNextPage) {
-      fetchNextPage()
-    }
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
+      if (target.isIntersecting && hasNextPage && !isFetchingNextPage) {
+        fetchNextPage()
+      }
+    },
+    [hasNextPage, isFetchingNextPage, fetchNextPage]
+  )
 
   useEffect(() => {
     const observer = new IntersectionObserver(handleObserver, {
@@ -133,15 +122,16 @@ return undefined
       threshold: 1.0
     })
 
-    if (loadMoreRef.current) {
-      observer.observe(loadMoreRef.current)
+    const currentRef = loadMoreRef.current
+
+    if (currentRef) {
+      observer.observe(currentRef)
     }
 
     return () => {
-      if (loadMoreRef.current) observer.unobserve(loadMoreRef.current)
+      if (currentRef) observer.unobserve(currentRef)
     }
   }, [handleObserver])
-
 
   // -- 5. Grouping Logic --
   // Group by 'resource'
@@ -158,13 +148,10 @@ return undefined
     return groups
   }, [allPermissions])
 
-
   // -- 6. Action Handlers --
 
   const handleToggle = (id: string) => {
-    setSelectedPermissionIds(prev =>
-      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
-    )
+    setSelectedPermissionIds(prev => (prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]))
   }
 
   const handleSelectAllGroup = (permsInGroup: PermissionDto[]) => {
@@ -174,17 +161,14 @@ return undefined
       // Add only IDs that aren't already selected
       const newIds = idsToSelect.filter(id => !prev.includes(id))
 
-      
-return [...prev, ...newIds]
+      return [...prev, ...newIds]
     })
   }
 
   const handleRevokeAllGroup = (permsInGroup: PermissionDto[]) => {
     const idsToRevoke = permsInGroup.map(p => p.id!)
 
-    setSelectedPermissionIds(prev =>
-      prev.filter(id => !idsToRevoke.includes(id))
-    )
+    setSelectedPermissionIds(prev => prev.filter(id => !idsToRevoke.includes(id)))
   }
 
   const handleSave = () => {
@@ -206,7 +190,6 @@ return [...prev, ...newIds]
     }
   }
 
-
   // -- Render --
 
   if (isLoading || isLoadingAll) {
@@ -220,7 +203,7 @@ return [...prev, ...newIds]
   if (!role) {
     return (
       <Card sx={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', p: 10 }}>
-        <Typography color="text.secondary">Select a role to manage permissions</Typography>
+        <Typography color='text.secondary'>Select a role to manage permissions</Typography>
       </Card>
     )
   }
@@ -239,13 +222,13 @@ return [...prev, ...newIds]
                 display: 'flex'
               }}
             >
-              <i className="tabler-shield-check" style={{ fontSize: '1.5rem' }} />
+              <i className='tabler-shield-check' style={{ fontSize: '1.5rem' }} />
             </Box>
             <Box>
-              <Typography variant="h5" fontWeight={600}>
+              <Typography variant='h5' fontWeight={600}>
                 {role.name}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant='body2' color='text.secondary'>
                 Manage access and system module permissions for this role.
               </Typography>
             </Box>
@@ -253,20 +236,17 @@ return [...prev, ...newIds]
         }
         action={
           <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-            <Typography variant="caption" color="text.secondary">
+            <Typography variant='caption' color='text.secondary'>
               {selectedPermissionIds.length} permissions selected
             </Typography>
-            <Button
-              variant="text"
-              color="secondary"
-              onClick={handleReset}
-              disabled={isUpdating || !!role.isImmutable}
-            >
+            <Button variant='text' color='secondary' onClick={handleReset} disabled={isUpdating || !!role.isImmutable}>
               Reset
             </Button>
             <Button
-              variant="contained"
-              startIcon={isUpdating ? <CircularProgress size={20} color="inherit" /> : <i className="tabler-device-floppy" />}
+              variant='contained'
+              startIcon={
+                isUpdating ? <CircularProgress size={20} color='inherit' /> : <i className='tabler-device-floppy' />
+              }
               onClick={handleSave}
               disabled={isUpdating || !!role.isImmutable}
               sx={{
@@ -285,7 +265,7 @@ return [...prev, ...newIds]
       <Divider />
 
       <CardContent
-        id="permissions-scroll-container"
+        id='permissions-scroll-container'
         sx={{
           flexGrow: 1,
           overflowY: 'auto',
@@ -297,7 +277,7 @@ return [...prev, ...newIds]
           {Object.entries(groupedPermissions).map(([resource, perms]) => {
             // Note: This logic only considers *loaded* permissions for "All Selected" check
             const groupIds = perms.map(p => p.id!)
-            const isAllLoadedSelected = groupIds.length > 0 && groupIds.every(id => selectedPermissionIds.includes(id))
+            const _isAllLoadedSelected = groupIds.length > 0 && groupIds.every(id => selectedPermissionIds.includes(id))
 
             return (
               <Grid size={{ xs: 12 }} key={resource}>
@@ -318,23 +298,33 @@ return [...prev, ...newIds]
                   }}
                 >
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <i className="tabler-lock-open" style={{ color: theme.palette.info.main }} />
-                    <Typography variant="subtitle1" fontWeight={600} color="text.primary">
+                    <i className='tabler-lock-open' style={{ color: theme.palette.info.main }} />
+                    <Typography variant='subtitle1' fontWeight={600} color='text.primary'>
                       {resource} Management
                     </Typography>
                   </Box>
                   {!role.isImmutable && (
                     <Box sx={{ display: 'flex', gap: 4 }}>
                       <Typography
-                        variant="caption"
-                        sx={{ cursor: 'pointer', color: 'primary.main', fontWeight: 600, '&:hover': { textDecoration: 'underline' } }}
+                        variant='caption'
+                        sx={{
+                          cursor: 'pointer',
+                          color: 'primary.main',
+                          fontWeight: 600,
+                          '&:hover': { textDecoration: 'underline' }
+                        }}
                         onClick={() => handleSelectAllGroup(perms)}
                       >
                         Select All
                       </Typography>
                       <Typography
-                        variant="caption"
-                        sx={{ cursor: 'pointer', color: 'error.main', fontWeight: 600, '&:hover': { textDecoration: 'underline' } }}
+                        variant='caption'
+                        sx={{
+                          cursor: 'pointer',
+                          color: 'error.main',
+                          fontWeight: 600,
+                          '&:hover': { textDecoration: 'underline' }
+                        }}
                         onClick={() => handleRevokeAllGroup(perms)}
                       >
                         Revoke All
@@ -369,17 +359,17 @@ return [...prev, ...newIds]
                           }}
                         >
                           <Box>
-                            <Typography variant="body2" fontWeight={600}>
+                            <Typography variant='body2' fontWeight={600}>
                               {perm.name}
                             </Typography>
-                            <Typography variant="caption" color="text.secondary">
+                            <Typography variant='caption' color='text.secondary'>
                               {perm.description || 'Allow access to this permission'}
                             </Typography>
                           </Box>
                           <Switch
                             checked={isSelected}
                             onChange={() => handleToggle(perm.id!)}
-                            size="small"
+                            size='small'
                             disabled={!!role.isImmutable}
                           />
                         </Box>

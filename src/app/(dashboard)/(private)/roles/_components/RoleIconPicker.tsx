@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
+
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Popover from '@mui/material/Popover'
@@ -54,6 +55,7 @@ const RoleIconPicker = ({ value, onChange, error, helperText }: RoleIconPickerPr
   const filteredIcons = useMemo(() => {
     if (!searchTerm) return allIcons
     const term = searchTerm.toLowerCase()
+
     return allIcons.filter(icon => icon.toLowerCase().includes(term))
   }, [searchTerm, allIcons])
 
@@ -63,25 +65,31 @@ const RoleIconPicker = ({ value, onChange, error, helperText }: RoleIconPickerPr
   }, [filteredIcons, visibleCount])
 
   // Callback ref for the sentinel
-  const sentinelRef = useCallback((node: HTMLDivElement) => {
-    if (!node) return
+  const sentinelRef = useCallback(
+    (node: HTMLDivElement) => {
+      if (!node) return
 
-    if (observerRef.current) {
-      observerRef.current.disconnect()
-    }
-
-    observerRef.current = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting) {
-        // Use functional update to ensure we don't depend on stale closures
-        setVisibleCount((prev) => prev + PAGE_SIZE)
+      if (observerRef.current) {
+        observerRef.current.disconnect()
       }
-    }, {
-      root: scrollContainer,
-      rootMargin: '300px',
-    })
 
-    observerRef.current.observe(node)
-  }, [visibleIcons.length, scrollContainer]) // Re-attach when list length changes or container becomes available
+      observerRef.current = new IntersectionObserver(
+        entries => {
+          if (entries[0].isIntersecting) {
+            // Use functional update to ensure we don't depend on stale closures
+            setVisibleCount(prev => prev + PAGE_SIZE)
+          }
+        },
+        {
+          root: scrollContainer,
+          rootMargin: '300px'
+        }
+      )
+
+      observerRef.current.observe(node)
+    },
+    [scrollContainer]
+  ) // Re-attach when container becomes available
 
   const open = Boolean(anchorEl)
 
@@ -89,8 +97,8 @@ const RoleIconPicker = ({ value, onChange, error, helperText }: RoleIconPickerPr
     <Box>
       <TextField
         fullWidth
-        label="Role Icon"
-        placeholder="Select an icon"
+        label='Role Icon'
+        placeholder='Select an icon'
         value={value}
         onClick={handleClick}
         error={error}
@@ -98,13 +106,13 @@ const RoleIconPicker = ({ value, onChange, error, helperText }: RoleIconPickerPr
         InputProps={{
           readOnly: true,
           startAdornment: value ? (
-            <InputAdornment position="start">
+            <InputAdornment position='start'>
               <i className={`${value} text-xl`} />
             </InputAdornment>
           ) : null,
           endAdornment: (
-            <InputAdornment position="end">
-              <i className="tabler-chevron-down" />
+            <InputAdornment position='end'>
+              <i className='tabler-chevron-down' />
             </InputAdornment>
           ),
           sx: { cursor: 'pointer' }
@@ -121,11 +129,11 @@ const RoleIconPicker = ({ value, onChange, error, helperText }: RoleIconPickerPr
         onClose={handleClose}
         anchorOrigin={{
           vertical: 'bottom',
-          horizontal: 'left',
+          horizontal: 'left'
         }}
         transformOrigin={{
           vertical: 'top',
-          horizontal: 'left',
+          horizontal: 'left'
         }}
         PaperProps={{
           sx: {
@@ -137,29 +145,29 @@ const RoleIconPicker = ({ value, onChange, error, helperText }: RoleIconPickerPr
           }
         }}
       >
-        <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>
+        <Typography variant='subtitle2' sx={{ mb: 1.5, fontWeight: 600 }}>
           Select Icon ({filteredIcons.length})
         </Typography>
 
         <TextField
-          size="small"
-          placeholder="Search icons..."
+          size='small'
+          placeholder='Search icons...'
           fullWidth
           value={searchTerm}
-          onChange={(e) => {
+          onChange={e => {
             setSearchTerm(e.target.value)
             setVisibleCount(PAGE_SIZE)
           }}
           sx={{ mb: 2 }}
           InputProps={{
             startAdornment: (
-              <InputAdornment position="start">
-                <i className="tabler-search" />
+              <InputAdornment position='start'>
+                <i className='tabler-search' />
               </InputAdornment>
             ),
             endAdornment: searchTerm && (
-              <InputAdornment position="end" sx={{ cursor: 'pointer' }} onClick={() => setSearchTerm('')}>
-                <i className="tabler-x" />
+              <InputAdornment position='end' sx={{ cursor: 'pointer' }} onClick={() => setSearchTerm('')}>
+                <i className='tabler-x' />
               </InputAdornment>
             )
           }}
@@ -179,7 +187,7 @@ const RoleIconPicker = ({ value, onChange, error, helperText }: RoleIconPickerPr
             borderRadius: 1
           }}
         >
-          {visibleIcons.map((icon) => (
+          {visibleIcons.map(icon => (
             <Button
               key={icon}
               variant={value === icon ? 'contained' : 'text'}
@@ -220,7 +228,7 @@ const RoleIconPicker = ({ value, onChange, error, helperText }: RoleIconPickerPr
 
           {filteredIcons.length === 0 && (
             <Box sx={{ gridColumn: 'span 8', textAlign: 'center', py: 4, color: 'text.secondary' }}>
-              <Typography variant="body2">No icons found</Typography>
+              <Typography variant='body2'>No icons found</Typography>
             </Box>
           )}
         </Box>

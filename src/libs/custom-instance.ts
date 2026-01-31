@@ -43,7 +43,7 @@ export type ToApiReturn<T> = T extends { result?: infer R | null } ? ApiReturn<N
 
 /**
  * Axios instance with base configuration
- * 
+ *
  * Authentication flow:
  * 1. User logs in via SSO OAuth flow -> NextAuth stores tokens in session
  * 2. Request interceptor gets token from NextAuth session
@@ -134,6 +134,7 @@ AXIOS_INSTANCE.interceptors.response.use(
           ...originalRequest.headers,
           Authorization: `Bearer ${session.accessToken}`
         }
+
         return AXIOS_INSTANCE(originalRequest)
       }
 
@@ -184,10 +185,10 @@ export const customInstance = <T>(
 
       const responseData = error.response?.data as
         | {
-          success?: boolean
-          message?: string
-          errors?: Array<{ message: string; code?: string }>
-        }
+            success?: boolean
+            message?: string
+            errors?: Array<{ message: string; code?: string }>
+          }
         | undefined
 
       // If BE already returned error format, use it

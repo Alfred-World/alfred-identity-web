@@ -68,7 +68,7 @@ async function generateIconsCSS() {
     json: [
       // Iconify JSON file (@iconify/json is a package name, /json/ is directory where files are, then filename)
       require.resolve('@iconify/json/json/tabler.json'),
-      require.resolve('@iconify/json/json/solar.json'),
+      require.resolve('@iconify/json/json/solar.json')
 
       // Custom file with only few icons
       /* {
@@ -247,6 +247,7 @@ async function generateIconsCSS() {
 
   const publicDir = join(__dirname, '../../../public')
   const jsonTarget = join(publicDir, 'icons.json')
+
   await fs.writeFile(jsonTarget, JSON.stringify(iconNames), 'utf8')
 
   console.log(`Saved JSON to ${jsonTarget}!`)

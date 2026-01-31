@@ -1,7 +1,9 @@
 'use client'
 
 import Link from 'next/link'
+
 import { Breadcrumbs, Typography, Link as MuiLink, Box } from '@mui/material'
+
 import { useBreadcrumbs } from '@/contexts/BreadcrumbsContext'
 
 const AppBreadcrumbs = () => {
@@ -12,8 +14,8 @@ const AppBreadcrumbs = () => {
   return (
     <Box sx={{ mb: 4, mt: -2 }}>
       <Breadcrumbs
-        aria-label="breadcrumb"
-        separator={<i className="tabler-chevron-right text-[14px]" />}
+        aria-label='breadcrumb'
+        separator={<i className='tabler-chevron-right text-[14px]' />}
         sx={{
           '& .MuiBreadcrumbs-li': {
             display: 'flex',
@@ -23,7 +25,7 @@ const AppBreadcrumbs = () => {
       >
         <MuiLink
           component={Link}
-          href="/"
+          href='/'
           sx={{
             display: 'flex',
             alignItems: 'center',
@@ -31,7 +33,7 @@ const AppBreadcrumbs = () => {
             '&:hover': { color: 'primary.main' }
           }}
         >
-          <i className="tabler-smart-home mr-1 text-[20px]" />
+          <i className='tabler-smart-home mr-1 text-[20px]' />
         </MuiLink>
 
         {breadcrumbs.map((item, index) => {
@@ -39,11 +41,7 @@ const AppBreadcrumbs = () => {
 
           if (isLast || !item.href) {
             return (
-              <Typography
-                key={index}
-                variant="body1"
-                sx={{ color: 'text.primary', fontWeight: 500 }}
-              >
+              <Typography key={index} variant='body1' sx={{ color: 'text.primary', fontWeight: 500 }}>
                 {item.title}
               </Typography>
             )
@@ -54,7 +52,7 @@ const AppBreadcrumbs = () => {
               key={index}
               component={Link}
               href={item.href}
-              variant="body1"
+              variant='body1'
               sx={{
                 color: 'text.secondary',
                 '&:hover': { color: 'primary.main' }

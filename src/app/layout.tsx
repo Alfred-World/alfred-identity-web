@@ -18,8 +18,7 @@ import '@assets/iconify-icons/generated-icons.css'
 
 export const metadata = {
   title: 'Alfred Identity',
-  description:
-    'Alfred Identity Application',
+  description: 'Alfred Identity Application'
 }
 
 const RootLayout = async (props: ChildrenType) => {

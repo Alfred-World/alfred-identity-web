@@ -2,10 +2,21 @@
 
 import React, { useState } from 'react'
 
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
-import { IconButton, Menu, MenuItem, ListItemIcon, ListItemText, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material'
+import {
+  IconButton,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button
+} from '@mui/material'
 
 import { toast } from 'react-toastify'
 
@@ -30,7 +41,7 @@ export const ApplicationListActions = ({ id, displayName, onDeleteSuccess }: App
         setIsDeleteDialogOpen(false)
         onDeleteSuccess?.()
       },
-      onError: (error) => {
+      onError: error => {
         const message = error.errors[0].message || 'Failed to delete application'
 
         toast.error(message)
@@ -68,13 +79,13 @@ export const ApplicationListActions = ({ id, displayName, onDeleteSuccess }: App
   }
 
   return (
-    <div onClick={(e) => e.stopPropagation()}>
+    <div onClick={e => e.stopPropagation()}>
       <IconButton
-        aria-label="more"
+        aria-label='more'
         id={`application-actions-button-${id}`}
         aria-controls={open ? `application-actions-menu-${id}` : undefined}
         aria-expanded={open ? 'true' : undefined}
-        aria-haspopup="true"
+        aria-haspopup='true'
         onClick={handleClick}
       >
         <i className='tabler-dots-vertical text-textSecondary' />
@@ -105,11 +116,15 @@ export const ApplicationListActions = ({ id, displayName, onDeleteSuccess }: App
           <ListItemIcon>
             <i className='tabler-trash text-xl text-error' />
           </ListItemIcon>
-          <ListItemText slotProps={{
-            primary: {
-              color: 'error'
-            }
-          }}>Delete</ListItemText>
+          <ListItemText
+            slotProps={{
+              primary: {
+                color: 'error'
+              }
+            }}
+          >
+            Delete
+          </ListItemText>
         </MenuItem>
       </Menu>
 
@@ -117,21 +132,21 @@ export const ApplicationListActions = ({ id, displayName, onDeleteSuccess }: App
       <Dialog
         open={isDeleteDialogOpen}
         onClose={handleCancelDelete}
-        onClick={(e) => e.stopPropagation()}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
+        onClick={e => e.stopPropagation()}
+        aria-labelledby='alert-dialog-title'
+        aria-describedby='alert-dialog-description'
       >
-        <DialogTitle id="alert-dialog-title">Delete Application?</DialogTitle>
+        <DialogTitle id='alert-dialog-title'>Delete Application?</DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description">
+          <DialogContentText id='alert-dialog-description'>
             Are you sure you want to delete application <strong>{displayName}</strong>? This action cannot be undone.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCancelDelete} color="inherit">
+          <Button onClick={handleCancelDelete} color='inherit'>
             Cancel
           </Button>
-          <Button onClick={handleConfirmDelete} color="error" variant="contained" autoFocus disabled={isPending}>
+          <Button onClick={handleConfirmDelete} color='error' variant='contained' autoFocus disabled={isPending}>
             {isPending ? 'Deleting...' : 'Delete'}
           </Button>
         </DialogActions>

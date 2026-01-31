@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo } from 'react'
 
 import { Grid, Box } from '@mui/material'
 import { toast } from 'react-toastify'
@@ -19,11 +19,13 @@ const RolesPage = () => {
   const [editingRole, setEditingRole] = useState<RoleDto | null>(null)
   const [roleToDelete, setRoleToDelete] = useState<RoleDto | null>(null)
 
-  const { data: rolesResponse, isLoading: isLoadingRoles, refetch: refetchRoles } = useGetRoles(
-    {
-      view: "detail"
-    }
-  )
+  const {
+    data: rolesResponse,
+    isLoading: isLoadingRoles,
+    refetch: refetchRoles
+  } = useGetRoles({
+    view: 'detail'
+  })
 
   const roles = useMemo(() => (rolesResponse?.success ? rolesResponse.result.items || [] : []), [rolesResponse])
 
@@ -41,7 +43,7 @@ const RolesPage = () => {
 
   const { mutate: deleteRole, isPending: isDeleting } = useDeleteRolesId({
     mutation: {
-      onSuccess: (data) => {
+      onSuccess: data => {
         if (data.success) {
           toast.success('Role deleted successfully')
           refetchRoles()
@@ -100,10 +102,7 @@ const RolesPage = () => {
 
         {/* Right Column: Permission Details */}
         <Grid size={{ xs: 12, md: 8, lg: 9 }}>
-          <RolePermissionsDetail
-            role={selectedRole}
-            isLoading={!selectedRole && isLoadingRoles}
-          />
+          <RolePermissionsDetail role={selectedRole} isLoading={!selectedRole && isLoadingRoles} />
         </Grid>
       </Grid>
 
@@ -118,10 +117,10 @@ const RolesPage = () => {
         open={isDeleteDialogOpen}
         onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={handleConfirmDelete}
-        title="Delete Role"
+        title='Delete Role'
         content={`Are you sure you want to delete role "${roleToDelete?.name}"? This action cannot be undone.`}
-        confirmText="Delete"
-        color="error"
+        confirmText='Delete'
+        color='error'
         loading={isDeleting}
       />
     </Box>
