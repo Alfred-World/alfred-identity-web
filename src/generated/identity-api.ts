@@ -652,12 +652,25 @@ export interface UpdateRoleCommand {
 
 export interface UserDto {
   id?: string;
-  userName?: string;
-  email?: string;
-  fullName?: string;
-  status?: string;
-  emailConfirmed?: boolean;
-  createdAt?: string;
+
+  /** @nullable */
+  userName?: string | null;
+
+  /** @nullable */
+  email?: string | null;
+
+  /** @nullable */
+  fullName?: string | null;
+
+  /** @nullable */
+  status?: string | null;
+
+  /** @nullable */
+  emailConfirmed?: boolean | null;
+
+  /** @nullable */
+  createdAt?: string | null;
+  roles?: RoleDto[];
 }
 
 /**
