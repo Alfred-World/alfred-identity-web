@@ -1,36 +1,36 @@
-'use client'
+'use client';
 
 // Next Imports
-import dynamic from 'next/dynamic'
+import dynamic from 'next/dynamic';
 
 // MUI Imports
-import Card from '@mui/material/Card'
-import CardHeader from '@mui/material/CardHeader'
-import CardContent from '@mui/material/CardContent'
-import Typography from '@mui/material/Typography'
-import { useTheme } from '@mui/material/styles'
+import Card from '@mui/material/Card';
+import CardHeader from '@mui/material/CardHeader';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
+import { useTheme } from '@mui/material/styles';
 
 // Third Party Imports
-import type { ApexOptions } from 'apexcharts'
+import type { ApexOptions } from 'apexcharts';
 
 // Components Imports
-import OptionMenu from '@core/components/option-menu'
-import CustomAvatar from '@core/components/mui/Avatar'
+import OptionMenu from '@core/components/option-menu';
+import CustomAvatar from '@core/components/mui/Avatar';
 
 // Styled Component Imports
-const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
+const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'));
 
 type DataType = {
-  title: string
-  amount: string
-  trendDiff: number
-  trend?: 'positive' | 'negative'
-}
+  title: string;
+  amount: string;
+  trendDiff: number;
+  trend?: 'positive' | 'negative';
+};
 
 // Vars
 const series = [
   { data: [2000, 2000, 4000, 4000, 3050, 3050, 2050, 2050, 3050, 3050, 4700, 4700, 2750, 2750, 5700, 5700] }
-]
+];
 
 const data: DataType[] = [
   {
@@ -44,14 +44,14 @@ const data: DataType[] = [
     trendDiff: 576.24,
     amount: '$2,207.03'
   }
-]
+];
 
 const ProjectStatus = () => {
   // Hooks
-  const theme = useTheme()
+  const theme = useTheme();
 
   // Vars
-  const warningColor = theme.palette.warning.main
+  const warningColor = theme.palette.warning.main;
 
   const options: ApexOptions = {
     chart: {
@@ -113,7 +113,7 @@ const ProjectStatus = () => {
       axisBorder: { show: false }
     },
     yaxis: { show: false }
-  }
+  };
 
   return (
     <Card>
@@ -153,7 +153,7 @@ const ProjectStatus = () => {
         </div>
       </CardContent>
     </Card>
-  )
-}
+  );
+};
 
-export default ProjectStatus
+export default ProjectStatus;

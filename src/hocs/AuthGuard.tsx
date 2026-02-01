@@ -1,14 +1,14 @@
 // Third-party Imports
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth';
 
 // Type Imports
-import type { ChildrenType } from '@core/types'
+import type { ChildrenType } from '@core/types';
 
 // Component Imports
-import AuthRedirect from '@/components/AuthRedirect'
+import AuthRedirect from '@/components/AuthRedirect';
 
 export default async function AuthGuard({ children }: ChildrenType) {
-  const session = await getServerSession()
+  const session = await getServerSession();
 
-  return <>{session ? children : <AuthRedirect />}</>
+  return <>{session ? children : <AuthRedirect />}</>;
 }

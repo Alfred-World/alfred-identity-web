@@ -1,5 +1,5 @@
 // React Imports
-import type { SVGAttributes } from 'react'
+import type { SVGAttributes } from 'react';
 
 const Check = (props: SVGAttributes<SVGElement>) => {
   return (
@@ -17,7 +17,7 @@ const Check = (props: SVGAttributes<SVGElement>) => {
         strokeLinejoin='round'
       />
     </svg>
-  )
-}
+  );
+};
 
-export default Check
+export default Check;

@@ -1,15 +1,15 @@
 // MUI Imports
-import Grid from '@mui/material/Grid'
-import Radio from '@mui/material/Radio'
-import Checkbox from '@mui/material/Checkbox'
-import Typography from '@mui/material/Typography'
-import { styled } from '@mui/material/styles'
+import Grid from '@mui/material/Grid';
+import Radio from '@mui/material/Radio';
+import Checkbox from '@mui/material/Checkbox';
+import Typography from '@mui/material/Typography';
+import { styled } from '@mui/material/styles';
 
 // Third-party Imports
-import classnames from 'classnames'
+import classnames from 'classnames';
 
 // Type Imports
-import type { CustomInputVerticalProps } from './types'
+import type { CustomInputVerticalProps } from './types';
 
 const Root = styled('div', {
   name: 'MuiCustomInputVertical',
@@ -45,7 +45,7 @@ const Root = styled('div', {
   '&.checkbox-only .MuiCheckbox-root': {
     marginTop: theme.spacing(-2)
   }
-}))
+}));
 
 const Title = styled(Typography, {
   name: 'MuiCustomInputVertical',
@@ -53,7 +53,7 @@ const Title = styled(Typography, {
 })(({ theme }) => ({
   fontWeight: theme.typography.fontWeightMedium,
   color: 'var(--mui-palette-text-primary) !important'
-}))
+}));
 
 const Content = styled(Typography, {
   name: 'MuiCustomInputVertical',
@@ -61,28 +61,28 @@ const Content = styled(Typography, {
 })(({ theme }) => ({
   ...theme.typography.body2,
   textAlign: 'center'
-}))
+}));
 
 const RadioInput = styled(Radio, {
   name: 'MuiCustomInputVertical',
   slot: 'input'
 })(({ theme }) => ({
   marginBottom: theme.spacing(-2)
-}))
+}));
 
 const CheckboxInput = styled(Checkbox, {
   name: 'MuiCustomInputVertical',
   slot: 'input'
 })(({ theme }) => ({
   marginBottom: theme.spacing(-2)
-}))
+}));
 
 const CustomInputVertical = (props: CustomInputVerticalProps) => {
   // Props
-  const { type, data, name, selected, gridProps, handleChange, color = 'primary' } = props
+  const { type, data, name, selected, gridProps, handleChange, color = 'primary' } = props;
 
   // Vars
-  const { title, value, content, asset } = data
+  const { title, value, content, asset } = data;
 
   const renderComponent = () => {
     return (
@@ -110,10 +110,10 @@ const CustomInputVertical = (props: CustomInputVerticalProps) => {
           )}
         </Root>
       </Grid>
-    )
-  }
+    );
+  };
 
-  return data ? renderComponent() : null
-}
+  return data ? renderComponent() : null;
+};
 
-export default CustomInputVertical
+export default CustomInputVertical;

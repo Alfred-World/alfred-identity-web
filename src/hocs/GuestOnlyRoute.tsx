@@ -1,25 +1,25 @@
 // Next Imports
-import { redirect } from 'next/navigation'
+import { redirect } from 'next/navigation';
 
 // Third-party Imports
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth';
 
 // Type Imports
-import type { ChildrenType } from '@core/types'
+import type { ChildrenType } from '@core/types';
 
 // Config Imports
-import themeConfig from '@configs/themeConfig'
+import themeConfig from '@configs/themeConfig';
 
 // Util Imports
 
 const GuestOnlyRoute = async ({ children }: ChildrenType) => {
-  const session = await getServerSession()
+  const session = await getServerSession();
 
   if (session) {
-    redirect(themeConfig.homePageUrl)
+    redirect(themeConfig.homePageUrl);
   }
 
-  return <>{children}</>
-}
+  return <>{children}</>;
+};
 
-export default GuestOnlyRoute
+export default GuestOnlyRoute;

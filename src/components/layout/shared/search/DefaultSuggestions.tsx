@@ -1,15 +1,15 @@
-import Link from 'next/link'
+import Link from 'next/link';
 
-import classnames from 'classnames'
+import classnames from 'classnames';
 
 type DefaultSuggestionsType = {
-  sectionLabel: string
+  sectionLabel: string;
   items: {
-    label: string
-    href: string
-    icon?: string
-  }[]
-}
+    label: string;
+    href: string;
+    icon?: string;
+  }[];
+};
 
 const defaultSuggestions: DefaultSuggestionsType[] = [
   {
@@ -37,7 +37,7 @@ const defaultSuggestions: DefaultSuggestionsType[] = [
       }
     ]
   }
-]
+];
 
 // TODO: Add more default suggestions (e.g. from settings, etc.)
 const DefaultSuggestions = ({ setOpen }: { setOpen: (value: boolean) => void }) => {
@@ -70,7 +70,7 @@ const DefaultSuggestions = ({ setOpen }: { setOpen: (value: boolean) => void }) 
         </div>
       ))}
     </div>
-  )
-}
+  );
+};
 
-export default DefaultSuggestions
+export default DefaultSuggestions;

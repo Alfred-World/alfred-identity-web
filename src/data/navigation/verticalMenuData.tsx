@@ -1,6 +1,6 @@
 // Type Imports
-import type { VerticalMenuDataType } from '@/types/menuTypes'
-import { ROUTES } from '@/configs/routes'
+import type { VerticalMenuDataType } from '@/types/menuTypes';
+import { ROUTES } from '@/configs/routes';
 
 const verticalMenuData = (): VerticalMenuDataType[] => [
   // This is how you will normally render submenu
@@ -29,6 +29,6 @@ const verticalMenuData = (): VerticalMenuDataType[] => [
     icon: 'tabler-lock',
     href: ROUTES.ROLES.LIST
   }
-]
+];
 
-export default verticalMenuData
+export default verticalMenuData;

@@ -1,22 +1,22 @@
 // Next Imports
-import type { Metadata } from 'next'
+import type { Metadata } from 'next';
 
 // Component Imports
-import Login from './_components/Login'
+import Login from './_components/Login';
 
 // Server Action Imports
-import { getServerMode } from '@core/utils/serverHelpers'
+import { getServerMode } from '@core/utils/serverHelpers';
 
 export const metadata: Metadata = {
   title: 'Login',
   description: 'Login to your account'
-}
+};
 
 const LoginPage = async () => {
   // Vars
-  const mode = await getServerMode()
+  const mode = await getServerMode();
 
-  return <Login mode={mode} />
-}
+  return <Login mode={mode} />;
+};
 
-export default LoginPage
+export default LoginPage;

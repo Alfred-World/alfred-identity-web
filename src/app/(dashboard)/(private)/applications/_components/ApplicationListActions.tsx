@@ -1,8 +1,8 @@
-'use client'
+'use client';
 
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 
-import { useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation';
 
 import {
   IconButton,
@@ -16,67 +16,67 @@ import {
   DialogContentText,
   DialogActions,
   Button
-} from '@mui/material'
+} from '@mui/material';
 
-import { toast } from 'react-toastify'
+import { toast } from 'react-toastify';
 
-import { useDeleteApplicationsId } from '@/generated'
+import { useDeleteApplicationsId } from '@/generated';
 
 interface ApplicationListActionsProps {
-  id: string
-  displayName: string
-  onDeleteSuccess?: () => void
+  id: string;
+  displayName: string;
+  onDeleteSuccess?: () => void;
 }
 
 export const ApplicationListActions = ({ id, displayName, onDeleteSuccess }: ApplicationListActionsProps) => {
-  const router = useRouter()
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const open = Boolean(anchorEl)
+  const router = useRouter();
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const open = Boolean(anchorEl);
 
   const { mutate: deleteApplication, isPending } = useDeleteApplicationsId({
     mutation: {
       onSuccess: () => {
-        toast.success(`Application "${displayName}" deleted successfully`)
-        setIsDeleteDialogOpen(false)
-        onDeleteSuccess?.()
+        toast.success(`Application "${displayName}" deleted successfully`);
+        setIsDeleteDialogOpen(false);
+        onDeleteSuccess?.();
       },
       onError: error => {
-        const message = error.errors[0].message || 'Failed to delete application'
+        const message = error.errors[0].message || 'Failed to delete application';
 
-        toast.error(message)
+        toast.error(message);
       }
     }
-  })
+  });
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    event.stopPropagation() // Prevent row click
-    setAnchorEl(event.currentTarget)
-  }
+    event.stopPropagation(); // Prevent row click
+    setAnchorEl(event.currentTarget);
+  };
 
   const handleClose = (event?: React.MouseEvent) => {
-    event?.stopPropagation()
-    setAnchorEl(null)
-  }
+    event?.stopPropagation();
+    setAnchorEl(null);
+  };
 
   const handleEdit = () => {
-    handleClose()
-    router.push(`/applications/${id}`)
-  }
+    handleClose();
+    router.push(`/applications/${id}`);
+  };
 
   const handleDeleteClick = () => {
-    handleClose()
-    setIsDeleteDialogOpen(true)
-  }
+    handleClose();
+    setIsDeleteDialogOpen(true);
+  };
 
   const handleConfirmDelete = () => {
-    deleteApplication({ id })
-  }
+    deleteApplication({ id });
+  };
 
   const handleCancelDelete = (event: React.MouseEvent) => {
-    event.stopPropagation()
-    setIsDeleteDialogOpen(false)
-  }
+    event.stopPropagation();
+    setIsDeleteDialogOpen(false);
+  };
 
   return (
     <div onClick={e => e.stopPropagation()}>
@@ -152,5 +152,5 @@ export const ApplicationListActions = ({ id, displayName, onDeleteSuccess }: App
         </DialogActions>
       </Dialog>
     </div>
-  )
-}
+  );
+};

@@ -1,8 +1,8 @@
 // MUI Imports
-import type { Theme } from '@mui/material/styles'
+import type { Theme } from '@mui/material/styles';
 
 // Type Imports
-import type { SystemMode } from '@core/types'
+import type { SystemMode } from '@core/types';
 
 const customShadows = (mode: SystemMode): Theme['customShadows'] => {
   return {
@@ -41,7 +41,7 @@ const customShadows = (mode: SystemMode): Theme['customShadows'] => {
       md: '0px 4px 16px rgb(var(--mui-palette-success-mainChannel) / 0.4)',
       lg: '0px 6px 20px rgb(var(--mui-palette-success-mainChannel) / 0.5)'
     }
-  }
-}
+  };
+};
 
-export default customShadows
+export default customShadows;

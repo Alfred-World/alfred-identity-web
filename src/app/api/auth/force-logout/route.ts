@@ -1,5 +1,5 @@
-import type { NextRequest } from 'next/server'
-import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 
 /**
  * Force logout endpoint - clears NextAuth session and redirects
@@ -8,16 +8,16 @@ import { NextResponse } from 'next/server'
  * GET /api/auth/force-logout?callbackUrl=<url>
  */
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url)
-  const callbackUrl = searchParams.get('callbackUrl')
+  const { searchParams } = new URL(request.url);
+  const callbackUrl = searchParams.get('callbackUrl');
 
   // Redirect URL
   const redirectUrl = callbackUrl?.startsWith('http')
     ? callbackUrl
-    : new URL(callbackUrl || '/login', request.url).toString()
+    : new URL(callbackUrl || '/login', request.url).toString();
 
   // Create response with redirect
-  const response = NextResponse.redirect(redirectUrl)
+  const response = NextResponse.redirect(redirectUrl);
 
   // Delete all NextAuth related cookies by setting them to expire
   const cookiesToDelete = [
@@ -37,14 +37,14 @@ export async function GET(request: NextRequest) {
     '__Secure-next-auth.pkce.code_verifier',
     'next-auth.state',
     '__Secure-next-auth.state'
-  ]
+  ];
 
   for (const cookieName of cookiesToDelete) {
     // Delete with various path options to ensure removal
     response.cookies.set(cookieName, '', {
       expires: new Date(0),
       path: '/'
-    })
+    });
 
     // Also try deleting with secure flag for __Secure- prefixed cookies
     if (cookieName.startsWith('__Secure-') || cookieName.startsWith('__Host-')) {
@@ -53,9 +53,9 @@ export async function GET(request: NextRequest) {
         path: '/',
         secure: true,
         httpOnly: true
-      })
+      });
     }
   }
 
-  return response
+  return response;
 }

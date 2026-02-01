@@ -1,18 +1,18 @@
 // MUI Imports
-import type { Theme } from '@mui/material/styles'
+import type { Theme } from '@mui/material/styles';
 
 // Type Imports
-import type { VerticalNavState } from '@menu/contexts/verticalNavContext'
+import type { VerticalNavState } from '@menu/contexts/verticalNavContext';
 
 // Util Imports
-import { menuClasses, verticalNavClasses } from '@menu/utils/menuClasses'
+import { menuClasses, verticalNavClasses } from '@menu/utils/menuClasses';
 
 const navigationCustomStyles = (verticalNavOptions: VerticalNavState, theme: Theme) => {
   // Vars
-  const { collapsedWidth, isCollapsed, isHovered, transitionDuration } = verticalNavOptions
+  const { collapsedWidth, isCollapsed, isHovered, transitionDuration } = verticalNavOptions;
 
-  const collapsedHovered = isCollapsed && isHovered
-  const collapsedNotHovered = isCollapsed && !isHovered
+  const collapsedHovered = isCollapsed && isHovered;
+  const collapsedNotHovered = isCollapsed && !isHovered;
 
   return {
     color: 'var(--mui-palette-text-primary)',
@@ -53,7 +53,7 @@ const navigationCustomStyles = (verticalNavOptions: VerticalNavState, theme: The
     [`& .${verticalNavClasses.backdrop}`]: {
       backgroundColor: 'var(--backdrop-color)'
     }
-  }
-}
+  };
+};
 
-export default navigationCustomStyles
+export default navigationCustomStyles;

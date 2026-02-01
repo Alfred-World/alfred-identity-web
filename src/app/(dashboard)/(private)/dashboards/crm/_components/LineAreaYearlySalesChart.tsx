@@ -1,30 +1,30 @@
-'use client'
+'use client';
 
 // Next Imports
-import dynamic from 'next/dynamic'
+import dynamic from 'next/dynamic';
 
 // MUI Imports
-import Card from '@mui/material/Card'
-import Typography from '@mui/material/Typography'
-import CardContent from '@mui/material/CardContent'
-import CardHeader from '@mui/material/CardHeader'
-import { useTheme } from '@mui/material/styles'
+import Card from '@mui/material/Card';
+import Typography from '@mui/material/Typography';
+import CardContent from '@mui/material/CardContent';
+import CardHeader from '@mui/material/CardHeader';
+import { useTheme } from '@mui/material/styles';
 
 // Third-party Imports
-import type { ApexOptions } from 'apexcharts'
+import type { ApexOptions } from 'apexcharts';
 
 // Styled Component Imports
-const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
+const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'));
 
 // Vars
-const series = [{ data: [40, 10, 65, 45] }]
+const series = [{ data: [40, 10, 65, 45] }];
 
 const LineAreaYearlySalesChart = () => {
   // Hooks
-  const theme = useTheme()
+  const theme = useTheme();
 
   // Vars
-  const successColor = theme.palette.success.main
+  const successColor = theme.palette.success.main;
 
   const options: ApexOptions = {
     chart: {
@@ -82,7 +82,7 @@ const LineAreaYearlySalesChart = () => {
       axisBorder: { show: false }
     },
     yaxis: { show: false }
-  }
+  };
 
   return (
     <Card>
@@ -99,7 +99,7 @@ const LineAreaYearlySalesChart = () => {
         </div>
       </CardContent>
     </Card>
-  )
-}
+  );
+};
 
-export default LineAreaYearlySalesChart
+export default LineAreaYearlySalesChart;

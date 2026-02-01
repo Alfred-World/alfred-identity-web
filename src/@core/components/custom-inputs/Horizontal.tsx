@@ -1,15 +1,15 @@
 // MUI Imports
-import Grid from '@mui/material/Grid'
-import Radio from '@mui/material/Radio'
-import Checkbox from '@mui/material/Checkbox'
-import Typography from '@mui/material/Typography'
-import { styled } from '@mui/material/styles'
+import Grid from '@mui/material/Grid';
+import Radio from '@mui/material/Radio';
+import Checkbox from '@mui/material/Checkbox';
+import Typography from '@mui/material/Typography';
+import { styled } from '@mui/material/styles';
 
 // Third-party Imports
-import classnames from 'classnames'
+import classnames from 'classnames';
 
 // Type Imports
-import type { CustomInputHorizontalProps } from './types'
+import type { CustomInputHorizontalProps } from './types';
 
 const Root = styled('div', {
   name: 'MuiCustomInputHorizontal',
@@ -38,7 +38,7 @@ const Root = styled('div', {
   '&.active i, &.active svg': {
     color: 'var(--mui-palette-primary-main) !important'
   }
-}))
+}));
 
 const Title = styled(Typography, {
   name: 'MuiCustomInputHorizontal',
@@ -46,7 +46,7 @@ const Title = styled(Typography, {
 })(({ theme }) => ({
   fontWeight: theme.typography.fontWeightMedium,
   color: 'var(--mui-palette-text-primary) !important'
-}))
+}));
 
 const Meta = styled(Typography, {
   name: 'MuiCustomInputHorizontal',
@@ -54,14 +54,14 @@ const Meta = styled(Typography, {
 })(({ theme }) => ({
   ...theme.typography.body2,
   color: 'var(--mui-palette-text-disabled) !important'
-}))
+}));
 
 const Content = styled(Typography, {
   name: 'MuiCustomInputHorizontal',
   slot: 'content'
 })(({ theme }) => ({
   ...theme.typography.body2
-}))
+}));
 
 const RadioInput = styled(Radio, {
   name: 'MuiCustomInputHorizontal',
@@ -69,7 +69,7 @@ const RadioInput = styled(Radio, {
 })(({ theme }) => ({
   marginBlockStart: theme.spacing(-0.25),
   marginInlineStart: theme.spacing(-0.25)
-}))
+}));
 
 const CheckboxInput = styled(Checkbox, {
   name: 'MuiCustomInputHorizontal',
@@ -77,14 +77,14 @@ const CheckboxInput = styled(Checkbox, {
 })(({ theme }) => ({
   marginBlockStart: theme.spacing(-0.25),
   marginInlineStart: theme.spacing(-0.25)
-}))
+}));
 
 const CustomInputHorizontal = (props: CustomInputHorizontalProps) => {
   // Props
-  const { type, data, name, selected, gridProps, handleChange, color = 'primary' } = props
+  const { type, data, name, selected, gridProps, handleChange, color = 'primary' } = props;
 
   // Vars
-  const { meta, title, value, content } = data
+  const { meta, title, value, content } = data;
 
   const renderData = () => {
     if (meta && title && content) {
@@ -96,29 +96,29 @@ const CustomInputHorizontal = (props: CustomInputHorizontalProps) => {
           </div>
           {typeof content === 'string' ? <Content>{content}</Content> : content}
         </div>
-      )
+      );
     } else if (meta && title && !content) {
       return (
         <div className='flex items-start justify-between is-full mbs-1.5'>
           {typeof title === 'string' ? <Title>{title}</Title> : title}
           {typeof meta === 'string' ? <Meta>{meta}</Meta> : meta}
         </div>
-      )
+      );
     } else if (!meta && title && content) {
       return (
         <div className='flex flex-col bs-full gap-1 mbs-1.5'>
           {typeof title === 'string' ? <Title>{title}</Title> : title}
           {typeof content === 'string' ? <Content>{content}</Content> : content}
         </div>
-      )
+      );
     } else if (!meta && !title && content) {
-      return typeof content === 'string' ? <Content className='mbs-1.5'>{content}</Content> : content
+      return typeof content === 'string' ? <Content className='mbs-1.5'>{content}</Content> : content;
     } else if (!meta && title && !content) {
-      return typeof title === 'string' ? <Title className='mbs-1.5'>{title}</Title> : title
+      return typeof title === 'string' ? <Title className='mbs-1.5'>{title}</Title> : title;
     } else {
-      return null
+      return null;
     }
-  }
+  };
 
   return data ? (
     <Grid {...gridProps}>
@@ -141,7 +141,7 @@ const CustomInputHorizontal = (props: CustomInputHorizontalProps) => {
         {renderData()}
       </Root>
     </Grid>
-  ) : null
-}
+  ) : null;
+};
 
-export default CustomInputHorizontal
+export default CustomInputHorizontal;

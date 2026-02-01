@@ -1,8 +1,8 @@
 // MUI Imports
-import type { Theme } from '@mui/material/styles'
+import type { Theme } from '@mui/material/styles';
 
 // Type Imports
-import type { Skin } from '@core/types'
+import type { Skin } from '@core/types';
 
 const popover = (skin: Skin): Theme['components'] => ({
   MuiPopover: {
@@ -16,6 +16,6 @@ const popover = (skin: Skin): Theme['components'] => ({
       }
     }
   }
-})
+});
 
-export default popover
+export default popover;

@@ -1,4 +1,4 @@
-import type { ShortcutsType } from '@/components/layout/shared/ShortcutsDropdown'
+import type { ShortcutsType } from '@/components/layout/shared/ShortcutsDropdown';
 
 export const shortcuts: ShortcutsType[] = [
   {
@@ -37,4 +37,4 @@ export const shortcuts: ShortcutsType[] = [
     title: 'Settings',
     subtitle: 'Account Settings'
   }
-]
+];

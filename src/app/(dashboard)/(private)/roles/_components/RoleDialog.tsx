@@ -1,34 +1,36 @@
-'use client'
+'use client';
 
-import { useEffect } from 'react'
+import { useEffect } from 'react';
 
-import Dialog from '@mui/material/Dialog'
-import DialogTitle from '@mui/material/DialogTitle'
-import DialogContent from '@mui/material/DialogContent'
-import DialogActions from '@mui/material/DialogActions'
-import TextField from '@mui/material/TextField'
-import Button from '@mui/material/Button'
-import CircularProgress from '@mui/material/CircularProgress'
-import Box from '@mui/material/Box'
-import Typography from '@mui/material/Typography'
-import IconButton from '@mui/material/IconButton'
-import { styled } from '@mui/material/styles'
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import IconButton from '@mui/material/IconButton';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
+import { styled } from '@mui/material/styles';
 
-import { useForm, Controller } from 'react-hook-form'
-import { valibotResolver } from '@hookform/resolvers/valibot'
-import { object, string, minLength, pipe, optional } from 'valibot'
-import { toast } from 'react-toastify'
+import { useForm, Controller } from 'react-hook-form';
+import { valibotResolver } from '@hookform/resolvers/valibot';
+import { object, string, minLength, pipe, optional, boolean } from 'valibot';
+import { toast } from 'react-toastify';
 
-import { usePostRoles, usePutRolesId } from '@/generated/identity-api'
-import type { RoleDto } from '@/generated/identity-api'
+import { usePostRoles, usePutRolesId } from '@/generated/identity-api';
+import type { RoleDto } from '@/generated/identity-api';
 
-import RoleIconPicker from './RoleIconPicker'
+import RoleIconPicker from './RoleIconPicker';
 
 interface RoleDialogProps {
-  open: boolean
-  onClose: () => void
-  role?: RoleDto | null
-  onSuccess?: () => void
+  open: boolean;
+  onClose: () => void;
+  role?: RoleDto | null;
+  onSuccess?: () => void;
 }
 
 const CustomCloseButton = styled(IconButton)(({ theme }) => ({
@@ -44,20 +46,24 @@ const CustomCloseButton = styled(IconButton)(({ theme }) => ({
   '&:hover': {
     transform: 'translate(7px, -5px)'
   }
-}))
+}));
 
 const schema = object({
   name: pipe(string(), minLength(1, 'Role name is required')),
-  icon: optional(string())
-})
+  icon: optional(string()),
+  isImmutable: optional(boolean()),
+  isSystem: optional(boolean())
+});
 
 type FormData = {
-  name: string
-  icon?: string
-}
+  name: string;
+  icon?: string;
+  isImmutable?: boolean;
+  isSystem?: boolean;
+};
 
 const RoleDialog = ({ open, onClose, role, onSuccess }: RoleDialogProps) => {
-  const isEdit = !!role
+  const isEdit = !!role;
 
   const {
     control,
@@ -67,63 +73,83 @@ const RoleDialog = ({ open, onClose, role, onSuccess }: RoleDialogProps) => {
   } = useForm<FormData>({
     defaultValues: {
       name: '',
-      icon: ''
+      icon: '',
+      isImmutable: false,
+      isSystem: false
     },
     resolver: valibotResolver(schema)
-  })
+  });
 
   // Reset form when opening/closing or changing role
   useEffect(() => {
     if (open) {
       reset({
         name: role?.name || '',
-        icon: role?.icon || ''
-      })
+        icon: role?.icon || '',
+        isImmutable: role?.isImmutable || false,
+        isSystem: role?.isSystem || false
+      });
     }
-  }, [open, role, reset])
+  }, [open, role, reset]);
 
   const { mutate: createRole, isPending: isCreating } = usePostRoles({
     mutation: {
       onSuccess: data => {
         if (data.success) {
-          toast.success('Role created successfully')
-          handleClose()
-          onSuccess?.()
+          toast.success('Role created successfully');
+          handleClose();
+          onSuccess?.();
         } else {
-          toast.error(data.errors?.[0]?.message || 'Failed to create role')
+          toast.error(data.errors?.[0]?.message || 'Failed to create role');
         }
       }
     }
-  })
+  });
 
   const { mutate: updateRole, isPending: isUpdating } = usePutRolesId({
     mutation: {
       onSuccess: data => {
         if (data.success) {
-          toast.success('Role updated successfully')
-          handleClose()
-          onSuccess?.()
+          toast.success('Role updated successfully');
+          handleClose();
+          onSuccess?.();
         } else {
-          toast.error(data.errors?.[0]?.message || 'Failed to update role')
+          toast.error(data.errors?.[0]?.message || 'Failed to update role');
         }
       }
     }
-  })
+  });
 
-  const isLoading = isCreating || isUpdating
+  const isLoading = isCreating || isUpdating;
 
   const onSubmit = (data: FormData) => {
     if (isEdit && role?.id) {
-      updateRole({ id: role.id, data: { name: data.name, icon: data.icon, id: role.id } })
+      updateRole({
+        id: role.id,
+        data: {
+          name: data.name,
+          icon: data.icon,
+          isImmutable: data.isImmutable,
+          isSystem: data.isSystem,
+          id: role.id
+        }
+      });
     } else {
-      createRole({ data: { name: data.name, icon: data.icon } })
+      createRole({
+        data: {
+          name: data.name,
+          icon: data.icon,
+          isImmutable: data.isImmutable,
+          isSystem: data.isSystem
+        }
+      });
     }
-  }
+  };
 
   const handleClose = () => {
-    reset()
-    onClose()
-  }
+    reset();
+    onClose();
+  };
 
   return (
     <Dialog
@@ -176,6 +202,28 @@ const RoleDialog = ({ open, onClose, role, onSuccess }: RoleDialogProps) => {
               )}
             />
           </Box>
+          <Box sx={{ mb: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Controller
+              name='isImmutable'
+              control={control}
+              render={({ field }) => (
+                <FormControlLabel
+                  control={<Switch {...field} checked={field.value} onChange={e => field.onChange(e.target.checked)} />}
+                  label='Immutable (Cannot be deleted or modified)'
+                />
+              )}
+            />
+            <Controller
+              name='isSystem'
+              control={control}
+              render={({ field }) => (
+                <FormControlLabel
+                  control={<Switch {...field} checked={field.value} onChange={e => field.onChange(e.target.checked)} />}
+                  label='System Role'
+                />
+              )}
+            />
+          </Box>
         </DialogContent>
         <DialogActions sx={{ p: 5, pt: 0, justifyContent: 'center' }}>
           <Button variant='outlined' color='secondary' onClick={handleClose} sx={{ mr: 2 }}>
@@ -192,7 +240,7 @@ const RoleDialog = ({ open, onClose, role, onSuccess }: RoleDialogProps) => {
         </DialogActions>
       </form>
     </Dialog>
-  )
-}
+  );
+};
 
-export default RoleDialog
+export default RoleDialog;

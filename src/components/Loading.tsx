@@ -1,11 +1,11 @@
-import React from 'react'
+import React from 'react';
 
-import classnames from 'classnames'
+import classnames from 'classnames';
 
 interface LoadingProps {
-  className?: string
-  spinnerClassName?: string
-  message?: string
+  className?: string;
+  spinnerClassName?: string;
+  message?: string;
 }
 
 const Loading: React.FC<LoadingProps> = ({ className, spinnerClassName, message }) => {
@@ -18,7 +18,7 @@ const Loading: React.FC<LoadingProps> = ({ className, spinnerClassName, message 
         {message && <p className='text-gray-500'>{message}</p>}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Loading
+export default Loading;

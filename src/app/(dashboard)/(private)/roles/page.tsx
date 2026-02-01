@@ -1,23 +1,61 @@
-'use client'
+'use client';
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react';
 
-import { Grid, Box } from '@mui/material'
-import { toast } from 'react-toastify'
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 
-import RoleList from './_components/RoleList'
-import RolePermissionsDetail from './_components/RolePermissionsDetail'
-import RoleDialog from './_components/RoleDialog'
-import ConfirmationDialog from '@/components/ConfirmationDialog'
-import { useGetRoles, useDeleteRolesId } from '@/generated/identity-api'
-import type { RoleDto } from '@/generated/identity-api'
+import { Grid, Box } from '@mui/material';
+import { toast } from 'react-toastify';
+
+import RoleList from './_components/RoleList';
+import RolePermissionsDetail from './_components/RolePermissionsDetail';
+import RoleDialog from './_components/RoleDialog';
+import ConfirmationDialog from '@/components/ConfirmationDialog';
+import { useGetRoles, useDeleteRolesId } from '@/generated/identity-api';
+import type { RoleDto } from '@/generated/identity-api';
 
 const RolesPage = () => {
-  const [selectedRoleId, setSelectedRoleId] = useState<string | null>(null)
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const [editingRole, setEditingRole] = useState<RoleDto | null>(null)
-  const [roleToDelete, setRoleToDelete] = useState<RoleDto | null>(null)
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const urlRoleId = searchParams.get('id');
+
+  const [selectedRoleId, setSelectedRoleId] = useState<string | null>(urlRoleId);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [editingRole, setEditingRole] = useState<RoleDto | null>(null);
+  const [roleToDelete, setRoleToDelete] = useState<RoleDto | null>(null);
+
+  // Helper to create query string
+  const createQueryString = useCallback(
+    (name: string, value: string | null) => {
+      const params = new URLSearchParams(searchParams.toString());
+
+      if (value) {
+        params.set(name, value);
+      } else {
+        params.delete(name);
+      }
+
+      return params.toString();
+    },
+    [searchParams]
+  );
+
+  // Sync state with URL
+  useEffect(() => {
+    if (urlRoleId !== selectedRoleId) {
+      setSelectedRoleId(urlRoleId);
+    }
+  }, [urlRoleId, selectedRoleId]);
+
+  const handleSelectRole = (id: string | null) => {
+    const queryString = createQueryString('id', id);
+
+    router.push(`${pathname}?${queryString}`, { scroll: false });
+    setSelectedRoleId(id);
+  };
 
   const {
     data: rolesResponse,
@@ -25,13 +63,13 @@ const RolesPage = () => {
     refetch: refetchRoles
   } = useGetRoles({
     view: 'detail'
-  })
+  });
 
-  const roles = useMemo(() => (rolesResponse?.success ? rolesResponse.result.items || [] : []), [rolesResponse])
+  const roles = useMemo(() => (rolesResponse?.success ? rolesResponse.result.items || [] : []), [rolesResponse]);
 
   const selectedRole = useMemo(() => {
-    return roles.find(role => role.id === selectedRoleId) || null
-  }, [roles, selectedRoleId])
+    return roles.find(role => role.id === selectedRoleId) || null;
+  }, [roles, selectedRoleId]);
 
   // Set initial selected role if none selected and data is loaded
   // REMOVED as per user request (no default selection)
@@ -45,44 +83,46 @@ const RolesPage = () => {
     mutation: {
       onSuccess: data => {
         if (data.success) {
-          toast.success('Role deleted successfully')
-          refetchRoles()
-          setIsDeleteDialogOpen(false)
-          setRoleToDelete(null)
+          toast.success('Role deleted successfully');
+          refetchRoles();
+          setIsDeleteDialogOpen(false);
+          setRoleToDelete(null);
 
           // If deleted role was selected, clear selection
-          if (selectedRoleId) setSelectedRoleId(null)
+          if (selectedRoleId === roleToDelete?.id) {
+            handleSelectRole(null);
+          }
         } else {
-          toast.error(data.errors?.[0]?.message || 'Failed to delete role')
+          toast.error(data.errors?.[0]?.message || 'Failed to delete role');
         }
       }
     }
-  })
+  });
 
   const handleAddClick = () => {
-    setEditingRole(null)
-    setIsDialogOpen(true)
-  }
+    setEditingRole(null);
+    setIsDialogOpen(true);
+  };
 
   const handleEditClick = (role: RoleDto) => {
-    setEditingRole(role)
-    setIsDialogOpen(true)
-  }
+    setEditingRole(role);
+    setIsDialogOpen(true);
+  };
 
   const handleDeleteClick = (role: RoleDto) => {
-    setRoleToDelete(role)
-    setIsDeleteDialogOpen(true)
-  }
+    setRoleToDelete(role);
+    setIsDeleteDialogOpen(true);
+  };
 
   const handleConfirmDelete = () => {
     if (roleToDelete?.id) {
-      deleteRole({ id: roleToDelete.id })
+      deleteRole({ id: roleToDelete.id });
     }
-  }
+  };
 
   const handleDialogSuccess = () => {
-    refetchRoles()
-  }
+    refetchRoles();
+  };
 
   return (
     <Box sx={{ p: { xs: 0, md: 2 }, height: '100%' }}>
@@ -92,7 +132,7 @@ const RolesPage = () => {
           <RoleList
             roles={roles}
             selectedRoleId={selectedRoleId}
-            onSelectRole={setSelectedRoleId}
+            onSelectRole={handleSelectRole}
             onAddClick={handleAddClick}
             onEditRole={handleEditClick}
             onDeleteRole={handleDeleteClick}
@@ -124,7 +164,7 @@ const RolesPage = () => {
         loading={isDeleting}
       />
     </Box>
-  )
-}
+  );
+};
 
-export default RolesPage
+export default RolesPage;

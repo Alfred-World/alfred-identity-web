@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
+import { useState } from 'react';
 
 import {
   Box,
@@ -19,18 +19,18 @@ import {
   alpha,
   useTheme,
   IconButton
-} from '@mui/material'
+} from '@mui/material';
 
-import type { RoleDto } from '@/generated/identity-api'
+import type { RoleDto } from '@/generated/identity-api';
 
 interface RoleListProps {
-  roles: RoleDto[]
-  selectedRoleId: string | null
-  onSelectRole: (id: string) => void
-  onAddClick: () => void
-  onEditRole: (role: RoleDto) => void
-  onDeleteRole: (role: RoleDto) => void
-  isLoading?: boolean
+  roles: RoleDto[];
+  selectedRoleId: string | null;
+  onSelectRole: (id: string) => void;
+  onAddClick: () => void;
+  onEditRole: (role: RoleDto) => void;
+  onDeleteRole: (role: RoleDto) => void;
+  isLoading?: boolean;
 }
 
 const RoleList = ({
@@ -42,26 +42,26 @@ const RoleList = ({
   onDeleteRole,
   isLoading
 }: RoleListProps) => {
-  const [search, setSearch] = useState('')
-  const theme = useTheme()
+  const [search, setSearch] = useState('');
+  const theme = useTheme();
 
-  const filteredRoles = roles.filter(role => role.name?.toLowerCase().includes(search.toLowerCase()))
+  const filteredRoles = roles.filter(role => role.name?.toLowerCase().includes(search.toLowerCase()));
 
   const getRoleIcon = (role: RoleDto) => {
-    if (role.icon) return role.icon
+    if (role.icon) return role.icon;
 
-    return 'tabler-user'
-  }
+    return 'tabler-user';
+  };
 
   const getAccessDescription = (roleName: string = '') => {
-    const name = roleName.toLowerCase()
+    const name = roleName.toLowerCase();
 
-    if (name.includes('admin')) return 'Full Access'
-    if (name.includes('editor')) return 'Limited Access'
-    if (name.includes('support')) return 'User Management'
+    if (name.includes('admin')) return 'Full Access';
+    if (name.includes('editor')) return 'Limited Access';
+    if (name.includes('support')) return 'User Management';
 
-    return 'Read-only'
-  }
+    return 'Read-only';
+  };
 
   return (
     <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', bgcolor: 'background.paper' }}>
@@ -112,9 +112,9 @@ const RoleList = ({
         ) : (
           <List component='nav' sx={{ p: 0 }}>
             {filteredRoles.map(role => {
-              const isSelected = role.id === selectedRoleId
-              const icon = getRoleIcon(role)
-              const accessType = getAccessDescription(role.name || '')
+              const isSelected = role.id === selectedRoleId;
+              const icon = getRoleIcon(role);
+              const accessType = getAccessDescription(role.name || '');
 
               return (
                 <ListItemButton
@@ -157,6 +157,10 @@ const RoleList = ({
                   </ListItemIcon>
 
                   <ListItemText
+                    slotProps={{
+                      primary: { component: 'div' },
+                      secondary: { component: 'div' }
+                    }}
                     primary={
                       <Typography
                         variant='body1'
@@ -167,9 +171,25 @@ const RoleList = ({
                       </Typography>
                     }
                     secondary={
-                      <Typography variant='caption' color='text.secondary'>
-                        {accessType}
-                      </Typography>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 0.5 }}>
+                        <Typography variant='caption' color='text.secondary'>
+                          {accessType}
+                        </Typography>
+                        {role.isSystem && (
+                          <Chip
+                            label='System'
+                            size='small'
+                            variant='tonal'
+                            color='info'
+                            sx={{ height: 18, fontSize: '0.625rem' }}
+                          />
+                        )}
+                        {role.isImmutable && (
+                          <Box sx={{ display: 'flex', alignItems: 'center', color: 'warning.main' }}>
+                            <i className='tabler-lock' style={{ fontSize: '0.875rem' }} />
+                          </Box>
+                        )}
+                      </Box>
                     }
                   />
 
@@ -201,7 +221,7 @@ const RoleList = ({
                     </IconButton>
                   </Box>
                 </ListItemButton>
-              )
+              );
             })}
           </List>
         )}
@@ -221,7 +241,7 @@ const RoleList = ({
         </Button>
       </Box>
     </Card>
-  )
-}
+  );
+};
 
-export default RoleList
+export default RoleList;

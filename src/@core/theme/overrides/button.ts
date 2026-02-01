@@ -1,8 +1,8 @@
 // MUI Imports
-import type { Theme } from '@mui/material/styles'
+import type { Theme } from '@mui/material/styles';
 
 // Config Imports
-import themeConfig from '@configs/themeConfig'
+import themeConfig from '@configs/themeConfig';
 
 const iconStyles = (size?: string) => ({
   '& > *:nth-of-type(1)': {
@@ -20,7 +20,7 @@ const iconStyles = (size?: string) => ({
               })
         })
   }
-})
+});
 
 const button: Theme['components'] = {
   MuiButtonBase: {
@@ -454,6 +454,6 @@ const button: Theme['components'] = {
       })
     }
   }
-}
+};
 
-export default button
+export default button;

@@ -1,7 +1,7 @@
-'use client'
+'use client';
 
 // MUI imports
-import { styled } from '@mui/material/styles'
+import { styled } from '@mui/material/styles';
 
 // Styled Components
 const AppRecharts = styled('div')(({ theme }) => ({
@@ -50,6 +50,6 @@ const AppRecharts = styled('div')(({ theme }) => ({
   '& .recharts-pie .recharts-sector, & .recharts-layer': {
     outline: 'none !important'
   }
-}))
+}));
 
-export default AppRecharts
+export default AppRecharts;

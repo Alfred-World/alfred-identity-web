@@ -1,10 +1,10 @@
-'use client'
+'use client';
 
-import MuiButton from '@mui/material/Button'
-import { styled } from '@mui/material/styles'
+import MuiButton from '@mui/material/Button';
+import { styled } from '@mui/material/styles';
 
 // Config Imports
-import themeConfig from '@configs/themeConfig'
+import themeConfig from '@configs/themeConfig';
 
 const CustomIconButton = styled(MuiButton)(({ color, size, theme, variant }) => {
   return {
@@ -73,7 +73,7 @@ const CustomIconButton = styled(MuiButton)(({ color, size, theme, variant }) => 
         backgroundColor: 'transparent'
       })
     })
-  }
-}) as typeof MuiButton
+  };
+}) as typeof MuiButton;
 
-export default CustomIconButton
+export default CustomIconButton;

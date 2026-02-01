@@ -1,62 +1,62 @@
-'use client'
+'use client';
 
 // React Imports
-import { forwardRef, useContext, useEffect, useState } from 'react'
-import type { AnchorHTMLAttributes, ForwardRefRenderFunction, ReactElement, MouseEvent, ReactNode } from 'react'
+import { forwardRef, useContext, useEffect, useState } from 'react';
+import type { AnchorHTMLAttributes, ForwardRefRenderFunction, ReactElement, MouseEvent, ReactNode } from 'react';
 
 // Next Imports
-import { usePathname } from 'next/navigation'
+import { usePathname } from 'next/navigation';
 
 // Third-party Imports
-import classnames from 'classnames'
-import { useUpdateEffect } from 'react-use'
-import type { CSSObject } from '@emotion/styled'
-import { useFloatingTree } from '@floating-ui/react'
+import classnames from 'classnames';
+import { useUpdateEffect } from 'react-use';
+import type { CSSObject } from '@emotion/styled';
+import { useFloatingTree } from '@floating-ui/react';
 
 // Type Imports
-import type { ChildrenType, MenuItemElement, MenuItemExactMatchUrlProps, RootStylesType } from '../../types'
+import type { ChildrenType, MenuItemElement, MenuItemExactMatchUrlProps, RootStylesType } from '../../types';
 
 // Context Imports
-import { HorizontalSubMenuContext } from './SubMenu'
+import { HorizontalSubMenuContext } from './SubMenu';
 
 // Component Imports
-import MenuButton from './MenuButton'
+import MenuButton from './MenuButton';
 
 // Hook Imports
-import useHorizontalMenu from '../../hooks/useHorizontalMenu'
-import useVerticalNav from '../../hooks/useVerticalNav'
+import useHorizontalMenu from '../../hooks/useHorizontalMenu';
+import useVerticalNav from '../../hooks/useVerticalNav';
 
 // Util Imports
-import { renderMenuIcon } from '../../utils/menuUtils'
-import { menuClasses } from '../../utils/menuClasses'
+import { renderMenuIcon } from '../../utils/menuUtils';
+import { menuClasses } from '../../utils/menuClasses';
 
 // Styled Component Imports
-import StyledMenuLabel from '../../styles/StyledMenuLabel'
-import StyledMenuPrefix from '../../styles/StyledMenuPrefix'
-import StyledMenuSuffix from '../../styles/StyledMenuSuffix'
-import StyledHorizontalMenuItem from '../../styles/horizontal/StyledHorizontalMenuItem'
+import StyledMenuLabel from '../../styles/StyledMenuLabel';
+import StyledMenuPrefix from '../../styles/StyledMenuPrefix';
+import StyledMenuSuffix from '../../styles/StyledMenuSuffix';
+import StyledHorizontalMenuItem from '../../styles/horizontal/StyledHorizontalMenuItem';
 
 // Style Imports
-import styles from '../../styles/horizontal/horizontalUl.module.css'
+import styles from '../../styles/horizontal/horizontalUl.module.css';
 
 export type MenuItemProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'prefix'> &
   RootStylesType &
   Partial<ChildrenType> &
   MenuItemExactMatchUrlProps & {
-    icon?: ReactElement
-    prefix?: ReactNode
-    suffix?: ReactNode
-    disabled?: boolean
-    target?: string
-    rel?: string
-    component?: string | ReactElement<{ href?: string; [key: string]: unknown }>
-    onActiveChange?: (active: boolean) => void
+    icon?: ReactElement;
+    prefix?: ReactNode;
+    suffix?: ReactNode;
+    disabled?: boolean;
+    target?: string;
+    rel?: string;
+    component?: string | ReactElement<{ href?: string; [key: string]: unknown }>;
+    onActiveChange?: (active: boolean) => void;
 
     /**
      * @ignore
      */
-    level?: number
-  }
+    level?: number;
+  };
 
 const MenuItem: ForwardRefRenderFunction<HTMLLIElement, MenuItemProps> = (props, ref) => {
   // Props
@@ -74,61 +74,61 @@ const MenuItem: ForwardRefRenderFunction<HTMLLIElement, MenuItemProps> = (props,
     onActiveChange,
     rootStyles,
     ...rest
-  } = props
+  } = props;
 
   // States
-  const [active, setActive] = useState(false)
+  const [active, setActive] = useState(false);
 
   // Hooks
-  const tree = useFloatingTree()
-  const pathname = usePathname()
-  const { toggleVerticalNav, isToggled } = useVerticalNav()
-  const { getItemProps } = useContext(HorizontalSubMenuContext)
-  const { menuItemStyles, renderExpandedMenuItemIcon, textTruncate } = useHorizontalMenu()
+  const tree = useFloatingTree();
+  const pathname = usePathname();
+  const { toggleVerticalNav, isToggled } = useVerticalNav();
+  const { getItemProps } = useContext(HorizontalSubMenuContext);
+  const { menuItemStyles, renderExpandedMenuItemIcon, textTruncate } = useHorizontalMenu();
 
   const getMenuItemStyles = (element: MenuItemElement): CSSObject | undefined => {
     // If the menuItemStyles prop is provided, get the styles for the specified element.
     if (menuItemStyles) {
       // Define the parameters that are passed to the style functions.
-      const params = { level, disabled, active, isSubmenu: false }
+      const params = { level, disabled, active, isSubmenu: false };
 
       // Get the style function for the specified element.
-      const styleFunction = menuItemStyles[element]
+      const styleFunction = menuItemStyles[element];
 
       if (styleFunction) {
         // If the style function is a function, call it and return the result.
         // Otherwise, return the style function itself.
-        return typeof styleFunction === 'function' ? styleFunction(params) : styleFunction
+        return typeof styleFunction === 'function' ? styleFunction(params) : styleFunction;
       }
     }
-  }
+  };
 
   // Handle the click event.
   const handleClick = () => {
     if (isToggled) {
-      toggleVerticalNav()
+      toggleVerticalNav();
     }
-  }
+  };
 
   // Change active state when the url changes
   useEffect(() => {
-    const href = rest.href || (component && typeof component !== 'string' && component.props.href)
+    const href = rest.href || (component && typeof component !== 'string' && component.props.href);
 
     if (href) {
       // Check if the current url matches any of the children urls
       if (exactMatch ? pathname === href : activeUrl && pathname.includes(activeUrl)) {
-        setActive(true)
+        setActive(true);
       } else {
-        setActive(false)
+        setActive(false);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname])
+  }, [pathname]);
 
   // Call the onActiveChange callback when the active state changes.
   useUpdateEffect(() => {
-    onActiveChange?.(active)
-  }, [active])
+    onActiveChange?.(active);
+  }, [active]);
 
   return (
     <StyledHorizontalMenuItem
@@ -153,8 +153,8 @@ const MenuItem: ForwardRefRenderFunction<HTMLLIElement, MenuItemProps> = (props,
         onClick={handleClick}
         {...getItemProps({
           onClick(event: MouseEvent<HTMLAnchorElement>) {
-            props.onClick?.(event)
-            tree?.events.emit('click')
+            props.onClick?.(event);
+            tree?.events.emit('click');
           }
         })}
         {...rest}
@@ -201,7 +201,7 @@ const MenuItem: ForwardRefRenderFunction<HTMLLIElement, MenuItemProps> = (props,
         )}
       </MenuButton>
     </StyledHorizontalMenuItem>
-  )
-}
+  );
+};
 
-export default forwardRef(MenuItem)
+export default forwardRef(MenuItem);

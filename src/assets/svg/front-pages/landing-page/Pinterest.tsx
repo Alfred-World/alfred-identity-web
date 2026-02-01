@@ -1,5 +1,5 @@
 // React Imports
-import type { SVGAttributes } from 'react'
+import type { SVGAttributes } from 'react';
 
 const Pinterest = (props: SVGAttributes<SVGElement>) => {
   return (
@@ -12,7 +12,7 @@ const Pinterest = (props: SVGAttributes<SVGElement>) => {
         />
       </g>
     </svg>
-  )
-}
+  );
+};
 
-export default Pinterest
+export default Pinterest;

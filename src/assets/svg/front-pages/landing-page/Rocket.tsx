@@ -1,5 +1,5 @@
 // React Imports
-import type { SVGAttributes } from 'react'
+import type { SVGAttributes } from 'react';
 
 const Rocket = (props: SVGAttributes<SVGElement>) => {
   return (
@@ -18,7 +18,7 @@ const Rocket = (props: SVGAttributes<SVGElement>) => {
         fill='currentColor'
       />
     </svg>
-  )
-}
+  );
+};
 
-export default Rocket
+export default Rocket;

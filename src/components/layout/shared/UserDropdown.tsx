@@ -1,34 +1,34 @@
-'use client'
+'use client';
 
 // React Imports
-import { useRef, useState } from 'react'
-import type { MouseEvent } from 'react'
+import { useRef, useState } from 'react';
+import type { MouseEvent } from 'react';
 
 // Next Imports
-import { useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation';
 
 // MUI Imports
-import { styled } from '@mui/material/styles'
-import Badge from '@mui/material/Badge'
-import Avatar from '@mui/material/Avatar'
-import Popper from '@mui/material/Popper'
-import Fade from '@mui/material/Fade'
-import Paper from '@mui/material/Paper'
-import ClickAwayListener from '@mui/material/ClickAwayListener'
-import MenuList from '@mui/material/MenuList'
-import Typography from '@mui/material/Typography'
-import Divider from '@mui/material/Divider'
-import MenuItem from '@mui/material/MenuItem'
-import Button from '@mui/material/Button'
+import { styled } from '@mui/material/styles';
+import Badge from '@mui/material/Badge';
+import Avatar from '@mui/material/Avatar';
+import Popper from '@mui/material/Popper';
+import Fade from '@mui/material/Fade';
+import Paper from '@mui/material/Paper';
+import ClickAwayListener from '@mui/material/ClickAwayListener';
+import MenuList from '@mui/material/MenuList';
+import Typography from '@mui/material/Typography';
+import Divider from '@mui/material/Divider';
+import MenuItem from '@mui/material/MenuItem';
+import Button from '@mui/material/Button';
 
 // Third-party Imports
-import { signOut, useSession } from 'next-auth/react'
+import { signOut, useSession } from 'next-auth/react';
 
 // Hook Imports
-import { useSettings } from '@core/hooks/useSettings'
+import { useSettings } from '@core/hooks/useSettings';
 
 // SSO Imports
-import { getSsoLogoutUrl } from '@/libs/sso-config'
+import { getSsoLogoutUrl } from '@/libs/sso-config';
 
 // Styled component for badge content
 const BadgeContentSpan = styled('span')({
@@ -38,48 +38,48 @@ const BadgeContentSpan = styled('span')({
   cursor: 'pointer',
   backgroundColor: 'var(--mui-palette-success-main)',
   boxShadow: '0 0 0 2px var(--mui-palette-background-paper)'
-})
+});
 
 const UserDropdown = () => {
   // States
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
 
   // Refs
-  const anchorRef = useRef<HTMLDivElement>(null)
+  const anchorRef = useRef<HTMLDivElement>(null);
 
   // Hooks
-  const router = useRouter()
-  const { data: session } = useSession()
-  const { settings } = useSettings()
+  const router = useRouter();
+  const { data: session } = useSession();
+  const { settings } = useSettings();
 
   const handleDropdownOpen = () => {
-    !open ? setOpen(true) : setOpen(false)
-  }
+    !open ? setOpen(true) : setOpen(false);
+  };
 
   const handleDropdownClose = (event?: MouseEvent<HTMLLIElement> | (MouseEvent | TouchEvent), url?: string) => {
     if (url) {
-      router.push(url)
+      router.push(url);
     }
 
     if (anchorRef.current && anchorRef.current.contains(event?.target as HTMLElement)) {
-      return
+      return;
     }
 
-    setOpen(false)
-  }
+    setOpen(false);
+  };
 
   const handleUserLogout = async () => {
     try {
       // First, clear local NextAuth session
-      await signOut({ redirect: false })
+      await signOut({ redirect: false });
 
       // Then redirect to Gateway SSO logout to clear SSO cookie
       // This ensures full SSO logout across all applications
-      window.location.href = getSsoLogoutUrl()
+      window.location.href = getSsoLogoutUrl();
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
-  }
+  };
 
   return (
     <>
@@ -162,7 +162,7 @@ const UserDropdown = () => {
         )}
       </Popper>
     </>
-  )
-}
+  );
+};
 
-export default UserDropdown
+export default UserDropdown;

@@ -17,7 +17,7 @@ export const menuClasses = {
   disabled: 'ts-disabled',
   active: 'ts-active',
   open: 'ts-open'
-}
+};
 
 // Classes for vertical navigation menu
 export const verticalNavClasses = {
@@ -34,11 +34,11 @@ export const verticalNavClasses = {
   breakpointReached: 'ts-breakpoint-reached',
   collapsing: 'ts-collapsing',
   expanding: 'ts-expanding'
-}
+};
 
 // Classes for horizontal navigation menu
 export const horizontalNavClasses = {
   root: 'ts-horizontal-nav-root',
   scrollWithContent: 'ts-scroll-with-content',
   breakpointReached: 'ts-breakpoint-reached'
-}
+};

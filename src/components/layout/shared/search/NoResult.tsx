@@ -1,14 +1,14 @@
 // Next Imports
-import Link from 'next/link'
+import Link from 'next/link';
 
 // Third-party Imports
-import classnames from 'classnames'
+import classnames from 'classnames';
 
 type NoResultData = {
-  label: string
-  href: string
-  icon: string
-}
+  label: string;
+  href: string;
+  icon: string;
+};
 
 const noResultData: NoResultData[] = [
   {
@@ -26,7 +26,7 @@ const noResultData: NoResultData[] = [
     href: '/dashboards/crm',
     icon: 'tabler-chart-donut-3'
   }
-]
+];
 
 const NoResult = ({ searchValue, setOpen }: { searchValue: string; setOpen: (value: boolean) => void }) => {
   // Hooks
@@ -53,7 +53,7 @@ const NoResult = ({ searchValue, setOpen }: { searchValue: string; setOpen: (val
         </ul>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default NoResult
+export default NoResult;

@@ -1,5 +1,5 @@
 // React Imports
-import type { SVGAttributes } from 'react'
+import type { SVGAttributes } from 'react';
 
 const Keyboard = (props: SVGAttributes<SVGElement>) => {
   return (
@@ -16,7 +16,7 @@ const Keyboard = (props: SVGAttributes<SVGElement>) => {
         fill='currentColor'
       />
     </svg>
-  )
-}
+  );
+};
 
-export default Keyboard
+export default Keyboard;

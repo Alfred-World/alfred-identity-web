@@ -1,14 +1,14 @@
 // Third-party Imports
-import styled from '@emotion/styled'
+import styled from '@emotion/styled';
 
 // Type Imports
-import type { RootStylesType } from '../types'
+import type { RootStylesType } from '../types';
 
 type StyledMenuSectionLabelProps = RootStylesType & {
-  isCollapsed?: boolean
-  isHovered?: boolean
-  textTruncate?: boolean
-}
+  isCollapsed?: boolean;
+  isHovered?: boolean;
+  textTruncate?: boolean;
+};
 
 const StyledMenuSectionLabel = styled.span<StyledMenuSectionLabelProps>`
   ${({ textTruncate }) =>
@@ -25,6 +25,6 @@ flex-grow: 1;
 `
       : ''}
   ${({ rootStyles }) => rootStyles};
-`
+`;
 
-export default StyledMenuSectionLabel
+export default StyledMenuSectionLabel;

@@ -1,22 +1,22 @@
 // MUI Imports
-import Card from '@mui/material/Card'
-import CardHeader from '@mui/material/CardHeader'
-import CardContent from '@mui/material/CardContent'
-import Typography from '@mui/material/Typography'
+import Card from '@mui/material/Card';
+import CardHeader from '@mui/material/CardHeader';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
 
 // Third-party Imports
-import classnames from 'classnames'
+import classnames from 'classnames';
 
 // Components Imports
-import OptionMenu from '@core/components/option-menu'
+import OptionMenu from '@core/components/option-menu';
 
 type DataType = {
-  title: string
-  imgSrc: string
-  subtitle: string
-  trendNumber: number
-  trend?: 'positive' | 'negative'
-}
+  title: string;
+  imgSrc: string;
+  subtitle: string;
+  trendNumber: number;
+  trend?: 'positive' | 'negative';
+};
 
 // Vars
 const data: DataType[] = [
@@ -58,7 +58,7 @@ const data: DataType[] = [
     trendNumber: 14.8,
     imgSrc: '/images/cards/china.png'
   }
-]
+];
 
 const SalesByCountries = () => {
   return (
@@ -96,7 +96,7 @@ const SalesByCountries = () => {
         ))}
       </CardContent>
     </Card>
-  )
-}
+  );
+};
 
-export default SalesByCountries
+export default SalesByCountries;

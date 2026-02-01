@@ -1,36 +1,36 @@
-'use client'
+'use client';
 
 // MUI Imports
-import Box from '@mui/material/Box'
-import useMediaQuery from '@mui/material/useMediaQuery'
-import { styled } from '@mui/material/styles'
-import type { BoxProps } from '@mui/material/Box'
-import type { Theme } from '@mui/material/styles'
+import Box from '@mui/material/Box';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { styled } from '@mui/material/styles';
+import type { BoxProps } from '@mui/material/Box';
+import type { Theme } from '@mui/material/styles';
 
 // Third-party Imports
-import 'react-toastify/dist/ReactToastify.css'
-import { ToastContainer } from 'react-toastify'
-import type { ToastContainerProps, ToastPosition } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
+import type { ToastContainerProps, ToastPosition } from 'react-toastify';
 
 // Type Imports
-import type { Direction } from '@core/types'
+import type { Direction } from '@core/types';
 
 // Config Imports
-import themeConfig from '@configs/themeConfig'
+import themeConfig from '@configs/themeConfig';
 
 // Hook Imports
-import { useSettings } from '@core/hooks/useSettings'
+import { useSettings } from '@core/hooks/useSettings';
 
 type Props = ToastContainerProps & {
-  boxProps?: BoxProps
-  direction?: Direction
-}
+  boxProps?: BoxProps;
+  direction?: Direction;
+};
 
 // Styled Components
 const ToastifyWrapper = styled(Box)<BoxProps>(({ theme }) => {
   // Hooks
-  const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down(480))
-  const { settings } = useSettings()
+  const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down(480));
+  const { settings } = useSettings();
 
   return {
     ...(isSmallScreen && {
@@ -96,11 +96,11 @@ const ToastifyWrapper = styled(Box)<BoxProps>(({ theme }) => {
     '& .Toastify__close-button': {
       color: 'var(--mui-palette-text-primary)'
     }
-  }
-}) as typeof Box
+  };
+}) as typeof Box;
 
 const AppReactToastify = (props: Props) => {
-  const { boxProps, direction = 'ltr', ...rest } = props
+  const { boxProps, direction = 'ltr', ...rest } = props;
 
   const positionMap: Partial<Record<ToastPosition, ToastPosition>> = {
     'top-right': 'top-left',
@@ -109,15 +109,15 @@ const AppReactToastify = (props: Props) => {
     'bottom-right': 'bottom-left',
     'top-center': 'top-center',
     'bottom-center': 'bottom-center'
-  }
+  };
 
-  const position = direction === 'rtl' ? positionMap[themeConfig.toastPosition] : themeConfig.toastPosition
+  const position = direction === 'rtl' ? positionMap[themeConfig.toastPosition] : themeConfig.toastPosition;
 
   return (
     <ToastifyWrapper {...boxProps}>
       <ToastContainer rtl={direction === 'rtl'} position={position} {...rest} />
     </ToastifyWrapper>
-  )
-}
+  );
+};
 
-export default AppReactToastify
+export default AppReactToastify;

@@ -1,8 +1,8 @@
 // React Imports
-import React from 'react'
+import React from 'react';
 
 // MUI Imports
-import type { Theme } from '@mui/material/styles'
+import type { Theme } from '@mui/material/styles';
 
 const Icon = () => {
   return (
@@ -13,8 +13,8 @@ const Icon = () => {
         strokeWidth='2'
       />
     </svg>
-  )
-}
+  );
+};
 
 const IndeterminateIcon = () => {
   return (
@@ -28,8 +28,8 @@ const IndeterminateIcon = () => {
         strokeLinejoin='round'
       />
     </svg>
-  )
-}
+  );
+};
 
 const CheckedIcon = () => {
   return (
@@ -43,8 +43,8 @@ const CheckedIcon = () => {
         strokeLinejoin='round'
       />
     </svg>
-  )
-}
+  );
+};
 
 const checkbox: Theme['components'] = {
   MuiCheckbox: {
@@ -102,6 +102,6 @@ const checkbox: Theme['components'] = {
       })
     }
   }
-}
+};
 
-export default checkbox
+export default checkbox;

@@ -1,8 +1,8 @@
 // MUI Imports
-import type { Theme } from '@mui/material/styles'
+import type { Theme } from '@mui/material/styles';
 
 // Type Imports
-import type { Skin } from '@core/types'
+import type { Skin } from '@core/types';
 
 const accordion = (skin: Skin): Theme['components'] => ({
   MuiAccordion: {
@@ -81,6 +81,6 @@ const accordion = (skin: Skin): Theme['components'] => ({
       })
     }
   }
-})
+});
 
-export default accordion
+export default accordion;

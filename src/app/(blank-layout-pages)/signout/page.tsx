@@ -1,25 +1,25 @@
-'use client'
+'use client';
 
-import { useEffect } from 'react'
+import { useEffect } from 'react';
 
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation';
 
-import { Box, CircularProgress, Typography } from '@mui/material'
+import { Box, CircularProgress, Typography } from '@mui/material';
 
 /**
  * Auto-signout page - redirects to server-side logout API
  * This ensures cookies are properly deleted before redirecting
  */
 export default function SignoutPage() {
-  const searchParams = useSearchParams()
-  const callbackUrl = searchParams.get('callbackUrl') || '/login'
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl') || '/login';
 
   useEffect(() => {
     // Redirect to server-side logout API which handles cookie deletion
-    const logoutUrl = `/api/auth/logout?callbackUrl=${encodeURIComponent(callbackUrl)}`
+    const logoutUrl = `/api/auth/logout?callbackUrl=${encodeURIComponent(callbackUrl)}`;
 
-    window.location.href = logoutUrl
-  }, [callbackUrl])
+    window.location.href = logoutUrl;
+  }, [callbackUrl]);
 
   return (
     <Box
@@ -37,5 +37,5 @@ export default function SignoutPage() {
         Signing out...
       </Typography>
     </Box>
-  )
+  );
 }

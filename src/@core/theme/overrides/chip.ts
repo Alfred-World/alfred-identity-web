@@ -1,5 +1,5 @@
 // MUI Imports
-import type { Theme } from '@mui/material/styles'
+import type { Theme } from '@mui/material/styles';
 
 const chip: Theme['components'] = {
   MuiChip: {
@@ -199,6 +199,6 @@ const chip: Theme['components'] = {
       }
     }
   }
-}
+};
 
-export default chip
+export default chip;

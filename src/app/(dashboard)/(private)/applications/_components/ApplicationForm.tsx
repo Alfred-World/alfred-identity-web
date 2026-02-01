@@ -1,13 +1,13 @@
-'use client'
+'use client';
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react';
 
-import { useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation';
 
-import { useForm, Controller } from 'react-hook-form'
-import { valibotResolver } from '@hookform/resolvers/valibot'
-import { object, string, maxLength, pipe, nonEmpty, array, minLength } from 'valibot'
-import type { InferInput } from 'valibot'
+import { useForm, Controller } from 'react-hook-form';
+import { valibotResolver } from '@hookform/resolvers/valibot';
+import { object, string, maxLength, pipe, nonEmpty, array, minLength } from 'valibot';
+import type { InferInput } from 'valibot';
 import {
   Box,
   Button,
@@ -31,83 +31,83 @@ import {
   DialogContentText,
   DialogActions,
   Tooltip
-} from '@mui/material'
-import Grid from '@mui/material/Grid'
-import { LoadingButton } from '@mui/lab'
-import { toast } from 'react-toastify'
+} from '@mui/material';
+import Grid from '@mui/material/Grid';
+import { LoadingButton } from '@mui/lab';
+import { toast } from 'react-toastify';
 
-import type { ApplicationDto } from '@/generated'
+import type { ApplicationDto } from '@/generated';
 import {
   useGetApplicationsMetadata,
   usePatchApplicationsIdStatus,
   usePostApplicationsIdSecretRegenerate
-} from '@/generated'
-import { useBreadcrumbs } from '@/contexts/BreadcrumbsContext'
-import { ROUTES } from '@/configs/routes'
+} from '@/generated';
+import { useBreadcrumbs } from '@/contexts/BreadcrumbsContext';
+import { ROUTES } from '@/configs/routes';
 
 export interface ApplicationFormSubmitData {
-  clientId: string
-  displayName: string
-  type: string
-  clientType: string
-  redirectUris: string
-  postLogoutRedirectUris: string
-  permissions: string
+  clientId: string;
+  displayName: string;
+  type: string;
+  clientType: string;
+  redirectUris: string;
+  postLogoutRedirectUris: string;
+  permissions: string;
 }
 
 interface ApplicationFormProps {
-  initialData?: ApplicationDto
-  isEdit?: boolean
-  isLoading?: boolean
-  onSubmit: (data: ApplicationFormSubmitData) => Promise<ApplicationDto | void> | void
+  initialData?: ApplicationDto;
+  isEdit?: boolean;
+  isLoading?: boolean;
+  onSubmit: (data: ApplicationFormSubmitData) => Promise<ApplicationDto | void> | void;
 }
 
 export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false, onSubmit }: ApplicationFormProps) => {
-  const router = useRouter()
-  const [_showSecret, _setShowSecret] = useState(false)
+  const router = useRouter();
+  const [_showSecret, _setShowSecret] = useState(false);
 
   // New State for features
-  const [isActive, setIsActive] = useState(true)
-  const [isRegenerating, setIsRegenerating] = useState(false)
-  const [openSecretModal, setOpenSecretModal] = useState(false)
-  const [newSecret, setNewSecret] = useState('')
-  const [copiedSecret, setCopiedSecret] = useState(false)
-  const [isTogglingStatus, setIsTogglingStatus] = useState(false)
+  const [isActive, setIsActive] = useState(true);
+  const [isRegenerating, setIsRegenerating] = useState(false);
+  const [openSecretModal, setOpenSecretModal] = useState(false);
+  const [newSecret, setNewSecret] = useState('');
+  const [copiedSecret, setCopiedSecret] = useState(false);
+  const [isTogglingStatus, setIsTogglingStatus] = useState(false);
 
   const [confirmState, setConfirmState] = useState<{
-    open: boolean
-    title: string
-    message: string
-    onConfirm: () => void
+    open: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
   }>({
     open: false,
     title: '',
     message: '',
     onConfirm: () => {}
-  })
+  });
 
   // Helper for custom confirmation
   const requestConfirm = (title: string, message: string, onConfirm: () => void) => {
-    setConfirmState({ open: true, title, message, onConfirm })
-  }
+    setConfirmState({ open: true, title, message, onConfirm });
+  };
 
-  const { setBreadcrumbs } = useBreadcrumbs()
+  const { setBreadcrumbs } = useBreadcrumbs();
 
   useEffect(() => {
     setBreadcrumbs([
       { title: 'Dashboards', href: ROUTES.DASHBOARDS.ROOT },
       { title: 'Applications', href: ROUTES.APPLICATIONS.LIST },
       { title: isEdit ? 'Edit Application' : 'Create Application' }
-    ])
-  }, [isEdit, setBreadcrumbs])
+    ]);
+  }, [isEdit, setBreadcrumbs]);
 
   // Generated API Hooks
-  const { mutateAsync: updateStatus } = usePatchApplicationsIdStatus()
-  const { mutateAsync: regenerateSecret } = usePostApplicationsIdSecretRegenerate()
+  const { mutateAsync: updateStatus } = usePatchApplicationsIdStatus();
+  const { mutateAsync: regenerateSecret } = usePostApplicationsIdSecretRegenerate();
 
   // Fetch metadata from API
-  const { data: resp } = useGetApplicationsMetadata()
-  const metadata = resp?.success ? resp.result : undefined
+  const { data: resp } = useGetApplicationsMetadata();
+  const metadata = resp?.success ? resp.result : undefined;
 
   // Form definition
   const schema = useMemo(() => {
@@ -119,10 +119,10 @@ export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false
       redirectUris: pipe(array(string()), minLength(1, 'At least one Redirect URI is required')),
       postLogoutRedirectUris: array(string()),
       scopes: pipe(array(string()), minLength(1, 'At least one Scope/Permission is required')) // This will hold all gt:, scp:, ept: tags
-    })
-  }, [])
+    });
+  }, []);
 
-  type FormData = InferInput<typeof schema>
+  type FormData = InferInput<typeof schema>;
 
   const {
     control,
@@ -141,159 +141,159 @@ export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false
       postLogoutRedirectUris: [],
       scopes: ['openid', 'profile'] // Initial default scopes
     }
-  })
+  });
 
   // Synchronization with initialData for Edit mode
   useEffect(() => {
     if (initialData) {
-      setValue('clientId', initialData.clientId || '')
-      setValue('displayName', initialData.displayName || '')
-      setValue('type', initialData.applicationType || 'web')
-      setValue('clientType', initialData.clientType || 'confidential')
-      setValue('redirectUris', initialData.redirectUris || [])
-      setValue('postLogoutRedirectUris', initialData.postLogoutRedirectUris || [])
+      setValue('clientId', initialData.clientId || '');
+      setValue('displayName', initialData.displayName || '');
+      setValue('type', initialData.applicationType || 'web');
+      setValue('clientType', initialData.clientType || 'confidential');
+      setValue('redirectUris', initialData.redirectUris || []);
+      setValue('postLogoutRedirectUris', initialData.postLogoutRedirectUris || []);
 
-      const permissions = initialData.permissions || []
+      const permissions = initialData.permissions || [];
 
       // Normalize permissions: keep the prefix (gt:, scp:, ept:) if it exists, otherwise assume scp: or just keep as is
-      setValue('scopes', permissions)
+      setValue('scopes', permissions);
 
-      setIsActive(initialData.isActive ?? true)
+      setIsActive(initialData.isActive ?? true);
     }
-  }, [initialData, setValue])
+  }, [initialData, setValue]);
 
-  const selectedScopes = watch('scopes')
+  const selectedScopes = watch('scopes');
 
   const handleFormSubmit = async (data: FormData) => {
     // Transform arrays back to strings for the API
     // Ensure all scopes have a prefix if they don't already
     const processedPermissions = data.scopes.map((s: string) => {
-      if (s.startsWith('scp:') || s.startsWith('gt:') || s.startsWith('ept:')) return s
+      if (s.startsWith('scp:') || s.startsWith('gt:') || s.startsWith('ept:')) return s;
 
-      return `scp:${s}` // Default to scp: for custom/unprefixed ones
-    })
+      return `scp:${s}`; // Default to scp: for custom/unprefixed ones
+    });
 
     const submissionData = {
       ...data,
       redirectUris: data.redirectUris.join(','),
       postLogoutRedirectUris: data.postLogoutRedirectUris.join(','),
       permissions: processedPermissions.join(' ')
-    }
+    };
 
-    const result = await onSubmit(submissionData)
+    const result = await onSubmit(submissionData);
 
     if (result && result.clientSecret) {
-      setNewSecret(result.clientSecret)
-      setOpenSecretModal(true)
-      setCopiedSecret(false)
+      setNewSecret(result.clientSecret);
+      setOpenSecretModal(true);
+      setCopiedSecret(false);
     } else if (!isEdit) {
       // If creating and no secret returned (public client), redirect immediately
       if (result) {
-        router.push(ROUTES.APPLICATIONS.LIST)
+        router.push(ROUTES.APPLICATIONS.LIST);
       }
     }
-  }
+  };
 
   const handleCopyClientId = () => {
-    const clientId = watch('clientId')
+    const clientId = watch('clientId');
 
-    navigator.clipboard.writeText(clientId)
-  }
+    navigator.clipboard.writeText(clientId);
+  };
 
   const handleToggleScope = (scope: string) => {
-    const current = [...selectedScopes]
+    const current = [...selectedScopes];
 
     if (current.includes(scope)) {
       setValue(
         'scopes',
         current.filter(s => s !== scope)
-      )
+      );
     } else {
-      setValue('scopes', [...current, scope])
+      setValue('scopes', [...current, scope]);
     }
-  }
+  };
 
   // --- New Handlers ---
 
   const handleToggleStatus = async () => {
-    if (!initialData?.id) return
+    if (!initialData?.id) return;
 
     try {
-      setIsTogglingStatus(true)
-      const newStatus = !isActive
+      setIsTogglingStatus(true);
+      const newStatus = !isActive;
 
       // Call API using generated hook
       await updateStatus({
         id: initialData.id,
         data: { isActive: newStatus }
-      })
+      });
 
-      setIsActive(newStatus)
-      toast.success(`Application ${newStatus ? 'activated' : 'deactivated'} successfully`)
+      setIsActive(newStatus);
+      toast.success(`Application ${newStatus ? 'activated' : 'deactivated'} successfully`);
     } catch (error) {
-      console.error('Failed to update status', error)
-      toast.error('Failed to update application status')
+      console.error('Failed to update status', error);
+      toast.error('Failed to update application status');
     } finally {
-      setIsTogglingStatus(false)
+      setIsTogglingStatus(false);
     }
-  }
+  };
 
   const handleRegenerateSecret = async () => {
-    const id = initialData?.id
+    const id = initialData?.id;
 
-    if (!id) return
+    if (!id) return;
 
     requestConfirm(
       'Regenerate Client Secret',
       'Are you sure you want to regenerate the client secret? This will invalidate the current secret immediately and applications using it will lose access.',
       async () => {
         try {
-          setIsRegenerating(true)
+          setIsRegenerating(true);
 
           // Call API using generated hook
           const result = await regenerateSecret({
             id
-          })
+          });
 
           if (result?.success) {
-            setNewSecret(result.result || '')
-            setOpenSecretModal(true)
-            setCopiedSecret(false)
-            toast.success('Secret regenerated successfully')
+            setNewSecret(result.result || '');
+            setOpenSecretModal(true);
+            setCopiedSecret(false);
+            toast.success('Secret regenerated successfully');
           } else {
-            toast.error('Failed to regenerate secret')
+            toast.error('Failed to regenerate secret');
           }
         } catch (error) {
-          console.error('Failed to regenerate secret', error)
-          toast.error('Failed to regenerate secret')
+          console.error('Failed to regenerate secret', error);
+          toast.error('Failed to regenerate secret');
         } finally {
-          setIsRegenerating(false)
+          setIsRegenerating(false);
         }
       }
-    )
-  }
+    );
+  };
 
   const handleCloseSecretModal = () => {
     const close = () => {
-      setOpenSecretModal(false)
-      setNewSecret('')
+      setOpenSecretModal(false);
+      setNewSecret('');
 
       // If we are in 'create' mode, redirect after closing the modal
       if (!isEdit) {
-        router.push(ROUTES.APPLICATIONS.LIST)
+        router.push(ROUTES.APPLICATIONS.LIST);
       }
-    }
+    };
 
     if (!copiedSecret) {
       requestConfirm(
         'Secret Not Copied',
         "You haven't copied the new secret yet. You won't be able to see it again after closing this window. Are you sure you want to close?",
         close
-      )
+      );
     } else {
-      close()
+      close();
     }
-  }
+  };
 
   const sectionHeader = (title: string, icon: string, color: string) => (
     <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
@@ -316,10 +316,10 @@ export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false
         {title}
       </Typography>
     </Box>
-  )
+  );
 
   const renderChipGroup = (title: string, items: string[], prefix: string, activeColor: string) => {
-    if (!items || items.length === 0) return null
+    if (!items || items.length === 0) return null;
 
     return (
       <Box sx={{ mb: 4 }}>
@@ -338,8 +338,8 @@ export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false
         </Typography>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>
           {items.map((item: string) => {
-            const label = item.replace(`${prefix}:`, '')
-            const isSelected = selectedScopes.includes(item) || selectedScopes.includes(label)
+            const label = item.replace(`${prefix}:`, '');
+            const isSelected = selectedScopes.includes(item) || selectedScopes.includes(label);
 
             return (
               <Chip
@@ -368,12 +368,12 @@ export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false
                       })
                 })}
               />
-            )
+            );
           })}
         </Box>
       </Box>
-    )
-  }
+    );
+  };
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)}>
@@ -524,7 +524,7 @@ export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false
                       onChange={(_, newValue) => field.onChange(newValue as string[])}
                       renderTags={(value: string[], getTagProps) =>
                         value.map((option: string, index: number) => {
-                          const { key, ...tagProps } = getTagProps({ index })
+                          const { key, ...tagProps } = getTagProps({ index });
 
                           return (
                             <Chip
@@ -539,7 +539,7 @@ export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false
                                 borderRadius: 1
                               }}
                             />
-                          )
+                          );
                         })
                       }
                       renderInput={params => (
@@ -577,7 +577,7 @@ export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false
                       onChange={(_, newValue) => field.onChange(newValue as string[])}
                       renderValue={(value: string[], getTagProps) =>
                         value.map((option: string, index: number) => {
-                          const { key, ...tagProps } = getTagProps({ index })
+                          const { key, ...tagProps } = getTagProps({ index });
 
                           return (
                             <Chip
@@ -588,7 +588,7 @@ export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false
                               variant='filled'
                               sx={{ borderRadius: 1 }}
                             />
-                          )
+                          );
                         })
                       }
                       renderInput={params => (
@@ -739,9 +739,9 @@ export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false
             <Tooltip title={copiedSecret ? 'Copied!' : 'Copy to clipboard'}>
               <IconButton
                 onClick={() => {
-                  navigator.clipboard.writeText(newSecret)
-                  setCopiedSecret(true)
-                  toast.success('Copied to clipboard')
+                  navigator.clipboard.writeText(newSecret);
+                  setCopiedSecret(true);
+                  toast.success('Copied to clipboard');
                 }}
                 sx={{ position: 'absolute', top: 8, right: 8 }}
                 color={copiedSecret ? 'success' : 'default'}
@@ -790,8 +790,8 @@ export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false
             variant='contained'
             color='primary'
             onClick={() => {
-              setConfirmState(prev => ({ ...prev, open: false }))
-              confirmState.onConfirm()
+              setConfirmState(prev => ({ ...prev, open: false }));
+              confirmState.onConfirm();
             }}
             sx={{
               borderRadius: 2,
@@ -805,5 +805,5 @@ export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false
         </DialogActions>
       </Dialog>
     </form>
-  )
-}
+  );
+};

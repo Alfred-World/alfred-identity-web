@@ -1,50 +1,50 @@
-'use client'
+'use client';
 
 // React Imports
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react';
 
 // Next Imports
-import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
+import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 // MUI Imports
-import useMediaQuery from '@mui/material/useMediaQuery'
-import { styled, useTheme } from '@mui/material/styles'
-import Typography from '@mui/material/Typography'
-import IconButton from '@mui/material/IconButton'
-import InputAdornment from '@mui/material/InputAdornment'
-import Checkbox from '@mui/material/Checkbox'
-import Button from '@mui/material/Button'
-import FormControlLabel from '@mui/material/FormControlLabel'
-import Divider from '@mui/material/Divider'
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { styled, useTheme } from '@mui/material/styles';
+import Typography from '@mui/material/Typography';
+import IconButton from '@mui/material/IconButton';
+import InputAdornment from '@mui/material/InputAdornment';
+import Checkbox from '@mui/material/Checkbox';
+import Button from '@mui/material/Button';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Divider from '@mui/material/Divider';
 
 // Third-party Imports
-import { signIn } from 'next-auth/react'
-import { Controller, useForm } from 'react-hook-form'
-import { valibotResolver } from '@hookform/resolvers/valibot'
-import { email, object, minLength, string, pipe, nonEmpty } from 'valibot'
-import type { SubmitHandler } from 'react-hook-form'
-import type { InferInput } from 'valibot'
-import classnames from 'classnames'
+import { signIn } from 'next-auth/react';
+import { Controller, useForm } from 'react-hook-form';
+import { valibotResolver } from '@hookform/resolvers/valibot';
+import { email, object, minLength, string, pipe, nonEmpty } from 'valibot';
+import type { SubmitHandler } from 'react-hook-form';
+import type { InferInput } from 'valibot';
+import classnames from 'classnames';
 
 // Type Imports
-import type { SystemMode } from '@core/types'
+import type { SystemMode } from '@core/types';
 
 // Component Imports
-import Logo from '@components/layout/shared/Logo'
-import CustomTextField from '@core/components/mui/TextField'
-import Loading from '@components/Loading'
+import Logo from '@components/layout/shared/Logo';
+import CustomTextField from '@core/components/mui/TextField';
+import Loading from '@components/Loading';
 
 // Config Imports
-import themeConfig from '@configs/themeConfig'
+import themeConfig from '@configs/themeConfig';
 
 // Hook Imports
-import { useImageVariant } from '@core/hooks/useImageVariant'
-import { useSettings } from '@core/hooks/useSettings'
+import { useImageVariant } from '@core/hooks/useImageVariant';
+import { useSettings } from '@core/hooks/useSettings';
 
 // SSO Imports
-import { validateSsoToken } from '@/libs/sso-config'
-import { postIdentityAuthSsoLogin } from '@/generated'
+import { validateSsoToken } from '@/libs/sso-config';
+import { postIdentityAuthSsoLogin } from '@/generated';
 
 // Styled Custom Components
 const LoginIllustration = styled('img')(({ theme }) => ({
@@ -59,7 +59,7 @@ const LoginIllustration = styled('img')(({ theme }) => ({
   [theme.breakpoints.down('lg')]: {
     maxBlockSize: 450
   }
-}))
+}));
 
 const MaskImg = styled('img')({
   blockSize: 'auto',
@@ -68,13 +68,13 @@ const MaskImg = styled('img')({
   position: 'absolute',
   insetBlockEnd: 0,
   zIndex: -1
-})
+});
 
 type ErrorType = {
-  message: string[]
-}
+  message: string[];
+};
 
-type FormData = InferInput<typeof schema>
+type FormData = InferInput<typeof schema>;
 
 const schema = object({
   email: pipe(string(), minLength(1, 'This field is required'), email('Email is invalid')),
@@ -83,30 +83,30 @@ const schema = object({
     nonEmpty('This field is required'),
     minLength(5, 'Password must be at least 5 characters long')
   )
-})
+});
 
 const Login = ({ mode }: { mode: SystemMode }) => {
   // States
-  const [isPasswordShown, setIsPasswordShown] = useState(false)
-  const [isCheckingSso, setIsCheckingSso] = useState(true)
-  const ssoCheckRef = useRef(false)
-  const [errorState, setErrorState] = useState<ErrorType | null>(null)
+  const [isPasswordShown, setIsPasswordShown] = useState(false);
+  const [isCheckingSso, setIsCheckingSso] = useState(true);
+  const ssoCheckRef = useRef(false);
+  const [errorState, setErrorState] = useState<ErrorType | null>(null);
 
   // Vars
-  const darkImg = '/images/pages/auth-mask-dark.png'
-  const lightImg = '/images/pages/auth-mask-light.png'
-  const darkIllustration = '/images/illustrations/auth/v2-login-dark.png'
-  const lightIllustration = '/images/illustrations/auth/v2-login-light.png'
-  const borderedDarkIllustration = '/images/illustrations/auth/v2-login-dark-border.png'
-  const borderedLightIllustration = '/images/illustrations/auth/v2-login-light-border.png'
+  const darkImg = '/images/pages/auth-mask-dark.png';
+  const lightImg = '/images/pages/auth-mask-light.png';
+  const darkIllustration = '/images/illustrations/auth/v2-login-dark.png';
+  const lightIllustration = '/images/illustrations/auth/v2-login-light.png';
+  const borderedDarkIllustration = '/images/illustrations/auth/v2-login-dark-border.png';
+  const borderedLightIllustration = '/images/illustrations/auth/v2-login-light-border.png';
 
   // Hooks
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const { settings } = useSettings()
-  const theme = useTheme()
-  const hidden = useMediaQuery(theme.breakpoints.down('md'))
-  const authBackground = useImageVariant(mode, lightImg, darkImg)
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { settings } = useSettings();
+  const theme = useTheme();
+  const hidden = useMediaQuery(theme.breakpoints.down('md'));
+  const authBackground = useImageVariant(mode, lightImg, darkImg);
 
   const {
     control,
@@ -118,7 +118,7 @@ const Login = ({ mode }: { mode: SystemMode }) => {
       email: 'admin@gmail.com',
       password: 'Admin@123'
     }
-  })
+  });
 
   const characterIllustration = useImageVariant(
     mode,
@@ -126,59 +126,59 @@ const Login = ({ mode }: { mode: SystemMode }) => {
     darkIllustration,
     borderedLightIllustration,
     borderedDarkIllustration
-  )
+  );
 
   // Handle SSO token from redirect flow (from AuthRedirect -> check-sso -> back here)
   // Also handle start_oauth param to trigger OAuth flow after SSO login
   useEffect(() => {
-    if (ssoCheckRef.current) return
-    ssoCheckRef.current = true
+    if (ssoCheckRef.current) return;
+    ssoCheckRef.current = true;
 
     const handleSsoToken = async () => {
-      const ssoToken = searchParams.get('sso_token')
-      const ssoError = searchParams.get('sso_error')
-      const startOAuth = searchParams.get('start_oauth')
-      const callbackUrl = searchParams.get('callbackUrl') || '/dashboards/crm'
-      const redirectTo = searchParams.get('redirectTo') || '/dashboards/crm'
+      const ssoToken = searchParams.get('sso_token');
+      const ssoError = searchParams.get('sso_error');
+      const startOAuth = searchParams.get('start_oauth');
+      const callbackUrl = searchParams.get('callbackUrl') || '/dashboards/crm';
+      const redirectTo = searchParams.get('redirectTo') || '/dashboards/crm';
 
       // If start_oauth=true, trigger OAuth flow to get access tokens
       // This happens after SSO login sets the cookie
       if (startOAuth === 'true') {
         // Call signIn with sso-oauth provider - this will redirect to Gateway
         // Gateway will see SSO cookie and auto-approve, returning with tokens
-        signIn('sso-oauth', { callbackUrl })
+        signIn('sso-oauth', { callbackUrl });
 
-        return
+        return;
       }
 
       // If SSO check returned error, just show login form
       if (ssoError) {
-        setIsCheckingSso(false)
+        setIsCheckingSso(false);
 
-        return
+        return;
       }
 
       // If we have an SSO token, exchange it for session
       if (ssoToken) {
         try {
           // Use generated API function via sso-config for type safety
-          const response = await validateSsoToken(ssoToken)
+          const response = await validateSsoToken(ssoToken);
 
           if (response.success && response.result) {
             // Sign in using SSO session
-            const user = response.result as { userId: string; email: string; fullName?: string; userName?: string }
+            const user = response.result as { userId: string; email: string; fullName?: string; userName?: string };
 
             const result = await signIn('sso-session', {
               redirect: false,
               userId: user.userId.toString(),
               email: user.email,
               name: user.fullName || user.userName || user.email
-            })
+            });
 
             if (result?.ok) {
-              router.replace(redirectTo)
+              router.replace(redirectTo);
 
-              return
+              return;
             }
           }
         } catch {
@@ -186,54 +186,54 @@ const Login = ({ mode }: { mode: SystemMode }) => {
         }
       }
 
-      setIsCheckingSso(false)
-    }
+      setIsCheckingSso(false);
+    };
 
-    handleSsoToken()
-  }, [router, searchParams])
+    handleSsoToken();
+  }, [router, searchParams]);
 
-  const handleClickShowPassword = () => setIsPasswordShown(show => !show)
+  const handleClickShowPassword = () => setIsPasswordShown(show => !show);
 
   const onSubmit: SubmitHandler<FormData> = async (data: FormData) => {
     try {
       // Build return URL that will trigger OAuth after SSO cookie is set
-      const ssoAppUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://sso.test'
-      const finalDestination = searchParams.get('returnUrl') || '/dashboards/crm'
+      const ssoAppUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://sso.test';
+      const finalDestination = searchParams.get('returnUrl') || '/dashboards/crm';
 
       // After exchange-token, redirect to login with start_oauth=true
       // This will trigger signIn('sso-oauth') to complete the OAuth flow
-      const returnUrl = `${ssoAppUrl}/login?start_oauth=true&callbackUrl=${encodeURIComponent(finalDestination)}`
+      const returnUrl = `${ssoAppUrl}/login?start_oauth=true&callbackUrl=${encodeURIComponent(finalDestination)}`;
 
       const response = await postIdentityAuthSsoLogin({
         identity: data.email,
         password: data.password,
         rememberMe: true,
         returnUrl: returnUrl
-      })
+      });
 
       if (!response.success || !response.result) {
-        setErrorState({ message: [response.message || 'Login failed'] })
+        setErrorState({ message: [response.message || 'Login failed'] });
 
-        return
+        return;
       }
 
-      const { returnUrl: exchangeUrl } = response.result
+      const { returnUrl: exchangeUrl } = response.result;
 
       if (exchangeUrl) {
         // Navigate to Gateway exchange-token to set SSO cookie
         // After that, will redirect back with start_oauth=true
-        window.location.href = exchangeUrl
+        window.location.href = exchangeUrl;
       } else {
-        setErrorState({ message: ['Exchange URL not received'] })
+        setErrorState({ message: ['Exchange URL not received'] });
       }
     } catch (e: unknown) {
-      setErrorState({ message: [e instanceof Error ? e.message : 'Login failed'] })
+      setErrorState({ message: [e instanceof Error ? e.message : 'Login failed'] });
     }
-  }
+  };
 
   // Show loading while checking SSO session
   if (isCheckingSso) {
-    return <Loading className='bs-full min-bs-[100dvh]' />
+    return <Loading className='bs-full min-bs-[100dvh]' />;
   }
 
   return (
@@ -278,8 +278,8 @@ const Login = ({ mode }: { mode: SystemMode }) => {
                   label='Email'
                   placeholder='Enter your email'
                   onChange={e => {
-                    field.onChange(e.target.value)
-                    errorState !== null && setErrorState(null)
+                    field.onChange(e.target.value);
+                    errorState !== null && setErrorState(null);
                   }}
                   {...((errors.email || errorState !== null) && {
                     error: true,
@@ -301,8 +301,8 @@ const Login = ({ mode }: { mode: SystemMode }) => {
                   id='login-password'
                   type={isPasswordShown ? 'text' : 'password'}
                   onChange={e => {
-                    field.onChange(e.target.value)
-                    errorState !== null && setErrorState(null)
+                    field.onChange(e.target.value);
+                    errorState !== null && setErrorState(null);
                   }}
                   slotProps={{
                     input: {
@@ -352,7 +352,7 @@ const Login = ({ mode }: { mode: SystemMode }) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;

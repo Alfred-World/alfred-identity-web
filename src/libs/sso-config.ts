@@ -7,23 +7,23 @@
  * This ensures if backend changes URLs, regenerating API will catch issues
  */
 
-import { AXIOS_INSTANCE } from './custom-instance'
-import { getIdentityAuthValidateToken, getGetIdentityAuthCheckSsoQueryKey } from '@/generated/identity-api'
+import { AXIOS_INSTANCE } from './custom-instance';
+import { getIdentityAuthValidateToken, getGetIdentityAuthCheckSsoQueryKey } from '@/generated/identity-api';
 
 /**
  * Gateway base URL - same as generated API client
  */
-export const GATEWAY_URL = AXIOS_INSTANCE.defaults.baseURL || 'https://gateway.test'
+export const GATEWAY_URL = AXIOS_INSTANCE.defaults.baseURL || 'https://gateway.test';
 
 /**
  * App base URL - used for post-logout redirect
  */
-export const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://sso.test'
+export const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://sso.test';
 
 /**
  * OAuth client ID for this application
  */
-export const OAUTH_CLIENT_ID = process.env.NEXT_PUBLIC_OAUTH_CLIENT_ID || 'sso_web'
+export const OAUTH_CLIENT_ID = process.env.NEXT_PUBLIC_OAUTH_CLIENT_ID || 'sso_web';
 
 /**
  * SSO check endpoint URL - for browser redirect (not axios call)
@@ -32,10 +32,10 @@ export const OAUTH_CLIENT_ID = process.env.NEXT_PUBLIC_OAUTH_CLIENT_ID || 'sso_w
  */
 export const getSsoCheckUrl = (returnUrl: string) => {
   // Get URL path from generated QueryKey
-  const [urlPath] = getGetIdentityAuthCheckSsoQueryKey({ returnUrl })
+  const [urlPath] = getGetIdentityAuthCheckSsoQueryKey({ returnUrl });
 
-  return `${GATEWAY_URL}${urlPath}?returnUrl=${encodeURIComponent(returnUrl)}`
-}
+  return `${GATEWAY_URL}${urlPath}?returnUrl=${encodeURIComponent(returnUrl)}`;
+};
 
 /**
  * SSO logout endpoint URL - for browser redirect
@@ -43,8 +43,8 @@ export const getSsoCheckUrl = (returnUrl: string) => {
  * @param postLogoutRedirectUri - URL to redirect to after logout (defaults to login?logout=true)
  */
 export const getSsoLogoutUrl = (postLogoutRedirectUri: string = `${APP_URL}/login?logout=true`) => {
-  return `${GATEWAY_URL}/connect/logout?client_id=${OAUTH_CLIENT_ID}&post_logout_redirect_uri=${encodeURIComponent(postLogoutRedirectUri)}`
-}
+  return `${GATEWAY_URL}/connect/logout?client_id=${OAUTH_CLIENT_ID}&post_logout_redirect_uri=${encodeURIComponent(postLogoutRedirectUri)}`;
+};
 
 /**
  * Validate SSO token using generated API function
@@ -52,5 +52,5 @@ export const getSsoLogoutUrl = (postLogoutRedirectUri: string = `${APP_URL}/logi
  * @param token - SSO token to validate
  */
 export const validateSsoToken = (token: string) => {
-  return getIdentityAuthValidateToken({ token })
-}
+  return getIdentityAuthValidateToken({ token });
+};

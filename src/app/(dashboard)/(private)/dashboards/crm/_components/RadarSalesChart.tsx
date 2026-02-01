@@ -1,36 +1,36 @@
-'use client'
+'use client';
 
 // Next Imports
-import dynamic from 'next/dynamic'
+import dynamic from 'next/dynamic';
 
 // MUI Imports
-import Card from '@mui/material/Card'
-import CardHeader from '@mui/material/CardHeader'
-import CardContent from '@mui/material/CardContent'
-import { useTheme } from '@mui/material/styles'
+import Card from '@mui/material/Card';
+import CardHeader from '@mui/material/CardHeader';
+import CardContent from '@mui/material/CardContent';
+import { useTheme } from '@mui/material/styles';
 
 // Third Party Imports
-import type { ApexOptions } from 'apexcharts'
+import type { ApexOptions } from 'apexcharts';
 
 // Components Imports
-import OptionMenu from '@core/components/option-menu'
+import OptionMenu from '@core/components/option-menu';
 
 // Styled Component Imports
-const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
+const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'));
 
 // Vars
 const series = [
   { name: 'Sales', data: [32, 27, 27, 30, 25, 25] },
   { name: 'Visits', data: [25, 35, 20, 20, 20, 20] }
-]
+];
 
 const RadarSalesChart = () => {
   // Hooks
-  const theme = useTheme()
+  const theme = useTheme();
 
   // Vars
-  const textDisabled = 'var(--mui-palette-text-disabled)'
-  const divider = 'var(--mui-palette-divider)'
+  const textDisabled = 'var(--mui-palette-text-disabled)';
+  const divider = 'var(--mui-palette-divider)';
 
   const options: ApexOptions = {
     chart: {
@@ -79,7 +79,7 @@ const RadarSalesChart = () => {
         }
       }
     ]
-  }
+  };
 
   return (
     <Card>
@@ -92,7 +92,7 @@ const RadarSalesChart = () => {
         <AppReactApexCharts type='radar' height={373} width='100%' series={series} options={options} />
       </CardContent>
     </Card>
-  )
-}
+  );
+};
 
-export default RadarSalesChart
+export default RadarSalesChart;

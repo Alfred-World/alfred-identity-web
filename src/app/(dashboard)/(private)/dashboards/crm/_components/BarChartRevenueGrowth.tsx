@@ -1,29 +1,29 @@
-'use client'
+'use client';
 
 // Next Imports
-import dynamic from 'next/dynamic'
+import dynamic from 'next/dynamic';
 
 // MUI Imports
-import Card from '@mui/material/Card'
-import Typography from '@mui/material/Typography'
-import CardContent from '@mui/material/CardContent'
-import Chip from '@mui/material/Chip'
-import { useTheme } from '@mui/material/styles'
+import Card from '@mui/material/Card';
+import Typography from '@mui/material/Typography';
+import CardContent from '@mui/material/CardContent';
+import Chip from '@mui/material/Chip';
+import { useTheme } from '@mui/material/styles';
 
 // Third-party Imports
-import type { ApexOptions } from 'apexcharts'
+import type { ApexOptions } from 'apexcharts';
 
 // Styled Component Imports
-const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
+const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'));
 
-const series = [{ data: [32, 52, 72, 94, 116, 94, 72] }]
+const series = [{ data: [32, 52, 72, 94, 116, 94, 72] }];
 
 const BarChartRevenueGrowth = () => {
   // Hook
-  const theme = useTheme()
+  const theme = useTheme();
 
   // Vars
-  const successColorWithOpacity = 'var(--mui-palette-success-lightOpacity)'
+  const successColorWithOpacity = 'var(--mui-palette-success-lightOpacity)';
 
   const options: ApexOptions = {
     chart: {
@@ -112,7 +112,7 @@ const BarChartRevenueGrowth = () => {
         }
       }
     ]
-  }
+  };
 
   return (
     <Card>
@@ -130,7 +130,7 @@ const BarChartRevenueGrowth = () => {
         <AppReactApexCharts type='bar' width={170} height={172} series={series} options={options} />
       </CardContent>
     </Card>
-  )
-}
+  );
+};
 
-export default BarChartRevenueGrowth
+export default BarChartRevenueGrowth;

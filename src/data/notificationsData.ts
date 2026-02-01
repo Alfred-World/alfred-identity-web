@@ -1,4 +1,4 @@
-import type { NotificationsType } from '@/components/layout/shared/NotificationsDropdown'
+import type { NotificationsType } from '@/components/layout/shared/NotificationsDropdown';
 
 export const notifications: NotificationsType[] = [
   {
@@ -46,4 +46,4 @@ export const notifications: NotificationsType[] = [
     time: 'Jan 6, 1:48 PM',
     read: true
   }
-]
+];

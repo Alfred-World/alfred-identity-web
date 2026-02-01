@@ -1,5 +1,5 @@
 // MUI Imports
-import type { Theme } from '@mui/material/styles'
+import type { Theme } from '@mui/material/styles';
 
 const tabs: Theme['components'] = {
   MuiTabs: {
@@ -96,6 +96,6 @@ const tabs: Theme['components'] = {
       }
     }
   }
-}
+};
 
-export default tabs
+export default tabs;

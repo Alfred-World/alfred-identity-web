@@ -1,90 +1,90 @@
-'use client'
+'use client';
 
 // React Imports
-import { useCallback, useRef, useState, useEffect } from 'react'
-import type { ReactNode } from 'react'
+import { useCallback, useRef, useState, useEffect } from 'react';
+import type { ReactNode } from 'react';
 
 // Next Imports
-import Link from 'next/link'
+import Link from 'next/link';
 
 // MUI Imports
-import IconButton from '@mui/material/IconButton'
-import Popper from '@mui/material/Popper'
-import Fade from '@mui/material/Fade'
-import Paper from '@mui/material/Paper'
-import ClickAwayListener from '@mui/material/ClickAwayListener'
-import Typography from '@mui/material/Typography'
-import Tooltip from '@mui/material/Tooltip'
-import Divider from '@mui/material/Divider'
-import Grid from '@mui/material/Grid'
-import useMediaQuery from '@mui/material/useMediaQuery'
-import type { Theme } from '@mui/material/styles'
+import IconButton from '@mui/material/IconButton';
+import Popper from '@mui/material/Popper';
+import Fade from '@mui/material/Fade';
+import Paper from '@mui/material/Paper';
+import ClickAwayListener from '@mui/material/ClickAwayListener';
+import Typography from '@mui/material/Typography';
+import Tooltip from '@mui/material/Tooltip';
+import Divider from '@mui/material/Divider';
+import Grid from '@mui/material/Grid';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import type { Theme } from '@mui/material/styles';
 
 // Third Party Components
-import classnames from 'classnames'
-import PerfectScrollbar from 'react-perfect-scrollbar'
+import classnames from 'classnames';
+import PerfectScrollbar from 'react-perfect-scrollbar';
 
 // Component Imports
-import CustomAvatar from '@core/components/mui/Avatar'
+import CustomAvatar from '@core/components/mui/Avatar';
 
 // Config Imports
-import themeConfig from '@configs/themeConfig'
+import themeConfig from '@configs/themeConfig';
 
 // Hook Imports
-import { useSettings } from '@core/hooks/useSettings'
+import { useSettings } from '@core/hooks/useSettings';
 
 export type ShortcutsType = {
-  url: string
-  icon: string
-  title: string
-  subtitle: string
-}
+  url: string;
+  icon: string;
+  title: string;
+  subtitle: string;
+};
 
 const ScrollWrapper = ({ children, hidden }: { children: ReactNode; hidden: boolean }) => {
   if (hidden) {
-    return <div className='overflow-x-hidden bs-full'>{children}</div>
+    return <div className='overflow-x-hidden bs-full'>{children}</div>;
   } else {
     return (
       <PerfectScrollbar className='bs-full' options={{ wheelPropagation: false, suppressScrollX: true }}>
         {children}
       </PerfectScrollbar>
-    )
+    );
   }
-}
+};
 
 const ShortcutsDropdown = ({ shortcuts }: { shortcuts: ShortcutsType[] }) => {
   // States
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
 
   // Refs
-  const anchorRef = useRef<HTMLButtonElement>(null)
-  const ref = useRef<HTMLDivElement | null>(null)
+  const anchorRef = useRef<HTMLButtonElement>(null);
+  const ref = useRef<HTMLDivElement | null>(null);
 
   // Hooks
-  const hidden = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'))
-  const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'))
-  const { settings } = useSettings()
+  const hidden = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
+  const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
+  const { settings } = useSettings();
 
   const handleClose = useCallback(() => {
-    setOpen(false)
-  }, [])
+    setOpen(false);
+  }, []);
 
   const handleToggle = useCallback(() => {
-    setOpen(prevOpen => !prevOpen)
-  }, [])
+    setOpen(prevOpen => !prevOpen);
+  }, []);
 
   useEffect(() => {
     const adjustPopoverHeight = () => {
       if (ref.current) {
         // Calculate available height, subtracting any fixed UI elements' height as necessary
-        const availableHeight = window.innerHeight - 100
+        const availableHeight = window.innerHeight - 100;
 
-        ref.current.style.height = `${Math.min(availableHeight, 550)}px`
+        ref.current.style.height = `${Math.min(availableHeight, 550)}px`;
       }
-    }
+    };
 
-    window.addEventListener('resize', adjustPopoverHeight)
-  }, [])
+    window.addEventListener('resize', adjustPopoverHeight);
+  }, []);
 
   return (
     <>
@@ -175,7 +175,7 @@ const ShortcutsDropdown = ({ shortcuts }: { shortcuts: ShortcutsType[] }) => {
         )}
       </Popper>
     </>
-  )
-}
+  );
+};
 
-export default ShortcutsDropdown
+export default ShortcutsDropdown;

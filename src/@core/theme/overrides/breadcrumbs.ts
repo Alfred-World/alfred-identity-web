@@ -1,5 +1,5 @@
 // MUI Imports
-import type { Theme } from '@mui/material/styles'
+import type { Theme } from '@mui/material/styles';
 
 const breadcrumbs: Theme['components'] = {
   MuiBreadcrumbs: {
@@ -21,6 +21,6 @@ const breadcrumbs: Theme['components'] = {
       })
     }
   }
-}
+};
 
-export default breadcrumbs
+export default breadcrumbs;

@@ -1,12 +1,12 @@
 // React Imports
-import React from 'react'
+import React from 'react';
 
 // MUI Imports
-import type { Theme } from '@mui/material/styles'
+import type { Theme } from '@mui/material/styles';
 
 const SelectIcon = () => {
-  return <i className='tabler-chevron-down' />
-}
+  return <i className='tabler-chevron-down' />;
+};
 
 const iconStyles = (theme: Theme) => ({
   userSelect: 'none',
@@ -20,7 +20,7 @@ const iconStyles = (theme: Theme) => ({
   position: 'absolute',
   right: '1rem',
   pointerEvents: 'none'
-})
+});
 
 const select: Theme['components'] = {
   MuiSelect: {
@@ -55,6 +55,6 @@ const select: Theme['components'] = {
       })
     }
   }
-}
+};
 
-export default select
+export default select;

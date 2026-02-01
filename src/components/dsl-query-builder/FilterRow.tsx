@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import { useMemo, memo } from 'react'
+import { useMemo, memo } from 'react';
 
 import {
   Box,
@@ -13,19 +13,19 @@ import {
   Typography,
   useTheme,
   useMediaQuery
-} from '@mui/material'
+} from '@mui/material';
 
-import type { FilterCondition, FieldConfig, DataType } from './types'
-import { getOperatorsForDataType, getOperatorConfig } from './operators'
+import type { FilterCondition, FieldConfig, DataType } from './types';
+import { getOperatorsForDataType, getOperatorConfig } from './operators';
 
 interface FilterRowProps<TData = unknown> {
-  condition: FilterCondition
-  fields: FieldConfig<TData>[]
-  showOrButton: boolean // Whether to show OR button
-  onChange: (id: string, updates: Partial<FilterCondition>) => void
-  onRemove: (id: string) => void
-  onAddAfter: (id: string, logicalOperator: 'AND' | 'OR') => void
-  canRemove?: boolean
+  condition: FilterCondition;
+  fields: FieldConfig<TData>[];
+  showOrButton: boolean; // Whether to show OR button
+  onChange: (id: string, updates: Partial<FilterCondition>) => void;
+  onRemove: (id: string) => void;
+  onAddAfter: (id: string, logicalOperator: 'AND' | 'OR') => void;
+  canRemove?: boolean;
 }
 
 const FilterRowInner = <TData,>({
@@ -37,32 +37,32 @@ const FilterRowInner = <TData,>({
   onAddAfter,
   canRemove = true
 }: FilterRowProps<TData>) => {
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   // ... existing useMemo hooks for selectedFieldConfig, availableOperators, operatorConfig
 
   const selectedFieldConfig = useMemo(() => {
-    return fields.find(f => f.key === condition.field)
-  }, [fields, condition.field])
+    return fields.find(f => f.key === condition.field);
+  }, [fields, condition.field]);
 
   // Get available operators based on the field's data type
   const availableOperators = useMemo(() => {
-    const dataType: DataType = selectedFieldConfig?.dataType || 'string'
+    const dataType: DataType = selectedFieldConfig?.dataType || 'string';
 
-    return getOperatorsForDataType(dataType)
-  }, [selectedFieldConfig])
+    return getOperatorsForDataType(dataType);
+  }, [selectedFieldConfig]);
 
   // Get the current operator config
   const operatorConfig = useMemo(() => {
-    const dataType: DataType = selectedFieldConfig?.dataType || 'string'
+    const dataType: DataType = selectedFieldConfig?.dataType || 'string';
 
-    return getOperatorConfig(dataType, condition.operator)
-  }, [selectedFieldConfig, condition.operator])
+    return getOperatorConfig(dataType, condition.operator);
+  }, [selectedFieldConfig, condition.operator]);
 
   const handleFieldChange = (value: string) => {
-    const newField = fields.find(f => f.key === value)
-    const newOperators = getOperatorsForDataType(newField?.dataType || 'string')
+    const newField = fields.find(f => f.key === value);
+    const newOperators = getOperatorsForDataType(newField?.dataType || 'string');
 
     // Reset operator and value when field changes
     onChange(condition.id, {
@@ -70,16 +70,16 @@ const FilterRowInner = <TData,>({
       operator: newOperators[0]?.value || '==',
       value: '',
       secondValue: undefined
-    })
-  }
+    });
+  };
 
   const handleOperatorChange = (value: string) => {
     onChange(condition.id, {
       operator: value,
       value: '',
       secondValue: undefined
-    })
-  }
+    });
+  };
 
   const renderValueInput = () => {
     if (!operatorConfig?.requiresValue) {
@@ -87,10 +87,10 @@ const FilterRowInner = <TData,>({
         <Box sx={{ display: 'flex', alignItems: 'center', height: 40, color: 'text.secondary', fontStyle: 'italic' }}>
           —
         </Box>
-      )
+      );
     }
 
-    const valueType = operatorConfig.valueType || 'text'
+    const valueType = operatorConfig.valueType || 'text';
 
     // Boolean input
     if (valueType === 'boolean') {
@@ -105,7 +105,7 @@ const FilterRowInner = <TData,>({
             <MenuItem value='false'>False</MenuItem>
           </Select>
         </FormControl>
-      )
+      );
     }
 
     // Date input
@@ -137,7 +137,7 @@ const FilterRowInner = <TData,>({
               }}
             />
           </Box>
-        )
+        );
       }
 
       return (
@@ -151,7 +151,7 @@ const FilterRowInner = <TData,>({
             inputLabel: { shrink: true }
           }}
         />
-      )
+      );
     }
 
     // Number input with between
@@ -176,12 +176,12 @@ const FilterRowInner = <TData,>({
             sx={{ flex: 1, minWidth: 80 }}
           />
         </Box>
-      )
+      );
     }
 
     // Multi-value input (for @in, @nin)
     if (valueType === 'multi') {
-      const isNumeric = selectedFieldConfig?.dataType === 'int' || selectedFieldConfig?.dataType === 'long'
+      const isNumeric = selectedFieldConfig?.dataType === 'int' || selectedFieldConfig?.dataType === 'long';
 
       return (
         <TextField
@@ -191,12 +191,12 @@ const FilterRowInner = <TData,>({
           onChange={e => onChange(condition.id, { value: e.target.value })}
           placeholder={isNumeric ? 'e.g. 1, 2, 3' : 'e.g. value1, value2'}
         />
-      )
+      );
     }
 
     // Enum input (when field has enumOptions)
     if (selectedFieldConfig?.enumOptions && selectedFieldConfig.enumOptions.length > 0) {
-      const enumOptions = selectedFieldConfig.enumOptions
+      const enumOptions = selectedFieldConfig.enumOptions;
 
       return (
         <FormControl fullWidth size='small'>
@@ -215,7 +215,7 @@ const FilterRowInner = <TData,>({
             ))}
           </Select>
         </FormControl>
-      )
+      );
     }
 
     // Number input
@@ -229,7 +229,7 @@ const FilterRowInner = <TData,>({
           onChange={e => onChange(condition.id, { value: e.target.value })}
           placeholder='Enter value'
         />
-      )
+      );
     }
 
     // Default text input
@@ -241,8 +241,8 @@ const FilterRowInner = <TData,>({
         onChange={e => onChange(condition.id, { value: e.target.value })}
         placeholder='Enter value'
       />
-    )
-  }
+    );
+  };
 
   return (
     <Box sx={{ mb: 1 }}>
@@ -264,24 +264,33 @@ const FilterRowInner = <TData,>({
         >
           {/* Row 1: Field & Operator */}
           <Box sx={{ display: 'flex', gap: 1 }}>
-            <FormControl size='small' sx={{ flex: 1 }}>
-              <Select value={condition.field} onChange={e => handleFieldChange(e.target.value)} displayEmpty>
-                {fields.map(field => (
-                  <MenuItem key={field.key} value={field.key}>
-                    {field.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <FormControl size='small' sx={{ flex: 1 }}>
-              <Select value={condition.operator} onChange={e => handleOperatorChange(e.target.value)}>
-                {availableOperators.map(op => (
-                  <MenuItem key={op.value} value={op.value}>
-                    {op.label}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+            <TextField
+              select
+              size='small'
+              value={condition.field}
+              onChange={e => handleFieldChange(e.target.value)}
+              sx={{ flex: 1 }}
+              SelectProps={{ displayEmpty: true }}
+            >
+              {fields.map(field => (
+                <MenuItem key={field.key} value={field.key}>
+                  {field.name}
+                </MenuItem>
+              ))}
+            </TextField>
+            <TextField
+              select
+              size='small'
+              value={condition.operator}
+              onChange={e => handleOperatorChange(e.target.value)}
+              sx={{ flex: 1 }}
+            >
+              {availableOperators.map(op => (
+                <MenuItem key={op.value} value={op.value}>
+                  {op.label}
+                </MenuItem>
+              ))}
+            </TextField>
           </Box>
 
           {/* Row 2: Value */}
@@ -324,29 +333,46 @@ const FilterRowInner = <TData,>({
         </Box>
       ) : (
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', width: '100%' }}>
-          <FormControl size='small' sx={{ minWidth: 140 }}>
-            <Select value={condition.field} onChange={e => handleFieldChange(e.target.value)} displayEmpty>
-              {fields.map(field => (
-                <MenuItem key={field.key} value={field.key}>
-                  {field.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          <TextField
+            select
+            size='small'
+            value={condition.field}
+            onChange={e => handleFieldChange(e.target.value)}
+            sx={{ minWidth: 140 }}
+            SelectProps={{ displayEmpty: true }}
+          >
+            {fields.map(field => (
+              <MenuItem key={field.key} value={field.key}>
+                {field.name}
+              </MenuItem>
+            ))}
+          </TextField>
 
-          <FormControl size='small' sx={{ minWidth: 150 }}>
-            <Select value={condition.operator} onChange={e => handleOperatorChange(e.target.value)}>
-              {availableOperators.map(op => (
-                <MenuItem key={op.value} value={op.value}>
-                  {op.label}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          <TextField
+            select
+            size='small'
+            value={condition.operator}
+            onChange={e => handleOperatorChange(e.target.value)}
+            sx={{ minWidth: 150 }}
+          >
+            {availableOperators.map(op => (
+              <MenuItem key={op.value} value={op.value}>
+                {op.label}
+              </MenuItem>
+            ))}
+          </TextField>
 
           <Box sx={{ flex: 1, minWidth: 200 }}>{renderValueInput()}</Box>
 
-          <ButtonGroup variant='outlined' size='small' sx={{ height: 40, borderColor: 'primary.main' }}>
+          <ButtonGroup
+            variant='outlined'
+            size='small'
+            sx={{
+              height: 40,
+              borderColor: 'primary.main',
+              flexShrink: 0
+            }}
+          >
             <Button
               onClick={() => onAddAfter(condition.id, 'AND')}
               sx={{ px: 2, fontSize: '0.75rem', fontWeight: 600, color: 'primary.main', borderColor: 'primary.main' }}
@@ -374,7 +400,7 @@ const FilterRowInner = <TData,>({
         </Box>
       )}
     </Box>
-  )
-}
+  );
+};
 
-export const FilterRow = memo(FilterRowInner) as typeof FilterRowInner
+export const FilterRow = memo(FilterRowInner) as typeof FilterRowInner;

@@ -1,97 +1,97 @@
-'use client'
+'use client';
 
-import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 
-import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
-import Popover from '@mui/material/Popover'
-import TextField from '@mui/material/TextField'
-import Typography from '@mui/material/Typography'
-import InputAdornment from '@mui/material/InputAdornment'
-import CircularProgress from '@mui/material/CircularProgress'
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Popover from '@mui/material/Popover';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import InputAdornment from '@mui/material/InputAdornment';
+import CircularProgress from '@mui/material/CircularProgress';
 
-const PAGE_SIZE = 400
+const PAGE_SIZE = 400;
 
 interface RoleIconPickerProps {
-  value: string
-  onChange: (icon: string) => void
-  error?: boolean
-  helperText?: string
+  value: string;
+  onChange: (icon: string) => void;
+  error?: boolean;
+  helperText?: string;
 }
 
 const RoleIconPicker = ({ value, onChange, error, helperText }: RoleIconPickerProps) => {
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
-  const [allIcons, setAllIcons] = useState<string[]>([])
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [allIcons, setAllIcons] = useState<string[]>([]);
 
-  const [scrollContainer, setScrollContainer] = useState<HTMLDivElement | null>(null)
-  const observerRef = useRef<IntersectionObserver | null>(null)
+  const [scrollContainer, setScrollContainer] = useState<HTMLDivElement | null>(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
   // Fetch icons on mount
   useEffect(() => {
     fetch('/icons.json')
       .then(res => res.json())
       .then(data => setAllIcons(data))
-      .catch(err => console.error('Failed to load icons:', err))
-  }, [])
+      .catch(err => console.error('Failed to load icons:', err));
+  }, []);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget)
-    setVisibleCount(PAGE_SIZE)
-  }
+    setAnchorEl(event.currentTarget);
+    setVisibleCount(PAGE_SIZE);
+  };
 
   const handleClose = () => {
-    setAnchorEl(null)
-    setSearchTerm('')
-  }
+    setAnchorEl(null);
+    setSearchTerm('');
+  };
 
   const handleSelect = (icon: string) => {
-    onChange(icon)
-    handleClose()
-  }
+    onChange(icon);
+    handleClose();
+  };
 
   // Filter icons based on search term
   const filteredIcons = useMemo(() => {
-    if (!searchTerm) return allIcons
-    const term = searchTerm.toLowerCase()
+    if (!searchTerm) return allIcons;
+    const term = searchTerm.toLowerCase();
 
-    return allIcons.filter(icon => icon.toLowerCase().includes(term))
-  }, [searchTerm, allIcons])
+    return allIcons.filter(icon => icon.toLowerCase().includes(term));
+  }, [searchTerm, allIcons]);
 
   // Get current slice of visible icons
   const visibleIcons = useMemo(() => {
-    return filteredIcons.slice(0, visibleCount)
-  }, [filteredIcons, visibleCount])
+    return filteredIcons.slice(0, visibleCount);
+  }, [filteredIcons, visibleCount]);
 
   // Callback ref for the sentinel
   const sentinelRef = useCallback(
     (node: HTMLDivElement) => {
-      if (!node) return
+      if (!node) return;
 
       if (observerRef.current) {
-        observerRef.current.disconnect()
+        observerRef.current.disconnect();
       }
 
       observerRef.current = new IntersectionObserver(
         entries => {
           if (entries[0].isIntersecting) {
             // Use functional update to ensure we don't depend on stale closures
-            setVisibleCount(prev => prev + PAGE_SIZE)
+            setVisibleCount(prev => prev + PAGE_SIZE);
           }
         },
         {
           root: scrollContainer,
           rootMargin: '300px'
         }
-      )
+      );
 
-      observerRef.current.observe(node)
+      observerRef.current.observe(node);
     },
     [scrollContainer]
-  ) // Re-attach when container becomes available
+  ); // Re-attach when container becomes available
 
-  const open = Boolean(anchorEl)
+  const open = Boolean(anchorEl);
 
   return (
     <Box>
@@ -155,8 +155,8 @@ const RoleIconPicker = ({ value, onChange, error, helperText }: RoleIconPickerPr
           fullWidth
           value={searchTerm}
           onChange={e => {
-            setSearchTerm(e.target.value)
-            setVisibleCount(PAGE_SIZE)
+            setSearchTerm(e.target.value);
+            setVisibleCount(PAGE_SIZE);
           }}
           sx={{ mb: 2 }}
           InputProps={{
@@ -234,7 +234,7 @@ const RoleIconPicker = ({ value, onChange, error, helperText }: RoleIconPickerPr
         </Box>
       </Popover>
     </Box>
-  )
-}
+  );
+};
 
-export default RoleIconPicker
+export default RoleIconPicker;

@@ -1,5 +1,5 @@
 // React Imports
-import type { SVGAttributes } from 'react'
+import type { SVGAttributes } from 'react';
 
 const LaptopCharging = (props: SVGAttributes<SVGElement>) => {
   return (
@@ -17,7 +17,7 @@ const LaptopCharging = (props: SVGAttributes<SVGElement>) => {
         strokeLinejoin='round'
       />
     </svg>
-  )
-}
+  );
+};
 
-export default LaptopCharging
+export default LaptopCharging;

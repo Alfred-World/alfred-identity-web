@@ -1,11 +1,11 @@
-'use client'
+'use client';
 
 // MUI imports
-import { styled } from '@mui/material/styles'
-import type { Theme } from '@mui/material/styles'
+import { styled } from '@mui/material/styles';
+import type { Theme } from '@mui/material/styles';
 
 // Third-party Imports
-import 'keen-slider/keen-slider.min.css'
+import 'keen-slider/keen-slider.min.css';
 
 // Styled Components
 const AppKeenSlider = styled('div')(({ theme }: { theme: Theme }) => ({
@@ -116,6 +116,6 @@ const AppKeenSlider = styled('div')(({ theme }: { theme: Theme }) => ({
       }
     }
   }
-}))
+}));
 
-export default AppKeenSlider
+export default AppKeenSlider;

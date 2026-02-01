@@ -1,5 +1,5 @@
-import type { HorizontalMenuDataType } from '@/types/menuTypes'
-import { ROUTES } from '@/configs/routes'
+import type { HorizontalMenuDataType } from '@/types/menuTypes';
+import { ROUTES } from '@/configs/routes';
 
 const horizontalMenuData = (): HorizontalMenuDataType[] => [
   {
@@ -18,6 +18,6 @@ const horizontalMenuData = (): HorizontalMenuDataType[] => [
     icon: 'tabler-apps',
     href: ROUTES.APPLICATIONS.LIST
   }
-]
+];
 
-export default horizontalMenuData
+export default horizontalMenuData;

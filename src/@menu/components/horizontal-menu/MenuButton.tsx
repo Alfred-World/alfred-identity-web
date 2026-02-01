@@ -1,28 +1,28 @@
 // React Imports
-import { cloneElement, createElement, forwardRef } from 'react'
-import type { ForwardRefRenderFunction } from 'react'
+import { cloneElement, createElement, forwardRef } from 'react';
+import type { ForwardRefRenderFunction } from 'react';
 
 // Third-party Imports
-import classnames from 'classnames'
-import { css } from '@emotion/react'
+import classnames from 'classnames';
+import { css } from '@emotion/react';
 
 // Type Imports
-import type { ChildrenType, MenuButtonProps } from '../../types'
+import type { ChildrenType, MenuButtonProps } from '../../types';
 
 // Component Imports
-import { RouterLink } from '../RouterLink'
+import { RouterLink } from '../RouterLink';
 
 // Util Imports
-import { menuClasses } from '../../utils/menuClasses'
+import { menuClasses } from '../../utils/menuClasses';
 
 type MenuButtonStylesProps = Partial<ChildrenType> & {
-  level: number
-  disabled?: boolean
-}
+  level: number;
+  disabled?: boolean;
+};
 
 export const menuButtonStyles = (props: MenuButtonStylesProps) => {
   // Props
-  const { level, disabled, children } = props
+  const { level, disabled, children } = props;
 
   return css({
     display: 'flex',
@@ -60,8 +60,8 @@ export const menuButtonStyles = (props: MenuButtonStylesProps) => {
             ...(children ? { backgroundColor: '#f3f3f3' } : { color: '#765feb', backgroundColor: '#765feb1f' })
           })
     }
-  })
-}
+  });
+};
 
 const MenuButton: ForwardRefRenderFunction<HTMLAnchorElement, MenuButtonProps> = (
   { className, component, children, ...rest },
@@ -78,10 +78,10 @@ const MenuButton: ForwardRefRenderFunction<HTMLAnchorElement, MenuButtonProps> =
           ref
         },
         children
-      )
+      );
     } else {
       // Otherwise, clone the element
-      const { className: classNameProp, ...props } = component.props
+      const { className: classNameProp, ...props } = component.props;
 
       return cloneElement(
         component,
@@ -92,7 +92,7 @@ const MenuButton: ForwardRefRenderFunction<HTMLAnchorElement, MenuButtonProps> =
           ref
         },
         children
-      )
+      );
     }
   } else {
     // If there is no component but href is defined, render RouterLink
@@ -101,15 +101,15 @@ const MenuButton: ForwardRefRenderFunction<HTMLAnchorElement, MenuButtonProps> =
         <RouterLink ref={ref} className={className} href={rest.href} {...rest}>
           {children}
         </RouterLink>
-      )
+      );
     } else {
       return (
         <a ref={ref} className={className} {...rest}>
           {children}
         </a>
-      )
+      );
     }
   }
-}
+};
 
-export default forwardRef(MenuButton)
+export default forwardRef(MenuButton);

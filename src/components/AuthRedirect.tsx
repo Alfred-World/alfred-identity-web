@@ -1,12 +1,12 @@
-'use client'
+'use client';
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react';
 
-import { usePathname } from 'next/navigation'
+import { usePathname } from 'next/navigation';
 
-import { APP_URL, getSsoCheckUrl } from '@/libs/sso-config'
+import { APP_URL, getSsoCheckUrl } from '@/libs/sso-config';
 
-import Loading from './Loading'
+import Loading from './Loading';
 
 /**
  * AuthRedirect - Redirects to Gateway SSO check instead of login
@@ -20,23 +20,23 @@ import Loading from './Loading'
  * The callback is handled by the login page or a dedicated SSO callback page
  */
 const AuthRedirect = () => {
-  const pathname = usePathname()
-  const hasRedirectedRef = useRef(false)
+  const pathname = usePathname();
+  const hasRedirectedRef = useRef(false);
 
   useEffect(() => {
-    if (hasRedirectedRef.current) return
-    hasRedirectedRef.current = true
+    if (hasRedirectedRef.current) return;
+    hasRedirectedRef.current = true;
 
     // Build the callback URL - we'll redirect to login page which handles SSO token
-    const callbackUrl = `${APP_URL}/login?redirectTo=${encodeURIComponent(pathname)}`
+    const callbackUrl = `${APP_URL}/login?redirectTo=${encodeURIComponent(pathname)}`;
 
     // Redirect to Gateway SSO check
-    const ssoCheckUrl = getSsoCheckUrl(callbackUrl)
+    const ssoCheckUrl = getSsoCheckUrl(callbackUrl);
 
-    window.location.href = ssoCheckUrl
-  }, [pathname])
+    window.location.href = ssoCheckUrl;
+  }, [pathname]);
 
-  return <Loading />
-}
+  return <Loading />;
+};
 
-export default AuthRedirect
+export default AuthRedirect;

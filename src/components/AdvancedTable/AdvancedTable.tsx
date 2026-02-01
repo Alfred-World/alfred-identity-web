@@ -1,146 +1,63 @@
-'use client'
+'use client';
 
 // React Imports
-import { useState, useMemo, type ReactNode } from 'react'
+import { useState, useMemo, useEffect } from 'react';
 
 // MUI Imports
-import Card from '@mui/material/Card'
-import CardContent from '@mui/material/CardContent'
-import Typography from '@mui/material/Typography'
-import MenuItem from '@mui/material/MenuItem'
-import Pagination from '@mui/material/Pagination'
-import Button from '@mui/material/Button'
-import Menu from '@mui/material/Menu'
-import Checkbox from '@mui/material/Checkbox'
-import FormControlLabel from '@mui/material/FormControlLabel'
-import Divider from '@mui/material/Divider'
-import Box from '@mui/material/Box'
-import IconButton from '@mui/material/IconButton'
-import Tooltip from '@mui/material/Tooltip'
-import { styled } from '@mui/material/styles'
-
-// Local Component Imports
+import Card from '@mui/material/Card';
+import Typography from '@mui/material/Typography';
+import Pagination from '@mui/material/Pagination';
+import Checkbox from '@mui/material/Checkbox';
 
 // Third-party Imports
-import classnames from 'classnames'
 import type {
   ColumnDef,
-  SortingState,
-  OnChangeFn,
   VisibilityState,
   ColumnPinningState,
   RowSelectionState,
   TableOptions,
-  RowData
-} from '@tanstack/react-table'
-import { flexRender, getCoreRowModel, useReactTable, createColumnHelper } from '@tanstack/react-table'
+  RowData,
+  ColumnOrderState
+} from '@tanstack/react-table';
+import { useReactTable, createColumnHelper, getCoreRowModel } from '@tanstack/react-table';
 
+// Module augmentation for ColumnMeta
 declare module '@tanstack/table-core' {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface ColumnMeta<TData extends RowData, TValue> {
-    align?: 'left' | 'center' | 'right'
-    width?: number | string
+    align?: 'left' | 'center' | 'right';
+    width?: number | string;
   }
 }
 
-import { TableSkeleton } from './TableSkeleton'
-
-// Component Imports
-import CustomTextField from '@core/components/mui/TextField'
+// Local Imports
+import { AdvancedTableToolbar } from './AdvancedTableToolbar';
+import { AdvancedTableHeader } from './AdvancedTableHeader';
+import { AdvancedTableBody } from './AdvancedTableBody';
+import type { AdvancedTableProps } from './AdvancedTable.utils';
 
 // Type Imports
-import type { FieldConfig } from '@/components/dsl-query-builder/types'
+import type { FieldConfig } from '@/components/dsl-query-builder/types';
 
 // Style Imports
-import tableStyles from '@core/styles/table.module.css'
+import tableStyles from '@core/styles/table.module.css';
 
 // Constants
-import { DEFAULT_PAGE_SIZE_OPTIONS } from '@/constants/pagination'
-
-// Styled Components
-const Icon = styled('i')({})
-
-// ============================================================
-// TYPES
-// ============================================================
-
-export interface AdvancedTableProps<TData> {
-
-  /** Data to display in the table */
-  data: TData[]
-
-  /**
-   * Field configurations - auto-generates columns from these
-   * Use this for simple tables where you don't need custom column definitions
-   */
-  fields?: FieldConfig<TData>[]
-
-  /**
-   * Column definitions from TanStack Table
-   * Use this when you need full control over column rendering
-   * If both fields and columns are provided, columns takes precedence
-   */
-  columns?: ColumnDef<TData, unknown>[]
-
-  /** Total number of records (for server-side pagination) */
-  total: number
-
-  /** Current page (1-indexed) */
-  page: number
-
-  /** Page size */
-  pageSize: number
-
-  /** Sorting state */
-  sorting?: SortingState
-
-  /** Callback when page changes */
-  onPageChange: (page: number) => void
-
-  /** Callback when page size changes */
-  onPageSizeChange: (pageSize: number) => void
-
-  /** Callback when sorting changes */
-  onSortingChange?: OnChangeFn<SortingState>
-
-  /** Row selection callback */
-  onRowSelectionChange?: (selectedRows: TData[]) => void
-
-  /** Loading state */
-  isLoading?: boolean
-
-  /** Enable row selection */
-  enableRowSelection?: boolean
-
-  /** Get unique row ID */
-  getRowId?: (row: TData) => string
-
-  /** Custom header content (left side) */
-  headerLeftContent?: ReactNode
-
-  /** Custom header content (right side) */
-  headerRightContent?: ReactNode
-
-  /** Card title */
-  title?: string
-
-  /** Page size options */
-  pageSizeOptions?: number[]
-}
+import { DEFAULT_PAGE_SIZE_OPTIONS } from '@/constants/pagination';
 
 // ============================================================
 // HELPER COMPONENTS
 // ============================================================
 
 interface TablePaginationProps<TData> {
-  table: ReturnType<typeof useReactTable<TData>>
-  total: number
-  onPageChange: (page: number) => void
+  table: ReturnType<typeof useReactTable<TData>>;
+  total: number;
+  onPageChange: (page: number) => void;
 }
 
 function TablePagination<TData>({ table, total, onPageChange }: TablePaginationProps<TData>) {
-  const pageCount = table.getPageCount()
-  const currentPage = table.getState().pagination.pageIndex + 1
+  const pageCount = table.getPageCount();
+  const currentPage = table.getState().pagination.pageIndex + 1;
 
   return (
     <div className='flex justify-between items-center flex-wrap pli-6 border-bs bs-auto plb-[12.5px] gap-2'>
@@ -158,13 +75,13 @@ function TablePagination<TData>({ table, total, onPageChange }: TablePaginationP
         count={pageCount}
         page={currentPage}
         onChange={(_, page) => {
-          onPageChange(page)
+          onPageChange(page);
         }}
         showFirstButton
         showLastButton
       />
     </div>
-  )
+  );
 }
 
 // ============================================================
@@ -186,11 +103,11 @@ function generateColumnsFromFields<TData>(
         header: field.name,
         enableSorting: !!field.enableSorting, // Default false
         cell: ({ row }) => {
-          const value = (row.original as Record<string, unknown>)[field.key]
+          const value = (row.original as Record<string, unknown>)[field.key];
 
           // Use custom renderer if provided
           if (field.renderCell) {
-            return field.renderCell(value, row.original)
+            return field.renderCell(value, row.original);
           }
 
           // Default rendering based on data type
@@ -201,22 +118,24 @@ function generateColumnsFromFields<TData>(
                   ? new Date(value as string | number | Date).toLocaleDateString()
                   : '-'}
               </Typography>
-            )
+            );
           }
 
           if (field.dataType === 'bool') {
-            return <Typography color='text.primary'>{value === true ? 'Yes' : value === false ? 'No' : '-'}</Typography>
+            return (
+              <Typography color='text.primary'>{value === true ? 'Yes' : value === false ? 'No' : '-'}</Typography>
+            );
           }
 
           // Default text rendering
-          return <Typography color='text.primary'>{(value as string | number | null) ?? '-'}</Typography>
+          return <Typography color='text.primary'>{(value as string | number | null) ?? '-'}</Typography>;
         },
         meta: {
           align: field.align,
           width: field.width
         }
-      })
-    })
+      });
+    });
 }
 
 export function AdvancedTable<TData>({
@@ -237,82 +156,115 @@ export function AdvancedTable<TData>({
   headerLeftContent,
   headerRightContent,
   title,
-  pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS
+  pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS,
+  enableIndexColumn = false
 }: AdvancedTableProps<TData>) {
   // ============================================================
   // Generate columns from fields if provided
   // ============================================================
-  const columnHelper = createColumnHelper<TData>()
+  const columnHelper = useMemo(() => createColumnHelper<TData>(), []);
 
   const generatedColumns = useMemo<ColumnDef<TData, unknown>[]>(() => {
     // If userColumns provided, use them directly
     if (userColumns && userColumns.length > 0) {
-      return userColumns
+      return userColumns;
     }
 
     // If fields provided, generate columns from them
     if (fields && fields.length > 0) {
-      return generateColumnsFromFields(fields, columnHelper)
+      return generateColumnsFromFields(fields, columnHelper);
     }
 
     // No columns or fields provided
-    return []
-  }, [userColumns, fields, columnHelper])
+    return [];
+  }, [userColumns, fields, columnHelper]);
 
   // ============================================================
   // Build columns with optional selection column
   // ============================================================
   const columns = useMemo<ColumnDef<TData, unknown>[]>(() => {
-    if (!enableRowSelection) return generatedColumns
+    const finalColumns = [...generatedColumns];
 
-    const selectionColumn: ColumnDef<TData, unknown> = {
-      id: 'select',
-      header: ({ table }) => (
-        <Checkbox
-          checked={table.getIsAllPageRowsSelected()}
-          indeterminate={table.getIsSomePageRowsSelected()}
-          onChange={table.getToggleAllPageRowsSelectedHandler()}
-          color='primary'
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          disabled={!row.getCanSelect()}
-          onChange={row.getToggleSelectedHandler()}
-          color='primary'
-        />
-      ),
-      enableSorting: false,
-      enableHiding: false
+    // Prepend selection column if enabled
+    if (enableRowSelection) {
+      const selectionColumn: ColumnDef<TData, unknown> = {
+        id: 'select',
+        header: ({ table }) => (
+          <Checkbox
+            checked={table.getIsAllPageRowsSelected()}
+            indeterminate={table.getIsSomePageRowsSelected()}
+            onChange={table.getToggleAllPageRowsSelectedHandler()}
+            color='primary'
+          />
+        ),
+        cell: ({ row }) => (
+          <Checkbox
+            checked={row.getIsSelected()}
+            disabled={!row.getCanSelect()}
+            onChange={row.getToggleSelectedHandler()}
+            color='primary'
+          />
+        ),
+        enableSorting: false,
+        enableHiding: false
+      };
+
+      finalColumns.unshift(selectionColumn);
     }
 
-    return [selectionColumn, ...generatedColumns]
-  }, [enableRowSelection, generatedColumns])
+    // Prepend index column if enabled
+    if (enableIndexColumn) {
+      const indexColumn: ColumnDef<TData, unknown> = {
+        id: 'index',
+        header: '#',
+        cell: ({ row }) => (
+          <Typography color='text.primary' variant='body2'>
+            {(page - 1) * pageSize + row.index + 1}
+          </Typography>
+        ),
+        enableSorting: false,
+        enableHiding: false,
+        size: 50,
+        meta: {
+          align: 'center',
+          width: 50
+        }
+      };
+
+      finalColumns.unshift(indexColumn);
+    }
+
+    return finalColumns;
+  }, [enableRowSelection, enableIndexColumn, generatedColumns, page, pageSize]);
 
   // ============================================================
   // State
   // ============================================================
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
 
   const [columnPinning, setColumnPinning] = useState<ColumnPinningState>({
     left: [],
     right: []
-  })
+  });
 
-  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
-  // Menu anchor for column visibility dropdown
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-  const open = Boolean(anchorEl)
+  const [columnOrder, setColumnOrder] = useState<ColumnOrderState>(
+    columns.map(column => column.id as string) // Initialize with current columns
+  );
 
-  const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget)
-  }
+  // Sync columnOrder when columns change, but only if IDs are different
+  useEffect(() => {
+    const newOrder = columns.map(column => column.id as string);
 
-  const handleMenuClose = () => {
-    setAnchorEl(null)
-  }
+    setColumnOrder(prev => {
+      if (prev.length === newOrder.length && prev.every((id, i) => id === newOrder[i])) {
+        return prev;
+      }
+
+      return newOrder;
+    });
+  }, [columns]);
 
   // ============================================================
   // Table configuration
@@ -329,8 +281,10 @@ export function AdvancedTable<TData>({
       sorting,
       columnVisibility,
       columnPinning,
-      rowSelection
+      rowSelection,
+      columnOrder
     },
+    onColumnOrderChange: setColumnOrder,
     enableRowSelection,
     getRowId: getRowId,
     manualPagination: true,
@@ -340,287 +294,71 @@ export function AdvancedTable<TData>({
         const newState = updater({
           pageIndex: page - 1,
           pageSize
-        })
+        });
 
-        onPageChange(newState.pageIndex + 1)
-        onPageSizeChange(newState.pageSize)
+        onPageChange(newState.pageIndex + 1);
+        onPageSizeChange(newState.pageSize);
       } else {
-        onPageChange(updater.pageIndex + 1)
-        onPageSizeChange(updater.pageSize)
+        onPageChange(updater.pageIndex + 1);
+        onPageSizeChange(updater.pageSize);
       }
     },
     onSortingChange: onSortingChange,
     onColumnVisibilityChange: setColumnVisibility,
     onColumnPinningChange: setColumnPinning,
     onRowSelectionChange: updater => {
-      const newSelection = typeof updater === 'function' ? updater(rowSelection) : updater
+      const newSelection = typeof updater === 'function' ? updater(rowSelection) : updater;
 
-      setRowSelection(newSelection)
+      setRowSelection(newSelection);
 
       // Call external callback with selected rows
       if (onRowSelectionChange) {
         const selectedRows = data.filter((_, index) => {
-          const rowId = getRowId ? getRowId(data[index] as TData) : String(index)
+          const rowId = getRowId ? getRowId(data[index] as TData) : String(index);
 
-          return newSelection[rowId]
-        })
+          return newSelection[rowId];
+        });
 
-        onRowSelectionChange(selectedRows)
+        onRowSelectionChange(selectedRows);
       }
     },
     getCoreRowModel: getCoreRowModel()
-  }
+  };
 
-  const table = useReactTable(tableOptions)
+  const table = useReactTable(tableOptions);
 
   // ============================================================
   // Render
   // ============================================================
   return (
     <Card>
-      <CardContent className='flex justify-between flex-col gap-4 items-start sm:flex-row sm:items-center'>
-        {/* Left side content */}
-        <div className='flex items-center gap-4'>
-          {title && (
-            <Typography variant='h6' fontWeight={600}>
-              {title}
-            </Typography>
-          )}
-          {headerLeftContent}
-          <div className='flex items-center gap-2'>
-            <Typography>Show</Typography>
-            <CustomTextField
-              select
-              value={pageSize}
-              onChange={e => onPageSizeChange(Number(e.target.value))}
-              className='max-sm:is-full sm:is-[80px]'
-            >
-              {pageSizeOptions.map(option => (
-                <MenuItem key={option} value={option}>
-                  {option}
-                </MenuItem>
-              ))}
-            </CustomTextField>
-          </div>
-        </div>
+      <AdvancedTableToolbar
+        title={title}
+        headerLeftContent={headerLeftContent}
+        headerRightContent={headerRightContent}
+        pageSize={pageSize}
+        onPageSizeChange={onPageSizeChange}
+        pageSizeOptions={pageSizeOptions}
+        table={table}
+        setColumnOrder={setColumnOrder}
+      />
 
-        {/* Right side content */}
-        <div className='flex items-center gap-2'>
-          {headerRightContent}
-
-          {/* Column Visibility Toggle Button */}
-          <Button
-            variant='outlined'
-            size='small'
-            onClick={handleMenuClick}
-            startIcon={<Icon className='tabler-columns' />}
-            sx={{ minWidth: 'auto' }}
-          >
-            View
-          </Button>
-
-          {/* Column Visibility Menu */}
-          <Menu
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleMenuClose}
-            anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'right'
-            }}
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'right'
-            }}
-            slotProps={{
-              paper: {
-                sx: { minWidth: 200, maxHeight: 400 }
-              }
-            }}
-          >
-            <Box sx={{ px: 2, py: 1 }}>
-              <Typography variant='subtitle2' sx={{ fontWeight: 600 }}>
-                Table View
-              </Typography>
-            </Box>
-            <Divider />
-
-            {/* Column Visibility Header */}
-            <Box sx={{ px: 2, pt: 1.5, pb: 0.5 }}>
-              <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase', fontWeight: 500 }}>
-                Column Visibility
-              </Typography>
-            </Box>
-
-            {/* Column Toggles */}
-            {table.getAllLeafColumns().map(column => {
-              // Skip selection column
-              if (column.id === 'select') return null
-
-              const isPinnedLeft = column.getIsPinned() === 'left'
-              const isPinnedRight = column.getIsPinned() === 'right'
-              const isPinned = isPinnedLeft || isPinnedRight
-
-              return (
-                <MenuItem
-                  key={column.id}
-                  sx={{ py: 0.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-                >
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={column.getIsVisible()}
-                        onChange={e => {
-                          e.stopPropagation()
-                          column.toggleVisibility(e.target.checked)
-                        }}
-                        size='small'
-                        sx={{ p: 0.5 }}
-                      />
-                    }
-                    label={
-                      <Typography variant='body2'>
-                        {typeof column.columnDef.header === 'string' ? column.columnDef.header : column.id}
-                      </Typography>
-                    }
-                    sx={{ m: 0, flex: 1 }}
-                    onClick={e => e.stopPropagation()}
-                  />
-
-                  {/* Pin/Unpin Buttons */}
-                  <Box sx={{ display: 'flex', gap: 0.5, ml: 1 }}>
-                    {isPinned ? (
-                      <Tooltip title='Unpin'>
-                        <IconButton
-                          size='small'
-                          onClick={e => {
-                            e.stopPropagation()
-                            column.pin(false)
-                          }}
-                          sx={{ p: 0.25 }}
-                        >
-                          <Icon className='tabler-x text-lg' />
-                        </IconButton>
-                      </Tooltip>
-                    ) : (
-                      <>
-                        <Tooltip title='Pin Left'>
-                          <IconButton
-                            size='small'
-                            onClick={e => {
-                              e.stopPropagation()
-                              column.pin('left')
-                            }}
-                            sx={{ p: 0.25 }}
-                          >
-                            <Icon className='tabler-arrow-bar-to-left text-lg' />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title='Pin Right'>
-                          <IconButton
-                            size='small'
-                            onClick={e => {
-                              e.stopPropagation()
-                              column.pin('right')
-                            }}
-                            sx={{ p: 0.25 }}
-                          >
-                            <Icon className='tabler-arrow-bar-to-right text-lg' />
-                          </IconButton>
-                        </Tooltip>
-                      </>
-                    )}
-                  </Box>
-                </MenuItem>
-              )
-            })}
-
-            <Divider sx={{ my: 1 }} />
-
-            {/* Show All Columns */}
-            <MenuItem
-              onClick={() => {
-                table.toggleAllColumnsVisible(true)
-              }}
-              sx={{ justifyContent: 'center' }}
-            >
-              <Typography variant='body2' color='primary'>
-                Show All Columns
-              </Typography>
-            </MenuItem>
-          </Menu>
-        </div>
-      </CardContent>
-
-      {/* Table */}
       <div className='overflow-x-auto'>
         <table className={tableStyles.table}>
-          <thead>
-            {table.getHeaderGroups().map(headerGroup => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map(header => (
-                  <th key={header.id}>
-                    {header.isPlaceholder ? null : (
-                      <div
-                        className={classnames('flex items-center gap-2 w-full', {
-                          'cursor-pointer select-none': header.column.getCanSort(),
-                          'justify-start':
-                            header.column.columnDef.meta?.align === 'left' || !header.column.columnDef.meta?.align,
-                          'justify-center': header.column.columnDef.meta?.align === 'center',
-                          'justify-end': header.column.columnDef.meta?.align === 'right'
-                        })}
-                        onClick={header.column.getToggleSortingHandler()}
-                      >
-                        <span>{flexRender(header.column.columnDef.header, header.getContext())}</span>
-                        {header.column.getCanSort() && (
-                          <span className='ml-2'>
-                            {{
-                              asc: <Icon className='tabler-chevron-up text-lg' />,
-                              desc: <Icon className='tabler-chevron-down text-lg' />
-                            }[header.column.getIsSorted() as 'asc' | 'desc'] ?? (
-                              <Icon className='tabler-selector text-lg opacity-50' />
-                            )}
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-          {isLoading ? (
-            <TableSkeleton
-              rowCount={Math.min(pageSize, 10)}
-              columnCount={enableRowSelection ? columns.length - 1 : columns.length}
-              showCheckbox={enableRowSelection}
-            />
-          ) : data.length === 0 ? (
-            <tbody>
-              <tr>
-                <td colSpan={columns.length} className='text-center'>
-                  No data available
-                </td>
-              </tr>
-            </tbody>
-          ) : (
-            <tbody>
-              {table.getRowModel().rows.map(row => (
-                <tr key={row.id} className={classnames({ selected: row.getIsSelected() })}>
-                  {row.getVisibleCells().map(cell => (
-                    <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          )}
+          <AdvancedTableHeader table={table} setColumnOrder={setColumnOrder} />
+
+          <AdvancedTableBody
+            table={table}
+            isLoading={isLoading}
+            data={data}
+            columns={columns}
+            pageSize={pageSize}
+            enableRowSelection={enableRowSelection}
+          />
         </table>
       </div>
 
-      {/* Pagination */}
       <TablePagination table={table} total={total} onPageChange={onPageChange} />
     </Card>
-  )
+  );
 }
-
-export default AdvancedTable

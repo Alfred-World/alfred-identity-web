@@ -1,47 +1,47 @@
-'use client'
+'use client';
 
 // React Imports
-import { createContext, forwardRef, useMemo } from 'react'
-import type { ForwardRefRenderFunction, MenuHTMLAttributes, ReactElement } from 'react'
+import { createContext, forwardRef, useMemo } from 'react';
+import type { ForwardRefRenderFunction, MenuHTMLAttributes, ReactElement } from 'react';
 
 // Third-party Imports
-import classnames from 'classnames'
-import { FloatingTree } from '@floating-ui/react'
+import classnames from 'classnames';
+import { FloatingTree } from '@floating-ui/react';
 
 // Type Imports
-import type { MenuProps as VerticalMenuProps } from '../vertical-menu/Menu'
+import type { MenuProps as VerticalMenuProps } from '../vertical-menu/Menu';
 import type {
   ChildrenType,
   MenuItemStyles,
   RenderExpandIconParams,
   RenderExpandedMenuItemIcon,
   RootStylesType
-} from '../../types'
+} from '../../types';
 
 // Util Imports
-import { menuClasses } from '../../utils/menuClasses'
+import { menuClasses } from '../../utils/menuClasses';
 
 // Styled Component Imports
-import StyledHorizontalMenu from '../../styles/horizontal/StyledHorizontalMenu'
+import StyledHorizontalMenu from '../../styles/horizontal/StyledHorizontalMenu';
 
 // Style Imports
-import styles from '../../styles/horizontal/horizontalUl.module.css'
+import styles from '../../styles/horizontal/horizontalUl.module.css';
 
 // Default Config Imports
-import { horizontalSubMenuToggleDuration } from '../../defaultConfigs'
+import { horizontalSubMenuToggleDuration } from '../../defaultConfigs';
 
 export type HorizontalMenuContextProps = {
-  triggerPopout?: 'hover' | 'click'
-  browserScroll?: boolean
-  menuItemStyles?: MenuItemStyles
-  renderExpandIcon?: (params: RenderExpandIconParams) => ReactElement
-  renderExpandedMenuItemIcon?: RenderExpandedMenuItemIcon
-  transitionDuration?: number
+  triggerPopout?: 'hover' | 'click';
+  browserScroll?: boolean;
+  menuItemStyles?: MenuItemStyles;
+  renderExpandIcon?: (params: RenderExpandIconParams) => ReactElement;
+  renderExpandedMenuItemIcon?: RenderExpandedMenuItemIcon;
+  transitionDuration?: number;
   popoutMenuOffset?: {
-    mainAxis?: number | ((params: { level?: number }) => number)
-    alignmentAxis?: number | ((params: { level?: number }) => number)
-  }
-  textTruncate?: boolean
+    mainAxis?: number | ((params: { level?: number }) => number);
+    alignmentAxis?: number | ((params: { level?: number }) => number);
+  };
+  textTruncate?: boolean;
   verticalMenuProps?: Pick<
     VerticalMenuProps,
     | 'transitionDuration'
@@ -52,15 +52,15 @@ export type HorizontalMenuContextProps = {
     | 'renderExpandedMenuItemIcon'
     | 'textTruncate'
     | 'rootStyles'
-  >
-}
+  >;
+};
 
 export type MenuProps = HorizontalMenuContextProps &
   RootStylesType &
   Partial<ChildrenType> &
-  MenuHTMLAttributes<HTMLMenuElement>
+  MenuHTMLAttributes<HTMLMenuElement>;
 
-export const HorizontalMenuContext = createContext({} as HorizontalMenuContextProps)
+export const HorizontalMenuContext = createContext({} as HorizontalMenuContextProps);
 
 const Menu: ForwardRefRenderFunction<HTMLMenuElement, MenuProps> = (props, ref) => {
   // Props
@@ -78,7 +78,7 @@ const Menu: ForwardRefRenderFunction<HTMLMenuElement, MenuProps> = (props, ref) 
     textTruncate = true,
     verticalMenuProps,
     ...rest
-  } = props
+  } = props;
 
   const providerValue = useMemo(
     () => ({
@@ -103,7 +103,7 @@ const Menu: ForwardRefRenderFunction<HTMLMenuElement, MenuProps> = (props, ref) 
       textTruncate,
       verticalMenuProps
     ]
-  )
+  );
 
   return (
     <HorizontalMenuContext.Provider value={providerValue}>
@@ -118,7 +118,7 @@ const Menu: ForwardRefRenderFunction<HTMLMenuElement, MenuProps> = (props, ref) 
         </StyledHorizontalMenu>
       </FloatingTree>
     </HorizontalMenuContext.Provider>
-  )
-}
+  );
+};
 
-export default forwardRef(Menu)
+export default forwardRef(Menu);

@@ -1,15 +1,15 @@
 // MUI Imports
-import MuiTabList from '@mui/lab/TabList'
-import { styled } from '@mui/material/styles'
-import type { TabListProps } from '@mui/lab/TabList'
+import MuiTabList from '@mui/lab/TabList';
+import { styled } from '@mui/material/styles';
+import type { TabListProps } from '@mui/lab/TabList';
 
 // Type Imports
-import type { ThemeColor } from '@core/types'
+import type { ThemeColor } from '@core/types';
 
 export type CustomTabListProps = TabListProps & {
-  color?: ThemeColor
-  pill?: 'true' | 'false'
-}
+  color?: ThemeColor;
+  pill?: 'true' | 'false';
+};
 
 const TabList = styled(MuiTabList)<CustomTabListProps>(({ color, theme, pill, orientation }) => ({
   ...(pill === 'true' && {
@@ -57,13 +57,13 @@ const TabList = styled(MuiTabList)<CustomTabListProps>(({ color, theme, pill, or
       }
     }
   })
-}))
+}));
 
 const CustomTabList = (props: CustomTabListProps) => {
   // Props
-  const { color = 'primary', ...rest } = props
+  const { color = 'primary', ...rest } = props;
 
-  return <TabList color={color} {...rest} />
-}
+  return <TabList color={color} {...rest} />;
+};
 
-export default CustomTabList
+export default CustomTabList;

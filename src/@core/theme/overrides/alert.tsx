@@ -1,8 +1,8 @@
 // React Imports
-import React from 'react'
+import React from 'react';
 
 // MUI Imports
-import type { Theme } from '@mui/material/styles'
+import type { Theme } from '@mui/material/styles';
 
 const alerts: Theme['components'] = {
   MuiAlert: {
@@ -175,6 +175,6 @@ const alerts: Theme['components'] = {
       })
     }
   }
-}
+};
 
-export default alerts
+export default alerts;

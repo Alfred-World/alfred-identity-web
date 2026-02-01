@@ -1,41 +1,41 @@
-'use client'
+'use client';
 
 // MUI Imports
-import Card from '@mui/material/Card'
-import CardHeader from '@mui/material/CardHeader'
-import Chip from '@mui/material/Chip'
-import Typography from '@mui/material/Typography'
-import Avatar from '@mui/material/Avatar'
-import { useColorScheme } from '@mui/material/styles'
+import Card from '@mui/material/Card';
+import CardHeader from '@mui/material/CardHeader';
+import Chip from '@mui/material/Chip';
+import Typography from '@mui/material/Typography';
+import Avatar from '@mui/material/Avatar';
+import { useColorScheme } from '@mui/material/styles';
 
 // Third-party Imports
-import classnames from 'classnames'
+import classnames from 'classnames';
 
 // Types Imports
-import type { ThemeColor, SystemMode } from '@core/types'
+import type { ThemeColor, SystemMode } from '@core/types';
 
 // Components Imports
-import OptionMenu from '@core/components/option-menu'
+import OptionMenu from '@core/components/option-menu';
 
 // Style Imports
-import tableStyles from '@core/styles/table.module.css'
+import tableStyles from '@core/styles/table.module.css';
 
 type DataType = {
-  date: string
-  trend: string
-  imgName: string
-  cardType: string
-  cardNumber: string
-  status: 'verified' | 'rejected' | 'pending' | 'on-hold'
-}
+  date: string;
+  trend: string;
+  imgName: string;
+  cardType: string;
+  cardNumber: string;
+  status: 'verified' | 'rejected' | 'pending' | 'on-hold';
+};
 
 type StatusObj = Record<
   DataType['status'],
   {
-    text: string
-    color: ThemeColor
+    text: string;
+    color: ThemeColor;
   }
->
+>;
 
 // Vars
 const data: DataType[] = [
@@ -79,21 +79,21 @@ const data: DataType[] = [
     imgName: 'visa',
     date: `19 Oct ${new Date().getFullYear()}`
   }
-]
+];
 
 const statusObj: StatusObj = {
   rejected: { text: 'Rejected', color: 'error' },
   pending: { text: 'Pending', color: 'secondary' },
   'on-hold': { text: 'On hold', color: 'warning' },
   verified: { text: 'Verified', color: 'success' }
-}
+};
 
 const LastTransaction = ({ serverMode }: { serverMode: SystemMode }) => {
   // Hooks
-  const { mode } = useColorScheme()
+  const { mode } = useColorScheme();
 
   // Vars
-  const _mode = (mode === 'system' ? serverMode : mode) || serverMode
+  const _mode = (mode === 'system' ? serverMode : mode) || serverMode;
 
   return (
     <Card>
@@ -158,7 +158,7 @@ const LastTransaction = ({ serverMode }: { serverMode: SystemMode }) => {
         </table>
       </div>
     </Card>
-  )
-}
+  );
+};
 
-export default LastTransaction
+export default LastTransaction;

@@ -1,28 +1,28 @@
 // Next Imports
-import Link from 'next/link'
+import Link from 'next/link';
 
 // Third-party Imports
-import classnames from 'classnames'
+import classnames from 'classnames';
 
 // Component Imports
-import NavToggle from './NavToggle'
-import Logo from '@components/layout/shared/Logo'
-import NavSearch from '@components/layout/shared/search'
+import NavToggle from './NavToggle';
+import Logo from '@components/layout/shared/Logo';
+import NavSearch from '@components/layout/shared/search';
 
-import ModeDropdown from '@components/layout/shared/ModeDropdown'
-import NotificationsDropdown from '@components/layout/shared/NotificationsDropdown'
-import UserDropdown from '@components/layout/shared/UserDropdown'
+import ModeDropdown from '@components/layout/shared/ModeDropdown';
+import NotificationsDropdown from '@components/layout/shared/NotificationsDropdown';
+import UserDropdown from '@components/layout/shared/UserDropdown';
 
 // Hook Imports
-import useHorizontalNav from '@menu/hooks/useHorizontalNav'
+import useHorizontalNav from '@menu/hooks/useHorizontalNav';
 
 // Util Imports
-import { horizontalLayoutClasses } from '@layouts/utils/layoutClasses'
-import { notifications } from '@/data/notificationsData'
+import { horizontalLayoutClasses } from '@layouts/utils/layoutClasses';
+import { notifications } from '@/data/notificationsData';
 
 const NavbarContent = () => {
   // Hooks
-  const { isBreakpointReached } = useHorizontalNav()
+  const { isBreakpointReached } = useHorizontalNav();
 
   return (
     <div
@@ -46,7 +46,7 @@ const NavbarContent = () => {
         {/* Language Dropdown, Notification Dropdown, quick access menu dropdown, user dropdown will be placed here */}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default NavbarContent
+export default NavbarContent;

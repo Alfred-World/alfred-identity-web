@@ -1,13 +1,13 @@
 // MUI Imports
-import Grid from '@mui/material/Grid'
-import Checkbox from '@mui/material/Checkbox'
-import { styled } from '@mui/material/styles'
+import Grid from '@mui/material/Grid';
+import Checkbox from '@mui/material/Checkbox';
+import { styled } from '@mui/material/styles';
 
 // Third-party Imports
-import classnames from 'classnames'
+import classnames from 'classnames';
 
 // Type Imports
-import type { CustomInputImgProps } from './types'
+import type { CustomInputImgProps } from './types';
 
 const Root = styled('div', {
   name: 'MuiCustomImage',
@@ -33,7 +33,7 @@ const Root = styled('div', {
   '&:not(.active):not(:hover) .MuiCheckbox-root': {
     display: 'none'
   }
-})
+});
 
 const CheckboxInput = styled(Checkbox, {
   name: 'MuiCustomImage',
@@ -42,21 +42,21 @@ const CheckboxInput = styled(Checkbox, {
   top: 7,
   right: 7,
   position: 'absolute'
-})
+});
 
 const Image = styled('img', {
   name: 'MuiCustomImage',
   slot: 'Image'
 })({
   maxWidth: '100%'
-})
+});
 
 const CustomCheckboxImg = (props: CustomInputImgProps) => {
   // Props
-  const { type, data, name, selected, gridProps, handleChange, color = 'primary' } = props
+  const { type, data, name, selected, gridProps, handleChange, color = 'primary' } = props;
 
   // Vars
-  const { alt, img, value } = data
+  const { alt, img, value } = data;
 
   const renderComponent = () => {
     return (
@@ -73,10 +73,10 @@ const CustomCheckboxImg = (props: CustomInputImgProps) => {
           )}
         </Root>
       </Grid>
-    )
-  }
+    );
+  };
 
-  return data ? renderComponent() : null
-}
+  return data ? renderComponent() : null;
+};
 
-export default CustomCheckboxImg
+export default CustomCheckboxImg;

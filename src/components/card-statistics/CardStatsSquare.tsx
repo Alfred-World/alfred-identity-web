@@ -1,17 +1,17 @@
 // MUI imports
-import Card from '@mui/material/Card'
-import CardContent from '@mui/material/CardContent'
-import Typography from '@mui/material/Typography'
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
 
 // Types Imports
-import type { CardStatsSquareProps } from '@/types/pages/widgetTypes'
+import type { CardStatsSquareProps } from '@/types/pages/widgetTypes';
 
 // Component Imports
-import CustomAvatar from '@core/components/mui/Avatar'
+import CustomAvatar from '@core/components/mui/Avatar';
 
 const CardStatsSquare = (props: CardStatsSquareProps) => {
   // Props
-  const { avatarColor, avatarIcon, stats, statsTitle, avatarVariant, avatarSize, avatarSkin } = props
+  const { avatarColor, avatarIcon, stats, statsTitle, avatarVariant, avatarSize, avatarSkin } = props;
 
   return (
     <Card>
@@ -25,7 +25,7 @@ const CardStatsSquare = (props: CardStatsSquareProps) => {
         </div>
       </CardContent>
     </Card>
-  )
-}
+  );
+};
 
-export default CardStatsSquare
+export default CardStatsSquare;

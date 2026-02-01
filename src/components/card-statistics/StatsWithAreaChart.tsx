@@ -1,33 +1,33 @@
-'use client'
+'use client';
 
 // Next Imports
-import dynamic from 'next/dynamic'
+import dynamic from 'next/dynamic';
 
 // MUI Imports
-import Card from '@mui/material/Card'
-import Typography from '@mui/material/Typography'
-import CardContent from '@mui/material/CardContent'
-import { useTheme } from '@mui/material/styles'
+import Card from '@mui/material/Card';
+import Typography from '@mui/material/Typography';
+import CardContent from '@mui/material/CardContent';
+import { useTheme } from '@mui/material/styles';
 
 // Third-party Imports
-import classnames from 'classnames'
-import type { ApexOptions } from 'apexcharts'
+import classnames from 'classnames';
+import type { ApexOptions } from 'apexcharts';
 
 // Type Imports
-import type { CardStatsWithAreaChartProps } from '@/types/pages/widgetTypes'
+import type { CardStatsWithAreaChartProps } from '@/types/pages/widgetTypes';
 
 // Component Imports
-import CustomAvatar from '@core/components/mui/Avatar'
+import CustomAvatar from '@core/components/mui/Avatar';
 
 // Styled Component Imports
-const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
+const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'));
 
 const CardStatsWithAreaChart = (props: CardStatsWithAreaChartProps) => {
   // Props
-  const { stats, title, avatarIcon, chartSeries, avatarSize, chartColor = 'primary', avatarColor, avatarSkin } = props
+  const { stats, title, avatarIcon, chartSeries, avatarSize, chartColor = 'primary', avatarColor, avatarSkin } = props;
 
   // Hook
-  const theme = useTheme()
+  const theme = useTheme();
 
   const options: ApexOptions = {
     chart: {
@@ -84,7 +84,7 @@ const CardStatsWithAreaChart = (props: CardStatsWithAreaChartProps) => {
       axisBorder: { show: false }
     },
     yaxis: { show: false }
-  }
+  };
 
   return (
     <Card>
@@ -99,7 +99,7 @@ const CardStatsWithAreaChart = (props: CardStatsWithAreaChartProps) => {
       </CardContent>
       <AppReactApexCharts type='area' height={100} width='100%' options={options} series={chartSeries} />
     </Card>
-  )
-}
+  );
+};
 
-export default CardStatsWithAreaChart
+export default CardStatsWithAreaChart;

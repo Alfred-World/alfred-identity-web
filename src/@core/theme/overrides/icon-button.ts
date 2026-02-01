@@ -1,8 +1,8 @@
 // MUI Imports
-import type { Theme } from '@mui/material/styles'
+import type { Theme } from '@mui/material/styles';
 
 // Config Imports
-import themeConfig from '@configs/themeConfig'
+import themeConfig from '@configs/themeConfig';
 
 const iconButton: Theme['components'] = {
   MuiIconButton: {
@@ -143,6 +143,6 @@ const iconButton: Theme['components'] = {
       })
     }
   }
-}
+};
 
-export default iconButton
+export default iconButton;

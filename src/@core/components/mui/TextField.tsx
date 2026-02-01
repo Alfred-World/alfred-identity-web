@@ -1,13 +1,13 @@
-'use client'
+'use client';
 
 // React Imports
-import { forwardRef } from 'react'
+import { forwardRef } from 'react';
 
 // MUI Imports
-import { styled } from '@mui/material/styles'
-import TextField from '@mui/material/TextField'
-import type { TextFieldProps } from '@mui/material/TextField'
-import type { InputLabelProps } from '@mui/material/InputLabel'
+import { styled } from '@mui/material/styles';
+import TextField from '@mui/material/TextField';
+import type { TextFieldProps } from '@mui/material/TextField';
+import type { InputLabelProps } from '@mui/material/InputLabel';
 
 const TextFieldStyled = styled(TextField)<TextFieldProps>(({ theme }) => ({
   '& .MuiInputLabel-root': {
@@ -248,10 +248,10 @@ const TextFieldStyled = styled(TextField)<TextFieldProps>(({ theme }) => ({
       overflowX: 'hidden'
     }
   }
-}))
+}));
 
 const CustomTextField = forwardRef((props: TextFieldProps, ref) => {
-  const { size = 'small', slotProps, ...rest } = props
+  const { size = 'small', slotProps, ...rest } = props;
 
   return (
     <TextFieldStyled
@@ -264,7 +264,7 @@ const CustomTextField = forwardRef((props: TextFieldProps, ref) => {
         inputLabel: { ...slotProps?.inputLabel, shrink: true } as InputLabelProps
       }}
     />
-  )
-})
+  );
+});
 
-export default CustomTextField
+export default CustomTextField;

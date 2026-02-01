@@ -1,30 +1,30 @@
-'use client'
+'use client';
 
 // Next Imports
-import dynamic from 'next/dynamic'
+import dynamic from 'next/dynamic';
 
 // MUI Imports
-import Card from '@mui/material/Card'
-import Typography from '@mui/material/Typography'
-import CardContent from '@mui/material/CardContent'
-import CardHeader from '@mui/material/CardHeader'
-import { useTheme } from '@mui/material/styles'
+import Card from '@mui/material/Card';
+import Typography from '@mui/material/Typography';
+import CardContent from '@mui/material/CardContent';
+import CardHeader from '@mui/material/CardHeader';
+import { useTheme } from '@mui/material/styles';
 
 // Third-party Imports
-import type { ApexOptions } from 'apexcharts'
+import type { ApexOptions } from 'apexcharts';
 
 // Styled Component Imports
-const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
+const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'));
 
 // Vars
-const series = [{ data: [77, 55, 23, 43, 77, 55, 89] }]
+const series = [{ data: [77, 55, 23, 43, 77, 55, 89] }];
 
 const DistributedBarChartOrder = () => {
   // Hooks
-  const theme = useTheme()
+  const theme = useTheme();
 
   // Vars
-  const actionSelectedColor = 'var(--mui-palette-action-selected)'
+  const actionSelectedColor = 'var(--mui-palette-action-selected)';
 
   const options: ApexOptions = {
     chart: {
@@ -104,7 +104,7 @@ const DistributedBarChartOrder = () => {
         }
       }
     ]
-  }
+  };
 
   return (
     <Card>
@@ -121,7 +121,7 @@ const DistributedBarChartOrder = () => {
         </div>
       </CardContent>
     </Card>
-  )
-}
+  );
+};
 
-export default DistributedBarChartOrder
+export default DistributedBarChartOrder;

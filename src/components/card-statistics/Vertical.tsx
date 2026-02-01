@@ -1,22 +1,22 @@
 // MUI Imports
-import Card from '@mui/material/Card'
-import Chip from '@mui/material/Chip'
-import Typography from '@mui/material/Typography'
-import CardContent from '@mui/material/CardContent'
+import Card from '@mui/material/Card';
+import Chip from '@mui/material/Chip';
+import Typography from '@mui/material/Typography';
+import CardContent from '@mui/material/CardContent';
 
 // Third-party Imports
-import classnames from 'classnames'
+import classnames from 'classnames';
 
 // Type Import
-import type { CardStatsVerticalProps } from '@/types/pages/widgetTypes'
+import type { CardStatsVerticalProps } from '@/types/pages/widgetTypes';
 
 // Component Import
-import CustomAvatar from '@core/components/mui/Avatar'
+import CustomAvatar from '@core/components/mui/Avatar';
 
 const CardStatsVertical = (props: CardStatsVerticalProps) => {
   // Props
   const { stats, title, subtitle, avatarIcon, avatarColor, avatarSize, avatarSkin, chipText, chipColor, chipVariant } =
-    props
+    props;
 
   return (
     <Card>
@@ -32,7 +32,7 @@ const CardStatsVertical = (props: CardStatsVerticalProps) => {
         <Chip label={chipText} color={chipColor} variant={chipVariant} size='small' />
       </CardContent>
     </Card>
-  )
-}
+  );
+};
 
-export default CardStatsVertical
+export default CardStatsVertical;

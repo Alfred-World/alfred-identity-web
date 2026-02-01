@@ -1,5 +1,5 @@
 // MUI Imports
-import type { Theme } from '@mui/material/styles'
+import type { Theme } from '@mui/material/styles';
 
 const pagination: Theme['components'] = {
   MuiPagination: {
@@ -172,6 +172,6 @@ const pagination: Theme['components'] = {
       }
     }
   }
-}
+};
 
-export default pagination
+export default pagination;

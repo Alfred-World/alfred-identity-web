@@ -1,30 +1,30 @@
 // MUI Imports
-import Card from '@mui/material/Card'
-import CardContent from '@mui/material/CardContent'
-import Typography from '@mui/material/Typography'
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
 
 // Third-party Imports
-import classnames from 'classnames'
+import classnames from 'classnames';
 
 // Type Imports
-import type { ThemeColor } from '@core/types'
+import type { ThemeColor } from '@core/types';
 
 // Component Imports
-import CustomAvatar from '@core/components/mui/Avatar'
+import CustomAvatar from '@core/components/mui/Avatar';
 
 export type UserDataType = {
-  title: string
-  stats: string
-  avatarIcon: string
-  avatarColor?: ThemeColor
-  trend: string
-  trendNumber: string
-  subtitle: string
-}
+  title: string;
+  stats: string;
+  avatarIcon: string;
+  avatarColor?: ThemeColor;
+  trend: string;
+  trendNumber: string;
+  subtitle: string;
+};
 
 const HorizontalWithSubtitle = (props: UserDataType) => {
   // Props
-  const { title, stats, avatarIcon, avatarColor, trend: trend, trendNumber: trendNumber, subtitle: subtitle } = props
+  const { title, stats, avatarIcon, avatarColor, trend: trend, trendNumber: trendNumber, subtitle: subtitle } = props;
 
   return (
     <Card>
@@ -44,7 +44,7 @@ const HorizontalWithSubtitle = (props: UserDataType) => {
         </CustomAvatar>
       </CardContent>
     </Card>
-  )
-}
+  );
+};
 
-export default HorizontalWithSubtitle
+export default HorizontalWithSubtitle;

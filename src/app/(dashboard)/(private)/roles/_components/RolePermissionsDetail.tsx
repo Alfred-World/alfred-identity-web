@@ -1,45 +1,45 @@
-'use client'
+'use client';
 
-import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 
-import { useInfiniteQuery } from '@tanstack/react-query'
+import { useInfiniteQuery } from '@tanstack/react-query';
 
-import Grid from '@mui/material/Grid'
-import Card from '@mui/material/Card'
-import CardHeader from '@mui/material/CardHeader'
-import CardContent from '@mui/material/CardContent'
-import Typography from '@mui/material/Typography'
-import Button from '@mui/material/Button'
-import Switch from '@mui/material/Switch'
-import Divider from '@mui/material/Divider'
-import CircularProgress from '@mui/material/CircularProgress'
-import Box from '@mui/material/Box'
-import { alpha, useTheme } from '@mui/material/styles'
+import Grid from '@mui/material/Grid';
+import Card from '@mui/material/Card';
+import CardHeader from '@mui/material/CardHeader';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import Switch from '@mui/material/Switch';
+import Divider from '@mui/material/Divider';
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
+import { alpha, useTheme } from '@mui/material/styles';
 
-import { toast } from 'react-toastify'
+import { toast } from 'react-toastify';
 
-import { usePostRolesIdPermissions, getPermissions } from '@/generated/identity-api'
-import type { RoleDto, PermissionDto, PermissionDtoPageResult } from '@/generated/identity-api'
-import { type ApiReturn } from '@/libs/custom-instance'
+import { usePostRolesIdPermissions, getPermissions } from '@/generated/identity-api';
+import type { RoleDto, PermissionDto, PermissionDtoPageResult } from '@/generated/identity-api';
+import { type ApiReturn } from '@/libs/custom-instance';
 
 interface RolePermissionsDetailProps {
-  role: RoleDto | null
-  isLoading?: boolean
+  role: RoleDto | null;
+  isLoading?: boolean;
 }
 
 // Helper to safely extract items from an API page
 const getItemsFromPage = (page: ApiReturn<PermissionDtoPageResult>) => {
   if (page.success && page.result?.items) {
-    return page.result.items
+    return page.result.items;
   }
 
-  return []
-}
+  return [];
+};
 
 const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) => {
-  const theme = useTheme()
-  const themeColor = theme.palette.primary.main
-  const loadMoreRef = useRef<HTMLDivElement>(null)
+  const theme = useTheme();
+  const themeColor = theme.palette.primary.main;
+  const loadMoreRef = useRef<HTMLDivElement>(null);
 
   // -- 1. Infinite Query for Permissions --
   const {
@@ -56,34 +56,34 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
         page: pageParam as number,
         pageSize: 50, // Load 50 items per page
         sort: 'resource,action' // Server sort by resource then action
-      })
+      });
     },
     getNextPageParam: lastPage => {
       // Check for API success and pagination info
       if (lastPage.success && lastPage.result?.hasNextPage) {
-        return (lastPage.result.page || 0) + 1
+        return (lastPage.result.page || 0) + 1;
       }
 
-      return undefined
+      return undefined;
     }
-  })
+  });
 
   // Flatten all pages into a single list
   const allPermissions = useMemo(() => {
-    return infiniteData?.pages.flatMap(getItemsFromPage) || []
-  }, [infiniteData])
+    return infiniteData?.pages.flatMap(getItemsFromPage) || [];
+  }, [infiniteData]);
 
   // -- 2. Current Role Permissions --
-  const [selectedPermissionIds, setSelectedPermissionIds] = useState<string[]>([])
+  const [selectedPermissionIds, setSelectedPermissionIds] = useState<string[]>([]);
 
   // Sync state with role permissions
   useEffect(() => {
     if (role?.permissions && Array.isArray(role.permissions)) {
-      const newIds = role.permissions.map(p => p.id!).filter(id => id !== undefined)
+      const newIds = role.permissions.map(p => p.id!).filter(id => id !== undefined);
 
-      setSelectedPermissionIds(newIds)
+      setSelectedPermissionIds(newIds);
     }
-  }, [role])
+  }, [role]);
 
   // -- 3. Mutations --
   /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -91,104 +91,104 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
     mutation: {
       onSuccess: (data: any) => {
         if (data.success) {
-          toast.success('Permissions updated successfully')
+          toast.success('Permissions updated successfully');
 
           // Force a reload of the current page to get updated role data (including permissions)
-          window.location.reload()
+          window.location.reload();
         } else {
-          toast.error(data.errors?.[0]?.message || 'Failed to update permissions')
+          toast.error(data.errors?.[0]?.message || 'Failed to update permissions');
         }
       }
     }
-  })
+  });
   /* eslint-enable @typescript-eslint/no-explicit-any */
 
   // -- 4. Infinite Scroll Observer --
   const handleObserver = useCallback(
     (entries: IntersectionObserverEntry[]) => {
-      const target = entries[0]
+      const target = entries[0];
 
       if (target.isIntersecting && hasNextPage && !isFetchingNextPage) {
-        fetchNextPage()
+        fetchNextPage();
       }
     },
     [hasNextPage, isFetchingNextPage, fetchNextPage]
-  )
+  );
 
   useEffect(() => {
     const observer = new IntersectionObserver(handleObserver, {
       root: null,
       rootMargin: '20px',
       threshold: 1.0
-    })
+    });
 
-    const currentRef = loadMoreRef.current
+    const currentRef = loadMoreRef.current;
 
     if (currentRef) {
-      observer.observe(currentRef)
+      observer.observe(currentRef);
     }
 
     return () => {
-      if (currentRef) observer.unobserve(currentRef)
-    }
-  }, [handleObserver])
+      if (currentRef) observer.unobserve(currentRef);
+    };
+  }, [handleObserver]);
 
   // -- 5. Grouping Logic --
   // Group by 'resource'
   const groupedPermissions = useMemo(() => {
-    const groups: Record<string, PermissionDto[]> = {}
+    const groups: Record<string, PermissionDto[]> = {};
 
     allPermissions.forEach(p => {
-      const resource = p.resource || 'Other'
+      const resource = p.resource || 'Other';
 
-      if (!groups[resource]) groups[resource] = []
-      groups[resource].push(p)
-    })
+      if (!groups[resource]) groups[resource] = [];
+      groups[resource].push(p);
+    });
 
-    return groups
-  }, [allPermissions])
+    return groups;
+  }, [allPermissions]);
 
   // -- 6. Action Handlers --
 
   const handleToggle = (id: string) => {
-    setSelectedPermissionIds(prev => (prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]))
-  }
+    setSelectedPermissionIds(prev => (prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]));
+  };
 
   const handleSelectAllGroup = (permsInGroup: PermissionDto[]) => {
-    const idsToSelect = permsInGroup.map(p => p.id!).filter(id => id !== undefined)
+    const idsToSelect = permsInGroup.map(p => p.id!).filter(id => id !== undefined);
 
     setSelectedPermissionIds(prev => {
       // Add only IDs that aren't already selected
-      const newIds = idsToSelect.filter(id => !prev.includes(id))
+      const newIds = idsToSelect.filter(id => !prev.includes(id));
 
-      return [...prev, ...newIds]
-    })
-  }
+      return [...prev, ...newIds];
+    });
+  };
 
   const handleRevokeAllGroup = (permsInGroup: PermissionDto[]) => {
-    const idsToRevoke = permsInGroup.map(p => p.id!)
+    const idsToRevoke = permsInGroup.map(p => p.id!);
 
-    setSelectedPermissionIds(prev => prev.filter(id => !idsToRevoke.includes(id)))
-  }
+    setSelectedPermissionIds(prev => prev.filter(id => !idsToRevoke.includes(id)));
+  };
 
   const handleSave = () => {
-    if (!role?.id) return
-    updatePermissions({ id: role.id, data: selectedPermissionIds })
-  }
+    if (!role?.id) return;
+    updatePermissions({ id: role.id, data: selectedPermissionIds });
+  };
 
   const handleReset = () => {
     if (role?.permissions && Array.isArray(role.permissions)) {
-      const newIds = role.permissions.map(p => p.id!).filter(id => id !== undefined)
+      const newIds = role.permissions.map(p => p.id!).filter(id => id !== undefined);
 
       if (newIds.length > 0) {
-        setSelectedPermissionIds(newIds)
+        setSelectedPermissionIds(newIds);
       } else {
-        setSelectedPermissionIds([])
+        setSelectedPermissionIds([]);
       }
     } else {
-      setSelectedPermissionIds([])
+      setSelectedPermissionIds([]);
     }
-  }
+  };
 
   // -- Render --
 
@@ -197,7 +197,7 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
       <Card sx={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <CircularProgress />
       </Card>
-    )
+    );
   }
 
   if (!role) {
@@ -205,7 +205,7 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
       <Card sx={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', p: 10 }}>
         <Typography color='text.secondary'>Select a role to manage permissions</Typography>
       </Card>
-    )
+    );
   }
 
   return (
@@ -276,8 +276,10 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
         <Grid container spacing={6}>
           {Object.entries(groupedPermissions).map(([resource, perms]) => {
             // Note: This logic only considers *loaded* permissions for "All Selected" check
-            const groupIds = perms.map(p => p.id!)
-            const _isAllLoadedSelected = groupIds.length > 0 && groupIds.every(id => selectedPermissionIds.includes(id))
+            const groupIds = perms.map(p => p.id!);
+
+            const _isAllLoadedSelected =
+              groupIds.length > 0 && groupIds.every(id => selectedPermissionIds.includes(id));
 
             return (
               <Grid size={{ xs: 12 }} key={resource}>
@@ -335,7 +337,7 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
 
                 <Grid container spacing={3}>
                   {perms.map(perm => {
-                    const isSelected = selectedPermissionIds.includes(perm.id!)
+                    const isSelected = selectedPermissionIds.includes(perm.id!);
 
                     return (
                       <Grid size={{ xs: 12 }} key={perm.id}>
@@ -374,11 +376,11 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
                           />
                         </Box>
                       </Grid>
-                    )
+                    );
                   })}
                 </Grid>
               </Grid>
-            )
+            );
           })}
         </Grid>
 
@@ -397,7 +399,7 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
         </Box>
       </CardContent>
     </Card>
-  )
-}
+  );
+};
 
-export default RolePermissionsDetail
+export default RolePermissionsDetail;

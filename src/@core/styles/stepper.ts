@@ -1,7 +1,7 @@
 // MUI imports
-import Box from '@mui/material/Box'
-import { styled } from '@mui/material/styles'
-import type { BoxProps } from '@mui/material/Box'
+import Box from '@mui/material/Box';
+import { styled } from '@mui/material/styles';
+import type { BoxProps } from '@mui/material/Box';
 
 const StepperWrapper = styled(Box)<BoxProps>(({ theme }) => {
   return {
@@ -104,7 +104,7 @@ const StepperWrapper = styled(Box)<BoxProps>(({ theme }) => {
         }
       }
     }
-  }
-}) as typeof Box
+  };
+}) as typeof Box;
 
-export default StepperWrapper
+export default StepperWrapper;

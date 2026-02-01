@@ -1,13 +1,13 @@
-import type { AxiosError, AxiosRequestConfig } from 'axios'
-import axios from 'axios'
-import { getSession } from 'next-auth/react'
+import type { AxiosError, AxiosRequestConfig } from 'axios';
+import axios, { isCancel } from 'axios';
+import { getSession } from 'next-auth/react';
 
 /**
  * Base interface for API return types with common properties.
  */
 export interface ApiReturnBase {
-  success: boolean
-  message?: string
+  success: boolean;
+  message?: string;
 }
 
 /**
@@ -16,8 +16,8 @@ export interface ApiReturnBase {
  * @template T - The result type
  */
 export interface ApiReturnSuccess<T> extends ApiReturnBase {
-  success: true
-  result: T
+  success: true;
+  result: T;
 }
 
 /**
@@ -25,21 +25,21 @@ export interface ApiReturnSuccess<T> extends ApiReturnBase {
  * When success is false, errors array is guaranteed to be present.
  */
 export interface ApiReturnFailure extends ApiReturnBase {
-  success: false
-  errors: Array<{ message: string; code?: string }>
+  success: false;
+  errors: Array<{ message: string; code?: string }>;
 }
 
 /**
  * Discriminated union type for API responses.
  * @template T - The success result type
  */
-export type ApiReturn<T> = ApiReturnSuccess<T> | ApiReturnFailure
+export type ApiReturn<T> = ApiReturnSuccess<T> | ApiReturnFailure;
 
 /**
  * Helper type to extract result type from generated API response
  * Converts SomeApiSuccessResponse to ApiReturn<ResultType>
  */
-export type ToApiReturn<T> = T extends { result?: infer R | null } ? ApiReturn<NonNullable<R>> : ApiReturn<T>
+export type ToApiReturn<T> = T extends { result?: infer R | null } ? ApiReturn<NonNullable<R>> : ApiReturn<T>;
 
 /**
  * Axios instance with base configuration
@@ -54,40 +54,40 @@ export const AXIOS_INSTANCE = axios.create({
   baseURL: process.env.NEXT_PUBLIC_GATEWAY_URL,
   withCredentials: true, // Send cookies with requests
   paramsSerializer: params => {
-    const searchParams = new URLSearchParams()
+    const searchParams = new URLSearchParams();
 
     Object.entries(params || {}).forEach(([key, value]) => {
       if (value !== null && value !== undefined) {
-        searchParams.append(key, String(value))
+        searchParams.append(key, String(value));
       }
-    })
+    });
 
-    return searchParams.toString()
+    return searchParams.toString();
   }
-})
+});
 
 // Track if we're currently refreshing the session
-let isRefreshing = false
-let refreshPromise: Promise<unknown> | null = null
+let isRefreshing = false;
+let refreshPromise: Promise<unknown> | null = null;
 
 /**
  * Force refresh the NextAuth session to get new tokens
  */
 async function forceRefreshSession() {
   if (isRefreshing && refreshPromise) {
-    return refreshPromise
+    return refreshPromise;
   }
 
-  isRefreshing = true
+  isRefreshing = true;
   refreshPromise = fetch('/api/auth/session', {
     method: 'GET',
     credentials: 'include'
   }).finally(() => {
-    isRefreshing = false
-    refreshPromise = null
-  })
+    isRefreshing = false;
+    refreshPromise = null;
+  });
 
-  return refreshPromise
+  return refreshPromise;
 }
 
 // Request interceptor to add Authorization header
@@ -95,57 +95,57 @@ AXIOS_INSTANCE.interceptors.request.use(async config => {
   // Only run on client side
   if (typeof window !== 'undefined') {
     // Force fresh session to trigger token refresh if needed
-    const session = await getSession()
+    const session = await getSession();
 
     if (session?.accessToken) {
-      config.headers.Authorization = `Bearer ${session.accessToken}`
+      config.headers.Authorization = `Bearer ${session.accessToken}`;
     }
 
     // Check if session has error (token refresh failed)
     if (session?.error === 'RefreshAccessTokenError') {
       // Session is invalid, redirect to login
-      window.location.href = '/login?error=session_expired'
-      throw new axios.Cancel('Session expired, redirecting to login')
+      window.location.href = '/login?error=session_expired';
+      throw isCancel('Session expired, redirecting to login');
     }
   }
 
-  return config
-})
+  return config;
+});
 
 // Response interceptor to handle 401 and retry with refreshed token
 AXIOS_INSTANCE.interceptors.response.use(
   response => response,
   async (error: AxiosError) => {
-    const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean }
+    const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
 
     // If 401 and we haven't retried yet, try to refresh session
     if (error.response?.status === 401 && !originalRequest._retry && typeof window !== 'undefined') {
-      originalRequest._retry = true
+      originalRequest._retry = true;
 
       // Force refresh the session
-      await forceRefreshSession()
+      await forceRefreshSession();
 
       // Get fresh session
-      const session = await getSession()
+      const session = await getSession();
 
       if (session?.accessToken) {
         // Retry with new token
         originalRequest.headers = {
           ...originalRequest.headers,
           Authorization: `Bearer ${session.accessToken}`
-        }
+        };
 
-        return AXIOS_INSTANCE(originalRequest)
+        return AXIOS_INSTANCE(originalRequest);
       }
 
       // Still no token after refresh, redirect to login
-      window.location.href = '/login?error=session_expired'
-      throw new axios.Cancel('Session expired, redirecting to login')
+      window.location.href = '/login?error=session_expired';
+      throw isCancel('Session expired, redirecting to login');
     }
 
-    return Promise.reject(error)
+    return Promise.reject(error);
   }
-)
+);
 
 /**
  * Custom instance for Orval - returns unified ApiReturn type automatically
@@ -167,7 +167,7 @@ export const customInstance = <T>(
   options?: AxiosRequestConfig
 ): Promise<ToApiReturn<T>> => {
   // eslint-disable-next-line import/no-named-as-default-member
-  const source = axios.CancelToken.source()
+  const source = axios.CancelToken.source();
 
   const promise = AXIOS_INSTANCE({
     ...config,
@@ -175,25 +175,25 @@ export const customInstance = <T>(
     cancelToken: source.token
   })
     .then(({ data }) => {
-      return data as ToApiReturn<T>
+      return data as ToApiReturn<T>;
     })
     .catch((error: AxiosError) => {
       // Handle cancelled requests
-      if (axios.isCancel(error)) {
-        throw error
+      if (isCancel(error)) {
+        throw error;
       }
 
       const responseData = error.response?.data as
         | {
-            success?: boolean
-            message?: string
-            errors?: Array<{ message: string; code?: string }>
+            success?: boolean;
+            message?: string;
+            errors?: Array<{ message: string; code?: string }>;
           }
-        | undefined
+        | undefined;
 
       // If BE already returned error format, use it
       if (responseData && responseData.success === false && responseData.errors) {
-        return responseData as ToApiReturn<T>
+        return responseData as ToApiReturn<T>;
       }
 
       // Create unified error response
@@ -205,17 +205,17 @@ export const customInstance = <T>(
             code: error.code || 'UNKNOWN_ERROR'
           }
         ]
-      }
+      };
 
-      return errorResponse as ToApiReturn<T>
-    })
+      return errorResponse as ToApiReturn<T>;
+    });
 
   // @ts-expect-error adding cancel method to promise
   promise.cancel = () => {
-    source.cancel('Query was cancelled')
-  }
+    source.cancel('Query was cancelled');
+  };
 
-  return promise
-}
+  return promise;
+};
 
-export default customInstance
+export default customInstance;

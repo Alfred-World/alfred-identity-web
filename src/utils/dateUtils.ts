@@ -1,4 +1,4 @@
-import { formatDistanceToNow, parseISO } from 'date-fns'
+import { formatDistanceToNow, parseISO } from 'date-fns';
 
 /**
  * Formats a date string, number, or Date object to a relative time string (e.g., "2 minutes ago", "yesterday").
@@ -10,15 +10,15 @@ export const formatRelativeTime = (
   date: string | number | Date | null | undefined,
   addSuffix: boolean = true
 ): string => {
-  if (!date) return ''
+  if (!date) return '';
 
   try {
-    const dateObj = typeof date === 'string' ? parseISO(date) : date
+    const dateObj = typeof date === 'string' ? parseISO(date) : date;
 
-    return formatDistanceToNow(dateObj, { addSuffix })
+    return formatDistanceToNow(dateObj, { addSuffix });
   } catch (error) {
-    console.error('Error formatting relative time:', error)
+    console.error('Error formatting relative time:', error);
 
-    return ''
+    return '';
   }
-}
+};

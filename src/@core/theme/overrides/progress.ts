@@ -1,5 +1,5 @@
 // MUI Imports
-import type { Theme } from '@mui/material/styles'
+import type { Theme } from '@mui/material/styles';
 
 const progress: Theme['components'] = {
   MuiLinearProgress: {
@@ -17,6 +17,6 @@ const progress: Theme['components'] = {
       })
     }
   }
-}
+};
 
-export default progress
+export default progress;

@@ -1,22 +1,22 @@
 // MUI Imports
-import Card from '@mui/material/Card'
-import CardHeader from '@mui/material/CardHeader'
-import CardContent from '@mui/material/CardContent'
-import Typography from '@mui/material/Typography'
-import LinearProgress from '@mui/material/LinearProgress'
+import Card from '@mui/material/Card';
+import CardHeader from '@mui/material/CardHeader';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
+import LinearProgress from '@mui/material/LinearProgress';
 
-import type { ThemeColor } from '@core/types'
+import type { ThemeColor } from '@core/types';
 
 // Components Imports
-import OptionMenu from '@core/components/option-menu'
+import OptionMenu from '@core/components/option-menu';
 
 type DataType = {
-  title: string
-  imgSrc: string
-  progress: number
-  subtitle: string
-  progressColor: ThemeColor
-}
+  title: string;
+  imgSrc: string;
+  progress: number;
+  subtitle: string;
+  progressColor: ThemeColor;
+};
 
 // Vars
 const data: DataType[] = [
@@ -62,7 +62,7 @@ const data: DataType[] = [
     progressColor: 'warning',
     imgSrc: '/images/logos/sketch.png'
   }
-]
+];
 
 const ActiveProjects = () => {
   return (
@@ -97,7 +97,7 @@ const ActiveProjects = () => {
         ))}
       </CardContent>
     </Card>
-  )
-}
+  );
+};
 
-export default ActiveProjects
+export default ActiveProjects;

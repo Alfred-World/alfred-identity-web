@@ -1,23 +1,23 @@
-'use client'
+'use client';
 
-import Button from '@mui/material/Button'
-import Dialog from '@mui/material/Dialog'
-import DialogActions from '@mui/material/DialogActions'
-import DialogContent from '@mui/material/DialogContent'
-import DialogContentText from '@mui/material/DialogContentText'
-import DialogTitle from '@mui/material/DialogTitle'
-import { alpha, useTheme } from '@mui/material/styles'
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import { alpha, useTheme } from '@mui/material/styles';
 
 interface ConfirmationDialogProps {
-  open: boolean
-  onClose: () => void
-  onConfirm: () => void
-  title: string
-  content: string
-  confirmText?: string
-  cancelText?: string
-  color?: 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning'
-  loading?: boolean
+  open: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  title: string;
+  content: string;
+  confirmText?: string;
+  cancelText?: string;
+  color?: 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning';
+  loading?: boolean;
 }
 
 const ConfirmationDialog = ({
@@ -31,7 +31,7 @@ const ConfirmationDialog = ({
   color = 'primary',
   loading = false
 }: ConfirmationDialogProps) => {
-  const theme = useTheme()
+  const theme = useTheme();
 
   return (
     <Dialog
@@ -71,7 +71,7 @@ const ConfirmationDialog = ({
         </Button>
       </DialogActions>
     </Dialog>
-  )
-}
+  );
+};
 
-export default ConfirmationDialog
+export default ConfirmationDialog;

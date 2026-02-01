@@ -1,33 +1,33 @@
-'use client'
+'use client';
 
-import { useState, useCallback, useMemo, useEffect } from 'react'
+import { useState, useCallback, useMemo, useEffect } from 'react';
 
-import Link from 'next/link'
+import Link from 'next/link';
 
-import { Box, Grid, Typography, Button } from '@mui/material'
+import { Box, Grid, Typography, Button, Chip } from '@mui/material';
 
-import { DslQueryBuilder, type FieldConfig, type FilterCondition } from '@/components/dsl-query-builder'
-import { useUrlPagination, useUrlSorting } from '@/components/UrlPagination'
-import { AdvancedTable } from '@/components/AdvancedTable'
-import { useGetApplications } from '@/generated'
-import type { ApplicationDto } from '@/generated'
+import { DslQueryBuilder, type FieldConfig, type FilterCondition } from '@/components/dsl-query-builder';
+import { useUrlPagination, useUrlSorting } from '@/components/UrlPagination';
+import { AdvancedTable } from '@/components/AdvancedTable';
+import { useGetApplications } from '@/generated';
+import type { ApplicationDto } from '@/generated';
 
-import { ApplicationListActions } from './_components/ApplicationListActions'
-import { useBreadcrumbs } from '@/contexts/BreadcrumbsContext'
-import { ROUTES } from '@/configs/routes'
+import { ApplicationListActions } from './_components/ApplicationListActions';
+import { useBreadcrumbs } from '@/contexts/BreadcrumbsContext';
+import { ROUTES } from '@/configs/routes';
 
 export default function ApplicationsPage() {
-  const { setBreadcrumbs } = useBreadcrumbs()
+  const { setBreadcrumbs } = useBreadcrumbs();
 
   useEffect(() => {
-    setBreadcrumbs([{ title: 'Dashboards', href: ROUTES.DASHBOARDS.ROOT }, { title: 'Applications' }])
-  }, [setBreadcrumbs])
+    setBreadcrumbs([{ title: 'Dashboards', href: ROUTES.DASHBOARDS.ROOT }, { title: 'Applications' }]);
+  }, [setBreadcrumbs]);
 
-  const [appliedQuery, setAppliedQuery] = useState('')
+  const [appliedQuery, setAppliedQuery] = useState('');
 
   // Get pagination from URL
-  const { page, pageSize, setPage, setPageSize, resetPage } = useUrlPagination()
-  const { sort, sorting, setSorting } = useUrlSorting('-createdAt') // Default sort by newest
+  const { page, pageSize, setPage, setPageSize, resetPage } = useUrlPagination();
+  const { sort, sorting, setSorting } = useUrlSorting('-createdAt'); // Default sort by newest
 
   // Fetch applications with the DSL filter and pagination
   const { data, isLoading, error, refetch } = useGetApplications({
@@ -35,9 +35,9 @@ export default function ApplicationsPage() {
     page,
     pageSize,
     sort
-  })
+  });
 
-  const result = data?.success ? data.result : null
+  const result = data?.success ? data.result : null;
 
   // Field config for Applications - memoized to include refetch in actions
   const applicationFields: FieldConfig<ApplicationDto>[] = useMemo(
@@ -64,8 +64,50 @@ export default function ApplicationsPage() {
         )
       },
       { name: 'Client ID', key: 'clientId', dataType: 'string', width: 250 },
-      { name: 'Type', key: 'applicationType', dataType: 'string', width: 120 },
-      { name: 'Active', key: 'isActive', dataType: 'bool', width: 100 },
+      {
+        name: 'Type',
+        key: 'applicationType',
+        dataType: 'string',
+        width: 120,
+        renderCell: value => {
+          const type = (value as string)?.toLowerCase();
+          let color: 'primary' | 'info' | 'success' | 'secondary' | 'default' = 'default';
+
+          if (type?.includes('web')) color = 'primary';
+          else if (type?.includes('spa')) color = 'info';
+          else if (type?.includes('native')) color = 'success';
+          else if (type?.includes('m2m')) color = 'secondary';
+
+          return <Chip label={value as string} size='small' variant='tonal' color={color} sx={{ height: 24 }} />;
+        }
+      },
+      {
+        name: 'Client Type',
+        key: 'clientType',
+        dataType: 'string',
+        width: 120,
+        renderCell: value => {
+          const type = (value as string)?.toLowerCase();
+          const color = type === 'confidential' ? 'warning' : 'info';
+
+          return <Chip label={value as string} size='small' variant='tonal' color={color} sx={{ height: 24 }} />;
+        }
+      },
+      {
+        name: 'Active',
+        key: 'isActive',
+        dataType: 'bool',
+        width: 100,
+        renderCell: value => (
+          <Chip
+            label={value ? 'Active' : 'Inactive'}
+            size='small'
+            variant='tonal'
+            color={value ? 'success' : 'error'}
+            sx={{ height: 24 }}
+          />
+        )
+      },
       { name: 'Permissions', key: 'permissions', dataType: 'string', hidden: true },
       { name: 'Created At', key: 'createdAt', dataType: 'date', enableSorting: true, width: 180 },
       { name: 'Updated At', key: 'updatedAt', dataType: 'date', enableSorting: true, hidden: true },
@@ -84,27 +126,27 @@ export default function ApplicationsPage() {
       }
     ],
     [refetch]
-  ) as FieldConfig<ApplicationDto>[]
+  ) as FieldConfig<ApplicationDto>[];
 
   const handleSearch = useCallback(
     (query: string) => {
-      setAppliedQuery(query)
-      resetPage() // Reset to first page on new search
+      setAppliedQuery(query);
+      resetPage(); // Reset to first page on new search
     },
     [resetPage]
-  )
+  );
 
   const handleReset = useCallback(() => {
-    setAppliedQuery('')
-    resetPage()
-  }, [resetPage])
+    setAppliedQuery('');
+    resetPage();
+  }, [resetPage]);
 
   const handleChange = useCallback((_conditions: FilterCondition[], _query: string) => {
     // Optional: track changes without triggering search
-  }, [])
+  }, []);
 
   if (error) {
-    return <Typography color='error'>Error loading data: {String(error)}</Typography>
+    return <Typography color='error'>Error loading data: {String(error)}</Typography>;
   }
 
   return (
@@ -149,10 +191,11 @@ export default function ApplicationsPage() {
             onSortingChange={setSorting}
             isLoading={isLoading}
             enableRowSelection={false}
+            enableIndexColumn={true}
             getRowId={row => String(row.id)}
           />
         </Grid>
       </Grid>
     </Box>
-  )
+  );
 }

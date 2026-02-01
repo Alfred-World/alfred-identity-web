@@ -1,16 +1,16 @@
 // Third-party Imports
-import styled from '@emotion/styled'
-import type { CSSObject } from '@emotion/styled'
+import styled from '@emotion/styled';
+import type { CSSObject } from '@emotion/styled';
 
 // Config Imports
-import themeConfig from '@configs/themeConfig'
+import themeConfig from '@configs/themeConfig';
 
 // Util Imports
-import { horizontalLayoutClasses } from '@layouts/utils/layoutClasses'
+import { horizontalLayoutClasses } from '@layouts/utils/layoutClasses';
 
 type StyledFooterProps = {
-  overrideStyles?: CSSObject
-}
+  overrideStyles?: CSSObject;
+};
 
 const StyledFooter = styled.footer<StyledFooterProps>`
   &.${horizontalLayoutClasses.footerFixed} {
@@ -39,6 +39,6 @@ const StyledFooter = styled.footer<StyledFooterProps>`
   }
 
   ${({ overrideStyles }) => overrideStyles}
-`
+`;
 
-export default StyledFooter
+export default StyledFooter;

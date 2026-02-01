@@ -1,18 +1,18 @@
 // MUI Imports
-import Card from '@mui/material/Card'
-import CardContent from '@mui/material/CardContent'
-import Chip from '@mui/material/Chip'
-import Typography from '@mui/material/Typography'
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Chip from '@mui/material/Chip';
+import Typography from '@mui/material/Typography';
 
 // Type Imports
-import type { CardStatsCustomerStatsProps } from '@/types/pages/widgetTypes'
+import type { CardStatsCustomerStatsProps } from '@/types/pages/widgetTypes';
 
 // Component Imports
-import CustomAvatar from '@core/components/mui/Avatar'
+import CustomAvatar from '@core/components/mui/Avatar';
 
 const CustomerStats = (props: CardStatsCustomerStatsProps) => {
   // Props
-  const { title, avatarIcon, color, description, stats, content, chipLabel } = props
+  const { title, avatarIcon, color, description, stats, content, chipLabel } = props;
 
   return (
     <Card>
@@ -39,7 +39,7 @@ const CustomerStats = (props: CardStatsCustomerStatsProps) => {
         </div>
       </CardContent>
     </Card>
-  )
-}
+  );
+};
 
-export default CustomerStats
+export default CustomerStats;

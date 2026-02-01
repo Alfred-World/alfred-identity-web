@@ -1,17 +1,17 @@
 // Third-party Imports
-import classnames from 'classnames'
+import classnames from 'classnames';
 
 // Component Imports
-import NavToggle from './NavToggle'
-import NavSearch from '@components/layout/shared/search'
+import NavToggle from './NavToggle';
+import NavSearch from '@components/layout/shared/search';
 
-import ModeDropdown from '@components/layout/shared/ModeDropdown'
-import NotificationsDropdown from '@components/layout/shared/NotificationsDropdown'
-import UserDropdown from '@components/layout/shared/UserDropdown'
+import ModeDropdown from '@components/layout/shared/ModeDropdown';
+import NotificationsDropdown from '@components/layout/shared/NotificationsDropdown';
+import UserDropdown from '@components/layout/shared/UserDropdown';
 
 // Util Imports
-import { verticalLayoutClasses } from '@layouts/utils/layoutClasses'
-import { notifications } from '@/data/notificationsData'
+import { verticalLayoutClasses } from '@layouts/utils/layoutClasses';
+import { notifications } from '@/data/notificationsData';
 
 const NavbarContent = () => {
   return (
@@ -27,7 +27,7 @@ const NavbarContent = () => {
         <UserDropdown />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default NavbarContent
+export default NavbarContent;

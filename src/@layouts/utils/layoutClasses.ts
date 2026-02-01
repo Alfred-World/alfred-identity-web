@@ -25,7 +25,7 @@ export const verticalLayoutClasses = {
   footerContent: 'ts-vertical-layout-footer-content',
   footerContentCompact: 'ts-vertical-layout-footer-content-compact',
   footerContentWide: 'ts-vertical-layout-footer-content-wide'
-}
+};
 
 // Classes for horizontal layout
 export const horizontalLayoutClasses = {
@@ -51,12 +51,12 @@ export const horizontalLayoutClasses = {
   footerContent: 'ts-horizontal-layout-footer-content',
   footerContentCompact: 'ts-horizontal-layout-footer-content-compact',
   footerContentWide: 'ts-horizontal-layout-footer-content-wide'
-}
+};
 
 // Classes for blank layout
 export const blankLayoutClasses = {
   root: 'ts-blank-layout'
-}
+};
 
 // Classes for front layout
 export const frontLayoutClasses = {
@@ -65,9 +65,9 @@ export const frontLayoutClasses = {
   navbar: 'ts-front-layout-navbar',
   navbarContent: 'ts-front-layout-navbar-content',
   footer: 'ts-front-layout-footer'
-}
+};
 
 // Common classes for Vertical and Horizontal layouts
 export const commonLayoutClasses = {
   contentHeightFixed: 'ts-layout-content-height-fixed'
-}
+};

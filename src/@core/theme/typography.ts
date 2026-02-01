@@ -1,5 +1,5 @@
 // MUI Imports
-import type { Theme } from '@mui/material/styles'
+import type { Theme } from '@mui/material/styles';
 
 const typography = (fontFamily: string): Theme['typography'] =>
   ({
@@ -83,6 +83,6 @@ const typography = (fontFamily: string): Theme['typography'] =>
       lineHeight: 1.16667,
       letterSpacing: '0.8px'
     }
-  }) as Theme['typography']
+  }) as Theme['typography'];
 
-export default typography
+export default typography;

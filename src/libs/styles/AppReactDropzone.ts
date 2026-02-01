@@ -1,11 +1,11 @@
-'use client'
+'use client';
 
 // MUI imports
-import Box from '@mui/material/Box'
-import { styled } from '@mui/material/styles'
+import Box from '@mui/material/Box';
+import { styled } from '@mui/material/styles';
 
 // Type imports
-import type { BoxProps } from '@mui/material/Box'
+import type { BoxProps } from '@mui/material/Box';
 
 // Styled Components
 const AppReactDropzone = styled(Box)<BoxProps>(({ theme }) => ({
@@ -77,6 +77,6 @@ const AppReactDropzone = styled(Box)<BoxProps>(({ theme }) => ({
       borderRadius: 'var(--mui-shape-borderRadius)'
     }
   }
-})) as typeof Box
+})) as typeof Box;
 
-export default AppReactDropzone
+export default AppReactDropzone;

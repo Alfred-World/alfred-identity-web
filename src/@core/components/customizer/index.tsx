@@ -1,83 +1,83 @@
-'use client'
+'use client';
 
 // React Imports
-import { useRef, useState } from 'react'
+import { useRef, useState } from 'react';
 
 // Next Imports
-import { usePathname } from 'next/navigation'
-import Link from 'next/link'
+import { usePathname } from 'next/navigation';
+import Link from 'next/link';
 
 // MUI Imports
-import Chip from '@mui/material/Chip'
-import Fade from '@mui/material/Fade'
-import Paper from '@mui/material/Paper'
-import Popper from '@mui/material/Popper'
-import { useTheme } from '@mui/material/styles'
-import ClickAwayListener from '@mui/material/ClickAwayListener'
-import Switch from '@mui/material/Switch'
-import type { Breakpoint } from '@mui/material/styles'
+import Chip from '@mui/material/Chip';
+import Fade from '@mui/material/Fade';
+import Paper from '@mui/material/Paper';
+import Popper from '@mui/material/Popper';
+import { useTheme } from '@mui/material/styles';
+import ClickAwayListener from '@mui/material/ClickAwayListener';
+import Switch from '@mui/material/Switch';
+import type { Breakpoint } from '@mui/material/styles';
 
 // Third-party Imports
-import classnames from 'classnames'
-import { useDebounce, useMedia } from 'react-use'
-import { HexColorPicker, HexColorInput } from 'react-colorful'
-import PerfectScrollbar from 'react-perfect-scrollbar'
+import classnames from 'classnames';
+import { useDebounce, useMedia } from 'react-use';
+import { HexColorPicker, HexColorInput } from 'react-colorful';
+import PerfectScrollbar from 'react-perfect-scrollbar';
 
 // Type Imports
-import type { Settings } from '@core/contexts/settingsContext'
-import type { Direction } from '@core/types'
-import type { PrimaryColorConfig } from '@configs/primaryColorConfig'
+import type { Settings } from '@core/contexts/settingsContext';
+import type { Direction } from '@core/types';
+import type { PrimaryColorConfig } from '@configs/primaryColorConfig';
 
 // Icon Imports
-import SkinDefault from '@core/svg/SkinDefault'
-import SkinBordered from '@core/svg/SkinBordered'
-import LayoutVertical from '@core/svg/LayoutVertical'
-import LayoutCollapsed from '@core/svg/LayoutCollapsed'
-import LayoutHorizontal from '@core/svg/LayoutHorizontal'
-import ContentCompact from '@core/svg/ContentCompact'
-import ContentWide from '@core/svg/ContentWide'
-import DirectionLtr from '@core/svg/DirectionLtr'
-import DirectionRtl from '@core/svg/DirectionRtl'
+import SkinDefault from '@core/svg/SkinDefault';
+import SkinBordered from '@core/svg/SkinBordered';
+import LayoutVertical from '@core/svg/LayoutVertical';
+import LayoutCollapsed from '@core/svg/LayoutCollapsed';
+import LayoutHorizontal from '@core/svg/LayoutHorizontal';
+import ContentCompact from '@core/svg/ContentCompact';
+import ContentWide from '@core/svg/ContentWide';
+import DirectionLtr from '@core/svg/DirectionLtr';
+import DirectionRtl from '@core/svg/DirectionRtl';
 
 // Config Imports
-import primaryColorConfig from '@configs/primaryColorConfig'
+import primaryColorConfig from '@configs/primaryColorConfig';
 
 // Hook Imports
-import { useSettings } from '@core/hooks/useSettings'
+import { useSettings } from '@core/hooks/useSettings';
 
 // Style Imports
-import styles from './styles.module.css'
+import styles from './styles.module.css';
 
 type CustomizerProps = {
-  breakpoint?: Breakpoint | 'xxl' | `${number}px` | `${number}rem` | `${number}em`
-  dir?: Direction
-  disableDirection?: boolean
-}
+  breakpoint?: Breakpoint | 'xxl' | `${number}px` | `${number}rem` | `${number}em`;
+  dir?: Direction;
+  disableDirection?: boolean;
+};
 
 const getLocalePath = (pathName: string, locale: string) => {
-  if (!pathName) return '/'
-  const segments = pathName.split('/')
+  if (!pathName) return '/';
+  const segments = pathName.split('/');
 
-  segments[1] = locale
+  segments[1] = locale;
 
-  return segments.join('/')
-}
+  return segments.join('/');
+};
 
 type DebouncedColorPickerProps = {
-  settings: Settings
-  isColorFromPrimaryConfig: PrimaryColorConfig | undefined
-  handleChange: (field: keyof Settings | 'primaryColor', value: Settings[keyof Settings] | string) => void
-}
+  settings: Settings;
+  isColorFromPrimaryConfig: PrimaryColorConfig | undefined;
+  handleChange: (field: keyof Settings | 'primaryColor', value: Settings[keyof Settings] | string) => void;
+};
 
 const DebouncedColorPicker = (props: DebouncedColorPickerProps) => {
   // Props
-  const { settings, isColorFromPrimaryConfig, handleChange } = props
+  const { settings, isColorFromPrimaryConfig, handleChange } = props;
 
   // States
-  const [debouncedColor, setDebouncedColor] = useState(settings.primaryColor ?? primaryColorConfig[0].main)
+  const [debouncedColor, setDebouncedColor] = useState(settings.primaryColor ?? primaryColorConfig[0].main);
 
   // Hooks
-  useDebounce(() => handleChange('primaryColor', debouncedColor), 200, [debouncedColor])
+  useDebounce(() => handleChange('primaryColor', debouncedColor), 200, [debouncedColor]);
 
   return (
     <>
@@ -93,79 +93,79 @@ const DebouncedColorPicker = (props: DebouncedColorPickerProps) => {
         placeholder='Type a color'
       />
     </>
-  )
-}
+  );
+};
 
 const Customizer = ({ breakpoint = 'lg', dir = 'ltr', disableDirection = false }: CustomizerProps) => {
   // States
-  const [isOpen, setIsOpen] = useState(false)
-  const [direction, setDirection] = useState(dir)
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
+  const [direction, setDirection] = useState(dir);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Refs
-  const anchorRef = useRef<HTMLDivElement | null>(null)
+  const anchorRef = useRef<HTMLDivElement | null>(null);
 
   // Hooks
-  const theme = useTheme()
-  const pathName = usePathname()
-  const { settings, updateSettings, resetSettings, isSettingsChanged } = useSettings()
-  const isSystemDark = useMedia('(prefers-color-scheme: dark)', false)
+  const theme = useTheme();
+  const pathName = usePathname();
+  const { settings, updateSettings, resetSettings, isSettingsChanged } = useSettings();
+  const isSystemDark = useMedia('(prefers-color-scheme: dark)', false);
 
   // Vars
-  let breakpointValue: CustomizerProps['breakpoint']
+  let breakpointValue: CustomizerProps['breakpoint'];
 
   switch (breakpoint) {
     case 'xxl':
-      breakpointValue = '1920px'
-      break
+      breakpointValue = '1920px';
+      break;
     case 'xl':
-      breakpointValue = `${theme.breakpoints.values.xl}px`
-      break
+      breakpointValue = `${theme.breakpoints.values.xl}px`;
+      break;
     case 'lg':
-      breakpointValue = `${theme.breakpoints.values.lg}px`
-      break
+      breakpointValue = `${theme.breakpoints.values.lg}px`;
+      break;
     case 'md':
-      breakpointValue = `${theme.breakpoints.values.md}px`
-      break
+      breakpointValue = `${theme.breakpoints.values.md}px`;
+      break;
     case 'sm':
-      breakpointValue = `${theme.breakpoints.values.sm}px`
-      break
+      breakpointValue = `${theme.breakpoints.values.sm}px`;
+      break;
     case 'xs':
-      breakpointValue = `${theme.breakpoints.values.xs}px`
-      break
+      breakpointValue = `${theme.breakpoints.values.xs}px`;
+      break;
     default:
-      breakpointValue = breakpoint
+      breakpointValue = breakpoint;
   }
 
-  const breakpointReached = useMedia(`(max-width: ${breakpointValue})`, false)
-  const isMobileScreen = useMedia('(max-width: 600px)', false)
-  const isBelowLgScreen = useMedia('(max-width: 1200px)', false)
-  const isColorFromPrimaryConfig = primaryColorConfig.find(item => item.main === settings.primaryColor)
+  const breakpointReached = useMedia(`(max-width: ${breakpointValue})`, false);
+  const isMobileScreen = useMedia('(max-width: 600px)', false);
+  const isBelowLgScreen = useMedia('(max-width: 1200px)', false);
+  const isColorFromPrimaryConfig = primaryColorConfig.find(item => item.main === settings.primaryColor);
 
-  const ScrollWrapper = isBelowLgScreen ? 'div' : PerfectScrollbar
+  const ScrollWrapper = isBelowLgScreen ? 'div' : PerfectScrollbar;
 
   const handleToggle = () => {
-    setIsOpen(!isOpen)
-  }
+    setIsOpen(!isOpen);
+  };
 
   // Update Settings
   const handleChange = (field: keyof Settings | 'direction', value: Settings[keyof Settings] | Direction) => {
     // Update direction state
     if (field === 'direction') {
-      setDirection(value as Direction)
+      setDirection(value as Direction);
     } else {
       // Update settings in cookie
-      updateSettings({ [field]: value })
+      updateSettings({ [field]: value });
     }
-  }
+  };
 
   const handleMenuClose = (event: MouseEvent | TouchEvent): void => {
     if (anchorRef.current && anchorRef.current.contains(event.target as HTMLElement)) {
-      return
+      return;
     }
 
-    setIsMenuOpen(false)
-  }
+    setIsMenuOpen(false);
+  };
 
   return (
     !breakpointReached && (
@@ -480,7 +480,7 @@ const Customizer = ({ breakpoint = 'lg', dir = 'ltr', disableDirection = false }
         </ScrollWrapper>
       </div>
     )
-  )
-}
+  );
+};
 
-export default Customizer
+export default Customizer;

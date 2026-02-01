@@ -1,12 +1,12 @@
 type SearchData = {
-  id: string
-  name: string
-  url: string
+  id: string;
+  name: string;
+  url: string;
 
-  icon: string
-  section: string
-  shortcut?: string
-}
+  icon: string;
+  section: string;
+  shortcut?: string;
+};
 
 // TODO: Add more search data
 const data: SearchData[] = [
@@ -17,6 +17,6 @@ const data: SearchData[] = [
     icon: 'tabler-chart-pie-2',
     section: 'Dashboards'
   }
-]
+];
 
-export default data
+export default data;

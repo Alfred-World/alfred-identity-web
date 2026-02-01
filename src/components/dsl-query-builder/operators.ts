@@ -1,12 +1,12 @@
 // DSL Query Builder Operators by Data Type
-import type { DataType } from './types'
+import type { DataType } from './types';
 
 export interface OperatorConfig {
-  value: string
-  label: string
-  requiresValue: boolean
-  requiresSecondValue?: boolean // For @between
-  valueType?: 'text' | 'number' | 'date' | 'boolean' | 'multi' // Type of input
+  value: string;
+  label: string;
+  requiresValue: boolean;
+  requiresSecondValue?: boolean; // For @between
+  valueType?: 'text' | 'number' | 'date' | 'boolean' | 'multi'; // Type of input
 }
 
 // String operators
@@ -21,7 +21,7 @@ const stringOperators: OperatorConfig[] = [
   { value: '@nin', label: 'is not in', requiresValue: true, valueType: 'multi' },
   { value: '@isnull', label: 'is null', requiresValue: false },
   { value: '@notnull', label: 'is not null', requiresValue: false }
-]
+];
 
 // Numeric operators (int, long)
 const numericOperators: OperatorConfig[] = [
@@ -36,7 +36,7 @@ const numericOperators: OperatorConfig[] = [
   { value: '@between', label: 'is between', requiresValue: true, requiresSecondValue: true, valueType: 'number' },
   { value: '@isnull', label: 'is null', requiresValue: false },
   { value: '@notnull', label: 'is not null', requiresValue: false }
-]
+];
 
 // Date operators
 const dateOperators: OperatorConfig[] = [
@@ -51,7 +51,7 @@ const dateOperators: OperatorConfig[] = [
   { value: '@between', label: 'is between', requiresValue: true, requiresSecondValue: true, valueType: 'date' },
   { value: '@isnull', label: 'is null', requiresValue: false },
   { value: '@notnull', label: 'is not null', requiresValue: false }
-]
+];
 
 // Boolean operators
 const boolOperators: OperatorConfig[] = [
@@ -59,7 +59,7 @@ const boolOperators: OperatorConfig[] = [
   { value: '!=', label: 'does not equal', requiresValue: true, valueType: 'boolean' },
   { value: '@isnull', label: 'is null', requiresValue: false },
   { value: '@notnull', label: 'is not null', requiresValue: false }
-]
+];
 
 export const operatorsByDataType: Record<DataType, OperatorConfig[]> = {
   string: stringOperators,
@@ -67,14 +67,14 @@ export const operatorsByDataType: Record<DataType, OperatorConfig[]> = {
   long: numericOperators,
   date: dateOperators,
   bool: boolOperators
-}
+};
 
 export function getOperatorsForDataType(dataType: DataType): OperatorConfig[] {
-  return operatorsByDataType[dataType] || stringOperators
+  return operatorsByDataType[dataType] || stringOperators;
 }
 
 export function getOperatorConfig(dataType: DataType, operatorValue: string): OperatorConfig | undefined {
-  const operators = getOperatorsForDataType(dataType)
+  const operators = getOperatorsForDataType(dataType);
 
-  return operators.find(op => op.value === operatorValue)
+  return operators.find(op => op.value === operatorValue);
 }

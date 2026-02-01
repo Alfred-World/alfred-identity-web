@@ -1,28 +1,28 @@
 // React Imports
-import { useRef } from 'react'
+import { useRef } from 'react';
 
 // Next Imports
-import Link from 'next/link'
+import Link from 'next/link';
 
 // MUI Imports
-import { styled } from '@mui/material/styles'
+import { styled } from '@mui/material/styles';
 
 // Third-party Imports
-import PerfectScrollbar from 'react-perfect-scrollbar'
+import PerfectScrollbar from 'react-perfect-scrollbar';
 
 // Type Imports
-import type { ChildrenType } from '@core/types'
+import type { ChildrenType } from '@core/types';
 
 // Component Imports
-import NavHeader from '@menu/components/vertical-menu/NavHeader'
-import Logo from '@components/layout/shared/Logo'
-import NavCollapseIcons from '@menu/components/vertical-menu/NavCollapseIcons'
+import NavHeader from '@menu/components/vertical-menu/NavHeader';
+import Logo from '@components/layout/shared/Logo';
+import NavCollapseIcons from '@menu/components/vertical-menu/NavCollapseIcons';
 
 // Hook Imports
-import useHorizontalNav from '@menu/hooks/useHorizontalNav'
+import useHorizontalNav from '@menu/hooks/useHorizontalNav';
 
 // Util Imports
-import { mapHorizontalToVerticalMenu } from '@menu/utils/menuUtils'
+import { mapHorizontalToVerticalMenu } from '@menu/utils/menuUtils';
 
 const StyledBoxForShadow = styled('div')(({ theme }) => ({
   top: 60,
@@ -40,32 +40,32 @@ const StyledBoxForShadow = styled('div')(({ theme }) => ({
   '&.scrolled': {
     opacity: 1
   }
-}))
+}));
 
 const VerticalNavContent = ({ children }: ChildrenType) => {
   // Hooks
-  const { isBreakpointReached } = useHorizontalNav()
+  const { isBreakpointReached } = useHorizontalNav();
 
   // Refs
-  const shadowRef = useRef(null)
+  const shadowRef = useRef(null);
 
   // Vars
-  const ScrollWrapper = isBreakpointReached ? 'div' : PerfectScrollbar
+  const ScrollWrapper = isBreakpointReached ? 'div' : PerfectScrollbar;
 
   const scrollMenu = (container: any, isPerfectScrollbar: boolean) => {
-    container = isBreakpointReached || !isPerfectScrollbar ? container.target : container
+    container = isBreakpointReached || !isPerfectScrollbar ? container.target : container;
 
     if (shadowRef && container.scrollTop > 0) {
       // @ts-ignore
       if (!shadowRef.current.classList.contains('scrolled')) {
         // @ts-ignore
-        shadowRef.current.classList.add('scrolled')
+        shadowRef.current.classList.add('scrolled');
       }
     } else {
       // @ts-ignore
-      shadowRef.current.classList.remove('scrolled')
+      shadowRef.current.classList.remove('scrolled');
     }
-  }
+  };
 
   return (
     <>
@@ -94,7 +94,7 @@ const VerticalNavContent = ({ children }: ChildrenType) => {
         {mapHorizontalToVerticalMenu(children)}
       </ScrollWrapper>
     </>
-  )
-}
+  );
+};
 
-export default VerticalNavContent
+export default VerticalNavContent;

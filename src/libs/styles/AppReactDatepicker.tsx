@@ -1,22 +1,22 @@
-'use client'
+'use client';
 
 // React Imports
-import type { ComponentProps } from 'react'
+import type { ComponentProps } from 'react';
 
 // MUI imports
-import Box from '@mui/material/Box'
-import { styled } from '@mui/material/styles'
-import type { BoxProps } from '@mui/material/Box'
+import Box from '@mui/material/Box';
+import { styled } from '@mui/material/styles';
+import type { BoxProps } from '@mui/material/Box';
 
 // Third-party Imports
-import ReactDatePickerComponent from 'react-datepicker'
+import ReactDatePickerComponent from 'react-datepicker';
 
 // Styles
-import 'react-datepicker/dist/react-datepicker.css'
+import 'react-datepicker/dist/react-datepicker.css';
 
 type Props = ComponentProps<typeof ReactDatePickerComponent> & {
-  boxProps?: BoxProps
-}
+  boxProps?: BoxProps;
+};
 
 // Styled Components
 const StyledReactDatePicker = styled(Box)<BoxProps>(({ theme }) => {
@@ -524,18 +524,18 @@ const StyledReactDatePicker = styled(Box)<BoxProps>(({ theme }) => {
         backgroundColor: 'transparent !important'
       }
     }
-  }
-}) as typeof Box
+  };
+}) as typeof Box;
 
 const AppReactDatepicker = (props: Props) => {
   // Props
-  const { boxProps, ...rest } = props
+  const { boxProps, ...rest } = props;
 
   return (
     <StyledReactDatePicker {...boxProps}>
       <ReactDatePickerComponent popperPlacement='bottom-start' {...rest} />
     </StyledReactDatePicker>
-  )
-}
+  );
+};
 
-export default AppReactDatepicker
+export default AppReactDatepicker;

@@ -1,25 +1,25 @@
-'use client'
+'use client';
 
 // MUI Imports
-import MuiCard from '@mui/material/Card'
-import CardContent from '@mui/material/CardContent'
-import Typography from '@mui/material/Typography'
-import { styled } from '@mui/material/styles'
-import type { CardProps } from '@mui/material/Card'
+import MuiCard from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
+import { styled } from '@mui/material/styles';
+import type { CardProps } from '@mui/material/Card';
 
 // Third-party Imports
-import classnames from 'classnames'
+import classnames from 'classnames';
 
 // Types Imports
-import type { ThemeColor } from '@core/types'
-import type { CardStatsHorizontalWithBorderProps } from '@/types/pages/widgetTypes'
+import type { ThemeColor } from '@core/types';
+import type { CardStatsHorizontalWithBorderProps } from '@/types/pages/widgetTypes';
 
 //Component Imports
-import CustomAvatar from '@core/components/mui/Avatar'
+import CustomAvatar from '@core/components/mui/Avatar';
 
 type Props = CardProps & {
-  color: ThemeColor
-}
+  color: ThemeColor;
+};
 
 const Card = styled(MuiCard)<Props>(({ color }) => ({
   transition: 'border 0.3s ease-in-out, box-shadow 0.3s ease-in-out, margin 0.3s ease-in-out',
@@ -34,11 +34,11 @@ const Card = styled(MuiCard)<Props>(({ color }) => ({
     boxShadow: 'var(--mui-customShadows-lg)',
     marginBlockEnd: '-1px'
   }
-}))
+}));
 
 const HorizontalWithBorder = (props: CardStatsHorizontalWithBorderProps) => {
   // Props
-  const { title, stats, trendNumber, avatarIcon, color } = props
+  const { title, stats, trendNumber, avatarIcon, color } = props;
 
   return (
     <Card color={color || 'primary'}>
@@ -63,7 +63,7 @@ const HorizontalWithBorder = (props: CardStatsHorizontalWithBorderProps) => {
         </div>
       </CardContent>
     </Card>
-  )
-}
+  );
+};
 
-export default HorizontalWithBorder
+export default HorizontalWithBorder;

@@ -1,20 +1,20 @@
 // MUI Imports
-import Card from '@mui/material/Card'
-import CardContent from '@mui/material/CardContent'
-import Typography from '@mui/material/Typography'
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
 
 // Third-party Imports
-import classnames from 'classnames'
+import classnames from 'classnames';
 
 // Types Imports
-import type { CardStatsHorizontalProps } from '@/types/pages/widgetTypes'
+import type { CardStatsHorizontalProps } from '@/types/pages/widgetTypes';
 
 // Components Imports
-import CustomAvatar from '@core/components/mui/Avatar'
+import CustomAvatar from '@core/components/mui/Avatar';
 
 const CardStatHorizontal = (props: CardStatsHorizontalProps) => {
   // Props
-  const { stats, avatarIcon, avatarColor, title, avatarSkin, avatarSize } = props
+  const { stats, avatarIcon, avatarColor, title, avatarSkin, avatarSize } = props;
 
   return (
     <Card className='bs-full'>
@@ -32,7 +32,7 @@ const CardStatHorizontal = (props: CardStatsHorizontalProps) => {
         </div>
       </CardContent>
     </Card>
-  )
-}
+  );
+};
 
-export default CardStatHorizontal
+export default CardStatHorizontal;

@@ -1,18 +1,18 @@
 // MUI Imports
-import type { Theme } from '@mui/material/styles'
+import type { Theme } from '@mui/material/styles';
 
 // Type Imports
-import type { VerticalNavState } from '@menu/contexts/verticalNavContext'
-import type { MenuProps } from '@menu/vertical-menu'
+import type { VerticalNavState } from '@menu/contexts/verticalNavContext';
+import type { MenuProps } from '@menu/vertical-menu';
 
 // Util Imports
-import { menuClasses } from '@menu/utils/menuClasses'
+import { menuClasses } from '@menu/utils/menuClasses';
 
 const menuSectionStyles = (verticalNavOptions: VerticalNavState, theme: Theme): MenuProps['menuSectionStyles'] => {
   // Vars
-  const { isCollapsed, isHovered } = verticalNavOptions
+  const { isCollapsed, isHovered } = verticalNavOptions;
 
-  const collapsedNotHovered = isCollapsed && !isHovered
+  const collapsedNotHovered = isCollapsed && !isHovered;
 
   return {
     root: {
@@ -47,7 +47,7 @@ const menuSectionStyles = (verticalNavOptions: VerticalNavState, theme: Theme): 
         }
       }
     }
-  }
-}
+  };
+};
 
-export default menuSectionStyles
+export default menuSectionStyles;

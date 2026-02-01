@@ -1,21 +1,21 @@
-'use client'
+'use client';
 
 // React Imports
-import { forwardRef } from 'react'
+import { forwardRef } from 'react';
 
 // MUI Imports
-import MuiAvatar from '@mui/material/Avatar'
-import { lighten, styled } from '@mui/material/styles'
-import type { AvatarProps } from '@mui/material/Avatar'
+import MuiAvatar from '@mui/material/Avatar';
+import { lighten, styled } from '@mui/material/styles';
+import type { AvatarProps } from '@mui/material/Avatar';
 
 // Type Imports
-import type { ThemeColor } from '@core/types'
+import type { ThemeColor } from '@core/types';
 
 export type CustomAvatarProps = AvatarProps & {
-  color?: ThemeColor
-  skin?: 'filled' | 'light' | 'light-static'
-  size?: number
-}
+  color?: ThemeColor;
+  skin?: 'filled' | 'light' | 'light-static';
+  size?: number;
+};
 
 const Avatar = styled(MuiAvatar)<CustomAvatarProps>(({ skin, color, size, theme }) => {
   return {
@@ -38,14 +38,14 @@ const Avatar = styled(MuiAvatar)<CustomAvatarProps>(({ skin, color, size, theme 
       height: size,
       width: size
     })
-  }
-})
+  };
+});
 
 const CustomAvatar = forwardRef<HTMLDivElement, CustomAvatarProps>((props: CustomAvatarProps, ref) => {
   // Props
-  const { color, skin = 'filled', ...rest } = props
+  const { color, skin = 'filled', ...rest } = props;
 
-  return <Avatar color={color} skin={skin} ref={ref} {...rest} />
-})
+  return <Avatar color={color} skin={skin} ref={ref} {...rest} />;
+});
 
-export default CustomAvatar
+export default CustomAvatar;

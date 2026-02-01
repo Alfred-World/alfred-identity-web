@@ -101,7 +101,8 @@ module.exports = {
         pathGroupsExcludedImportTypes: ['react', 'type'],
         'newlines-between': 'always-and-inside-groups'
       }
-    ]
+    ],
+    'import/no-deprecated': 'warn'
   },
   settings: {
     react: {
@@ -120,11 +121,15 @@ module.exports = {
   overrides: [
     {
       files: ['*.ts', '*.tsx', 'src/iconify-bundle/*'],
+      parserOptions: {
+        project: './tsconfig.json'
+      },
       rules: {
         '@typescript-eslint/explicit-module-boundary-types': 'off',
-        '@typescript-eslint/no-var-requires': 'off'
+        '@typescript-eslint/no-var-requires': 'off',
+        'deprecation/deprecation': 'warn'
       }
     }
   ],
-  plugins: []
-}
+  plugins: ['deprecation']
+};

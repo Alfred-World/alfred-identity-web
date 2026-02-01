@@ -1,5 +1,5 @@
 // MUI Imports
-import type { Theme } from '@mui/material/styles'
+import type { Theme } from '@mui/material/styles';
 
 const slider: Theme['components'] = {
   MuiSlider: {
@@ -95,6 +95,6 @@ const slider: Theme['components'] = {
       })
     }
   }
-}
+};
 
-export default slider
+export default slider;

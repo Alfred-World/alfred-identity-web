@@ -1,14 +1,14 @@
-import type { ChildrenType } from '@core/types'
+import type { ChildrenType } from '@core/types';
 
 // HOC Imports
-import GuestOnlyRoute from '@/hocs/GuestOnlyRoute'
+import GuestOnlyRoute from '@/hocs/GuestOnlyRoute';
 
 const Layout = async (props: ChildrenType) => {
-  const { children } = props
+  const { children } = props;
 
   // Type guard to ensure lang is a valid Locale
 
-  return <GuestOnlyRoute>{children}</GuestOnlyRoute>
-}
+  return <GuestOnlyRoute>{children}</GuestOnlyRoute>;
+};
 
-export default Layout
+export default Layout;

@@ -17,41 +17,41 @@
  */
 
 // Third-party Imports
-import type { ToastPosition } from 'react-toastify'
+import type { ToastPosition } from 'react-toastify';
 
 // Type Imports
-import type { Mode, Skin, Layout, LayoutComponentPosition, LayoutComponentWidth } from '@core/types'
+import type { Mode, Skin, Layout, LayoutComponentPosition, LayoutComponentWidth } from '@core/types';
 
 type Navbar = {
-  type: LayoutComponentPosition
-  contentWidth: LayoutComponentWidth
-  floating: boolean
-  detached: boolean
-  blur: boolean
-}
+  type: LayoutComponentPosition;
+  contentWidth: LayoutComponentWidth;
+  floating: boolean;
+  detached: boolean;
+  blur: boolean;
+};
 
 type Footer = {
-  type: LayoutComponentPosition
-  contentWidth: LayoutComponentWidth
-  detached: boolean
-}
+  type: LayoutComponentPosition;
+  contentWidth: LayoutComponentWidth;
+  detached: boolean;
+};
 
 export type Config = {
-  templateName: string
-  homePageUrl: string
-  settingsCookieName: string
-  mode: Mode
-  skin: Skin
-  semiDark: boolean
-  layout: Layout
-  layoutPadding: number
-  navbar: Navbar
-  contentWidth: LayoutComponentWidth
-  compactContentWidth: number
-  footer: Footer
-  disableRipple: boolean
-  toastPosition: ToastPosition
-}
+  templateName: string;
+  homePageUrl: string;
+  settingsCookieName: string;
+  mode: Mode;
+  skin: Skin;
+  semiDark: boolean;
+  layout: Layout;
+  layoutPadding: number;
+  navbar: Navbar;
+  contentWidth: LayoutComponentWidth;
+  compactContentWidth: number;
+  footer: Footer;
+  disableRipple: boolean;
+  toastPosition: ToastPosition;
+};
 
 const themeConfig: Config = {
   templateName: 'Vuexy',
@@ -78,6 +78,6 @@ const themeConfig: Config = {
   },
   disableRipple: false, // true, false
   toastPosition: 'top-right' // 'top-right', 'top-center', 'top-left', 'bottom-right', 'bottom-center', 'bottom-left'
-}
+};
 
-export default themeConfig
+export default themeConfig;

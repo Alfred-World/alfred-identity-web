@@ -1,5 +1,5 @@
 // React Imports
-import type { SVGAttributes } from 'react'
+import type { SVGAttributes } from 'react';
 
 const Discord = (props: SVGAttributes<SVGElement>) => {
   return (
@@ -24,7 +24,7 @@ const Discord = (props: SVGAttributes<SVGElement>) => {
         strokeLinejoin='round'
       />
     </svg>
-  )
-}
+  );
+};
 
-export default Discord
+export default Discord;

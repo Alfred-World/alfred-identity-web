@@ -1,45 +1,45 @@
-'use client'
+'use client';
 
 // React Imports
-import { useState } from 'react'
-import type { SyntheticEvent } from 'react'
+import { useState } from 'react';
+import type { SyntheticEvent } from 'react';
 
 // Next Imports
-import dynamic from 'next/dynamic'
+import dynamic from 'next/dynamic';
 
 // MUI Imports
-import Card from '@mui/material/Card'
-import CardHeader from '@mui/material/CardHeader'
-import CardContent from '@mui/material/CardContent'
-import Tab from '@mui/material/Tab'
-import TabList from '@mui/lab/TabList'
-import TabPanel from '@mui/lab/TabPanel'
-import TabContext from '@mui/lab/TabContext'
-import Typography from '@mui/material/Typography'
-import type { Theme } from '@mui/material/styles'
-import { useTheme } from '@mui/material/styles'
+import Card from '@mui/material/Card';
+import CardHeader from '@mui/material/CardHeader';
+import CardContent from '@mui/material/CardContent';
+import Tab from '@mui/material/Tab';
+import TabList from '@mui/lab/TabList';
+import TabPanel from '@mui/lab/TabPanel';
+import TabContext from '@mui/lab/TabContext';
+import Typography from '@mui/material/Typography';
+import type { Theme } from '@mui/material/styles';
+import { useTheme } from '@mui/material/styles';
 
 // Third Party Imports
-import classnames from 'classnames'
-import type { ApexOptions } from 'apexcharts'
+import classnames from 'classnames';
+import type { ApexOptions } from 'apexcharts';
 
 // Components Imports
-import OptionMenu from '@core/components/option-menu'
-import CustomAvatar from '@core/components/mui/Avatar'
+import OptionMenu from '@core/components/option-menu';
+import CustomAvatar from '@core/components/mui/Avatar';
 
 // Styled Component Imports
-const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
+const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'));
 
-type ApexChartSeries = NonNullable<ApexOptions['series']>
-type ApexChartSeriesData = Exclude<ApexChartSeries[0], number>
+type ApexChartSeries = NonNullable<ApexOptions['series']>;
+type ApexChartSeriesData = Exclude<ApexChartSeries[0], number>;
 
-type TabCategory = 'orders' | 'sales' | 'profit' | 'income'
+type TabCategory = 'orders' | 'sales' | 'profit' | 'income';
 
 type TabType = {
-  type: TabCategory
-  avatarIcon: string
-  series: ApexChartSeries
-}
+  type: TabCategory;
+  avatarIcon: string;
+  series: ApexChartSeries;
+};
 
 // Vars
 const tabData: TabType[] = [
@@ -63,7 +63,7 @@ const tabData: TabType[] = [
     avatarIcon: 'tabler-chart-pie-2',
     series: [{ data: [5, 9, 12, 18, 20, 25, 30, 36, 48] }]
   }
-]
+];
 
 const renderTabs = (value: TabCategory) => {
   return tabData.map((item, index) => (
@@ -87,15 +87,15 @@ const renderTabs = (value: TabCategory) => {
         </div>
       }
     />
-  ))
-}
+  ));
+};
 
 const renderTabPanels = (value: TabCategory, theme: Theme, options: ApexOptions, colors: string[]) => {
   return tabData.map((item, index) => {
-    const max = Math.max(...((item.series[0] as ApexChartSeriesData).data as number[]))
-    const seriesIndex = ((item.series[0] as ApexChartSeriesData).data as number[]).indexOf(max)
+    const max = Math.max(...((item.series[0] as ApexChartSeriesData).data as number[]));
+    const seriesIndex = ((item.series[0] as ApexChartSeriesData).data as number[]).indexOf(max);
 
-    const finalColors = colors.map((color, i) => (seriesIndex === i ? 'var(--mui-palette-primary-main)' : color))
+    const finalColors = colors.map((color, i) => (seriesIndex === i ? 'var(--mui-palette-primary-main)' : color));
 
     return (
       <TabPanel key={index} value={item.type} className='!p-0'>
@@ -107,25 +107,25 @@ const renderTabPanels = (value: TabCategory, theme: Theme, options: ApexOptions,
           series={item.series}
         />
       </TabPanel>
-    )
-  })
-}
+    );
+  });
+};
 
 const EarningReportsWithTabs = () => {
   // States
-  const [value, setValue] = useState<TabCategory>('orders')
+  const [value, setValue] = useState<TabCategory>('orders');
 
   // Hooks
-  const theme = useTheme()
+  const theme = useTheme();
 
   // Vars
-  const disabledText = 'var(--mui-palette-text-disabled)'
+  const disabledText = 'var(--mui-palette-text-disabled)';
 
   const handleChange = (event: SyntheticEvent, newValue: TabCategory) => {
-    setValue(newValue)
-  }
+    setValue(newValue);
+  };
 
-  const colors = Array(9).fill('var(--mui-palette-primary-lightOpacity)')
+  const colors = Array(9).fill('var(--mui-palette-primary-lightOpacity)');
 
   const options: ApexOptions = {
     chart: {
@@ -224,7 +224,7 @@ const EarningReportsWithTabs = () => {
         }
       }
     ]
-  }
+  };
 
   return (
     <Card>
@@ -263,7 +263,7 @@ const EarningReportsWithTabs = () => {
         </TabContext>
       </CardContent>
     </Card>
-  )
-}
+  );
+};
 
-export default EarningReportsWithTabs
+export default EarningReportsWithTabs;

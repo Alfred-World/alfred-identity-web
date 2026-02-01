@@ -1,5 +1,5 @@
 // React Imports
-import type { SVGAttributes } from 'react'
+import type { SVGAttributes } from 'react';
 
 const Airbnb = (props: SVGAttributes<SVGElement>) => {
   return (
@@ -10,7 +10,7 @@ const Airbnb = (props: SVGAttributes<SVGElement>) => {
         fill='currentColor'
       />
     </svg>
-  )
-}
+  );
+};
 
-export default Airbnb
+export default Airbnb;

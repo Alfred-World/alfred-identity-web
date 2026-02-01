@@ -1,56 +1,56 @@
-'use client'
+'use client';
 
 // MUI Imports
-import { useTheme } from '@mui/material/styles'
-import useScrollTrigger from '@mui/material/useScrollTrigger'
+import { useTheme } from '@mui/material/styles';
+import useScrollTrigger from '@mui/material/useScrollTrigger';
 
 // Third-party Imports
-import classnames from 'classnames'
-import type { CSSObject } from '@emotion/styled'
+import classnames from 'classnames';
+import type { CSSObject } from '@emotion/styled';
 
 // Type Imports
-import type { ChildrenType } from '@core/types'
+import type { ChildrenType } from '@core/types';
 
 // Config Imports
-import themeConfig from '@configs/themeConfig'
+import themeConfig from '@configs/themeConfig';
 
 // Hook Imports
-import { useSettings } from '@core/hooks/useSettings'
+import { useSettings } from '@core/hooks/useSettings';
 
 // Util Imports
-import { verticalLayoutClasses } from '@layouts/utils/layoutClasses'
+import { verticalLayoutClasses } from '@layouts/utils/layoutClasses';
 
 // Styled Component Imports
-import StyledHeader from '@layouts/styles/vertical/StyledHeader'
+import StyledHeader from '@layouts/styles/vertical/StyledHeader';
 
 type Props = ChildrenType & {
-  overrideStyles?: CSSObject
-}
+  overrideStyles?: CSSObject;
+};
 
 const Navbar = (props: Props) => {
   // Props
-  const { children, overrideStyles } = props
+  const { children, overrideStyles } = props;
 
   // Hooks
-  const { settings } = useSettings()
-  const theme = useTheme()
+  const { settings } = useSettings();
+  const theme = useTheme();
 
   const trigger = useScrollTrigger({
     threshold: 0,
     disableHysteresis: true
-  })
+  });
 
   // Vars
-  const { navbarContentWidth } = settings
+  const { navbarContentWidth } = settings;
 
-  const headerFixed = themeConfig.navbar.type === 'fixed'
-  const headerStatic = themeConfig.navbar.type === 'static'
-  const headerFloating = themeConfig.navbar.floating === true
-  const headerDetached = themeConfig.navbar.detached === true
-  const headerAttached = themeConfig.navbar.detached === false
-  const headerBlur = themeConfig.navbar.blur === true
-  const headerContentCompact = navbarContentWidth === 'compact'
-  const headerContentWide = navbarContentWidth === 'wide'
+  const headerFixed = themeConfig.navbar.type === 'fixed';
+  const headerStatic = themeConfig.navbar.type === 'static';
+  const headerFloating = themeConfig.navbar.floating === true;
+  const headerDetached = themeConfig.navbar.detached === true;
+  const headerAttached = themeConfig.navbar.detached === false;
+  const headerBlur = themeConfig.navbar.blur === true;
+  const headerContentCompact = navbarContentWidth === 'compact';
+  const headerContentWide = navbarContentWidth === 'wide';
 
   return (
     <StyledHeader
@@ -70,7 +70,7 @@ const Navbar = (props: Props) => {
     >
       <div className={classnames(verticalLayoutClasses.navbar, 'flex bs-full')}>{children}</div>
     </StyledHeader>
-  )
-}
+  );
+};
 
-export default Navbar
+export default Navbar;

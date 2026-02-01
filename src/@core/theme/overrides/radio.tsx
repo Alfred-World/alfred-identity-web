@@ -1,8 +1,8 @@
 // React Imports
-import React from 'react'
+import React from 'react';
 
 // MUI Imports
-import type { Theme } from '@mui/material/styles'
+import type { Theme } from '@mui/material/styles';
 
 const IconChecked = () => {
   return (
@@ -14,16 +14,16 @@ const IconChecked = () => {
         strokeWidth='5'
       />
     </svg>
-  )
-}
+  );
+};
 
 const UncheckedIcon = () => {
   return (
     <svg width='1em' height='1em' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
       <path d='M4 12a8 8 0 1 1 16 0 8 8 0 0 1-16 0Z' stroke='var(--mui-palette-text-disabled)' strokeWidth='2' />
     </svg>
-  )
-}
+  );
+};
 
 const radio: Theme['components'] = {
   MuiRadio: {
@@ -79,6 +79,6 @@ const radio: Theme['components'] = {
       })
     }
   }
-}
+};
 
-export default radio
+export default radio;

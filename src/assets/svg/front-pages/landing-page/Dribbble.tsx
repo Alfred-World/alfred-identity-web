@@ -1,5 +1,5 @@
 // React Imports
-import type { SVGAttributes } from 'react'
+import type { SVGAttributes } from 'react';
 
 const Dribbble = (props: SVGAttributes<SVGElement>) => {
   return (
@@ -9,7 +9,7 @@ const Dribbble = (props: SVGAttributes<SVGElement>) => {
         fill='currentColor'
       />
     </svg>
-  )
-}
+  );
+};
 
-export default Dribbble
+export default Dribbble;

@@ -1,29 +1,29 @@
-'use client'
+'use client';
 
 // Third-party Imports
-import classnames from 'classnames'
+import classnames from 'classnames';
 
 // Type Imports
-import type { ChildrenType } from '@core/types'
+import type { ChildrenType } from '@core/types';
 
 // Hook Imports
-import { useSettings } from '@core/hooks/useSettings'
+import { useSettings } from '@core/hooks/useSettings';
 
 // Util Imports
-import { verticalLayoutClasses } from '@layouts/utils/layoutClasses'
+import { verticalLayoutClasses } from '@layouts/utils/layoutClasses';
 
 // Styled Component Imports
-import StyledMain from '@layouts/styles/shared/StyledMain'
+import StyledMain from '@layouts/styles/shared/StyledMain';
 
-import AppBreadcrumbs from '@core/components/mui/Breadcrumbs'
+import AppBreadcrumbs from '@core/components/mui/Breadcrumbs';
 
 const LayoutContent = ({ children }: ChildrenType) => {
   // Hooks
-  const { settings } = useSettings()
+  const { settings } = useSettings();
 
   // Vars
-  const contentCompact = settings.contentWidth === 'compact'
-  const contentWide = settings.contentWidth === 'wide'
+  const contentCompact = settings.contentWidth === 'compact';
+  const contentWide = settings.contentWidth === 'wide';
 
   return (
     <StyledMain
@@ -36,7 +36,7 @@ const LayoutContent = ({ children }: ChildrenType) => {
       <AppBreadcrumbs />
       {children}
     </StyledMain>
-  )
-}
+  );
+};
 
-export default LayoutContent
+export default LayoutContent;
