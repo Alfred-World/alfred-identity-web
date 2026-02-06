@@ -19,8 +19,7 @@ import { alpha, useTheme } from '@mui/material/styles';
 import { toast } from 'react-toastify';
 
 import { usePostRolesIdPermissions, getPermissions } from '@/generated/identity-api';
-import type { RoleDto, PermissionDto, PermissionDtoPageResult } from '@/generated/identity-api';
-import { type ApiReturn } from '@/libs/custom-instance';
+import type { RoleDto, PermissionDto, PermissionDtoApiPagedResponse } from '@/generated/identity-api';
 
 interface RolePermissionsDetailProps {
   role: RoleDto | null;
@@ -28,7 +27,7 @@ interface RolePermissionsDetailProps {
 }
 
 // Helper to safely extract items from an API page
-const getItemsFromPage = (page: ApiReturn<PermissionDtoPageResult>) => {
+const getItemsFromPage = (page: PermissionDtoApiPagedResponse) => {
   if (page.success && page.result?.items) {
     return page.result.items;
   }

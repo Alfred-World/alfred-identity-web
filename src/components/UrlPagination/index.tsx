@@ -297,8 +297,9 @@ export function useUrlSorting(defaultSort = '', sortParamName = 'sort') {
 
         params.set(sortParamName, sortString);
       } else {
-        // When clearing sort, remove param from URL (will fallback to default)
-        params.delete(sortParamName);
+        // When clearing sort, explicitly set to empty string to override default
+        // If we delete it, it would fallback to defaultSort
+        params.set(sortParamName, '');
       }
 
       routerRef.current.replace(`${pathnameRef.current}?${params.toString()}`, { scroll: false });

@@ -36,15 +36,16 @@ export const ApplicationListActions = ({ id, displayName, onDeleteSuccess }: App
 
   const { mutate: deleteApplication, isPending } = useDeleteApplicationsId({
     mutation: {
-      onSuccess: () => {
-        toast.success(`Application "${displayName}" deleted successfully`);
-        setIsDeleteDialogOpen(false);
-        onDeleteSuccess?.();
-      },
-      onError: error => {
-        const message = error.errors[0].message || 'Failed to delete application';
-
-        toast.error(message);
+      onSuccess: data => {
+        if (data.success) {
+          toast.success(`Application "${displayName}" deleted successfully`);
+          setIsDeleteDialogOpen(false);
+          onDeleteSuccess?.();
+        } else if (data.errors) {
+          data.errors.forEach(e => toast.error(e.message));
+        } else {
+          toast.error(data.message || 'Failed to delete application');
+        }
       }
     }
   });

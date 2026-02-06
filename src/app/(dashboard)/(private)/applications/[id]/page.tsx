@@ -9,7 +9,7 @@ import { toast } from 'react-toastify';
 
 import { useGetApplicationsId, usePutApplicationsId, type UpdateApplicationRequest } from '@/generated';
 import { ApplicationForm, type ApplicationFormSubmitData } from '../_components/ApplicationForm';
-import type { ApiReturnFailure } from '@/libs/custom-instance';
+import { isApiFailure } from '@/libs/custom-instance';
 import { ROUTES } from '@/configs/routes';
 
 export default function EditApplicationPage({ params }: { params: Promise<{ id: string }> }) {
@@ -25,30 +25,10 @@ export default function EditApplicationPage({ params }: { params: Promise<{ id: 
         if (data?.success) {
           toast.success('Application updated successfully');
           router.push(ROUTES.APPLICATIONS.LIST);
+        } else if (isApiFailure(data)) {
+          data.errors.forEach(err => toast.error(err.message));
         } else {
-          const errors = (data as ApiReturnFailure)?.errors;
-
-          if (errors && Array.isArray(errors)) {
-            errors.forEach(err => toast.error(err.message));
-          } else {
-            toast.error(data?.message || 'Failed to update application');
-          }
-        }
-      },
-      onError: (e: unknown) => {
-        const error = e as {
-          response?: { data?: ApiReturnFailure | { title?: string; errors?: Record<string, string[]> } };
-          message?: string;
-        };
-
-        const errorData = error.response?.data;
-
-        if (errorData && 'errors' in errorData && typeof errorData.errors === 'object') {
-          Object.values(errorData.errors as Record<string, string[]>)
-            .flat()
-            .forEach(msg => toast.error(String(msg)));
-        } else {
-          toast.error((errorData as { title?: string })?.title || error.message || 'Failed to update application');
+          toast.error(data?.message || 'Failed to update application');
         }
       }
     }

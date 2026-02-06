@@ -17,6 +17,9 @@ const commonOutputConfig = {
             options: {
                 staleTime: 10000
             }
+        },
+        fetch: {
+            includeHttpResponseReturnType: false
         }
     }
 }

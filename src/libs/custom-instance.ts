@@ -2,44 +2,69 @@ import type { AxiosError, AxiosRequestConfig } from 'axios';
 import axios, { isCancel } from 'axios';
 import { getSession } from 'next-auth/react';
 
-/**
- * Base interface for API return types with common properties.
- */
-export interface ApiReturnBase {
-  success: boolean;
-  message?: string;
+// ============================================================
+// Discriminated Union Types for API Responses
+// ============================================================
+// Backend sends unified response shape:
+//   Success: { success: true, result: T, message?: string }
+//   Error:   { success: false, errors: [{ message, code }] }
+//
+// Usage:
+//   const { data } = useDeleteRolesId(...)
+//   if (isApiSuccess(data)) {
+//     data.result  // TS narrows to T (non-null)
+//   } else {
+//     data.errors  // TS narrows to ApiError[]
+//   }
+// ============================================================
+
+export interface ApiError {
+  message: string;
+  code: string;
 }
 
-/**
- * Success return type with result data.
- * When success is true, result is guaranteed to be present.
- * @template T - The result type
- */
-export interface ApiReturnSuccess<T> extends ApiReturnBase {
+export interface ApiSuccess<T> {
   success: true;
+  message?: string;
   result: T;
 }
 
-/**
- * Failure return type with error information.
- * When success is false, errors array is guaranteed to be present.
- */
-export interface ApiReturnFailure extends ApiReturnBase {
+export interface ApiFailure {
   success: false;
-  errors: Array<{ message: string; code?: string }>;
+  errors: ApiError[];
 }
 
 /**
  * Discriminated union type for API responses.
- * @template T - The success result type
+ * Use isApiSuccess() / isApiFailure() type guards for narrowing.
  */
-export type ApiReturn<T> = ApiReturnSuccess<T> | ApiReturnFailure;
+export type ApiResult<T> = ApiSuccess<T> | ApiFailure;
 
 /**
- * Helper type to extract result type from generated API response
- * Converts SomeApiSuccessResponse to ApiReturn<ResultType>
+ * Type guard: narrows to success response with result.
+ *
+ * @example
+ * if (isApiSuccess(data)) {
+ *   console.log(data.result.name);  // TS knows result is non-null
+ * }
  */
-export type ToApiReturn<T> = T extends { result?: infer R | null } ? ApiReturn<NonNullable<R>> : ApiReturn<T>;
+export function isApiSuccess<T extends { success: boolean; result?: any }>(
+  response: T | null | undefined
+): response is T & { success: true; result: NonNullable<T['result']> } {
+  return response?.success === true;
+}
+
+/**
+ * Type guard: narrows to failure response with errors array.
+ *
+ * @example
+ * if (isApiFailure(data)) {
+ *   data.errors.forEach(e => toast.error(e.message));
+ * }
+ */
+export function isApiFailure(response: { success: boolean; errors?: any } | null | undefined): response is ApiFailure {
+  return response?.success === false && Array.isArray(response?.errors);
+}
 
 /**
  * Axios instance with base configuration
@@ -148,66 +173,73 @@ AXIOS_INSTANCE.interceptors.response.use(
 );
 
 /**
- * Custom instance for Orval - returns unified ApiReturn type automatically
- * No need to wrap API calls, just use directly:
+ * Custom Axios instance for Orval.
+ *
+ * - On 2xx: returns response body as T
+ * - On 4xx/5xx: catches axios error, returns error response body as T
+ *   (which has { success: false, errors: [...] })
+ * - On network error (no response): re-throws
+ *
+ * This means ALL API responses flow through onSuccess/data in react-query,
+ * and you can use isApiSuccess(data) / isApiFailure(data) to narrow:
  *
  * @example
- *
- * const response = await postApiAuthLogin({ identity, password })
- *
- * if (!response.success) {
- *   console.log(response.errors[0].message)
- *   return
+ * const { data } = useGetRoles()
+ * if (isApiSuccess(data)) {
+ *   console.log(data.result?.items)
  * }
- * console.log(response.result.accessToken)
  *
+ * @example
+ * const { mutate } = useDeleteRolesId({
+ *   mutation: {
+ *     onSuccess: (data) => {
+ *       if (isApiSuccess(data)) {
+ *         toast.success('Deleted!')
+ *       } else if (isApiFailure(data)) {
+ *         data.errors.forEach(e => toast.error(e.message))
+ *       }
+ *     }
+ *   }
+ * })
  */
-export const customInstance = <T>(
-  config: AxiosRequestConfig,
-  options?: AxiosRequestConfig
-): Promise<ToApiReturn<T>> => {
+export const customInstance = <T>(url: string, options?: RequestInit): Promise<T> => {
   // eslint-disable-next-line import/no-named-as-default-member
   const source = axios.CancelToken.source();
 
-  const promise = AXIOS_INSTANCE({
-    ...config,
-    ...options,
+  // Convert RequestInit headers to plain object for Axios
+  let headers: Record<string, string> | undefined;
+
+  if (options?.headers) {
+    if (options.headers instanceof Headers) {
+      headers = {};
+      options.headers.forEach((value, key) => {
+        headers![key] = value;
+      });
+    } else {
+      headers = { ...options.headers } as Record<string, string>;
+    }
+  }
+
+  // Convert RequestInit options to AxiosRequestConfig
+  const axiosConfig: AxiosRequestConfig = {
+    url,
+    method: (options?.method as any) || 'GET',
+    headers,
+    data: options?.body,
     cancelToken: source.token
-  })
-    .then(({ data }) => {
-      return data as ToApiReturn<T>;
-    })
+  };
+
+  const promise = AXIOS_INSTANCE(axiosConfig)
+    .then(({ data }) => data as T)
     .catch((error: AxiosError) => {
-      // Handle cancelled requests
-      if (isCancel(error)) {
-        throw error;
+      // If server responded with error body (4xx/5xx), return it as T
+      // This allows checking data.success / data.errors in onSuccess
+      if (error.response?.data) {
+        return error.response.data as T;
       }
 
-      const responseData = error.response?.data as
-        | {
-            success?: boolean;
-            message?: string;
-            errors?: Array<{ message: string; code?: string }>;
-          }
-        | undefined;
-
-      // If BE already returned error format, use it
-      if (responseData && responseData.success === false && responseData.errors) {
-        return responseData as ToApiReturn<T>;
-      }
-
-      // Create unified error response
-      const errorResponse: ApiReturnFailure = {
-        success: false,
-        errors: [
-          {
-            message: responseData?.message || error.message || 'An unexpected error occurred',
-            code: error.code || 'UNKNOWN_ERROR'
-          }
-        ]
-      };
-
-      return errorResponse as ToApiReturn<T>;
+      // Network errors (no response) still throw
+      throw error;
     });
 
   // @ts-expect-error adding cancel method to promise
@@ -217,5 +249,8 @@ export const customInstance = <T>(
 
   return promise;
 };
+
+// Override the return error type so react-query sees AxiosError
+export type ErrorType<Error> = AxiosError<Error>;
 
 export default customInstance;

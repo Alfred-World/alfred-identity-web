@@ -65,7 +65,7 @@ const RolesPage = () => {
     view: 'detail'
   });
 
-  const roles = useMemo(() => (rolesResponse?.success ? rolesResponse.result.items || [] : []), [rolesResponse]);
+  const roles = useMemo(() => (rolesResponse?.success ? rolesResponse.result?.items || [] : []), [rolesResponse]);
 
   const selectedRole = useMemo(() => {
     return roles.find(role => role.id === selectedRoleId) || null;
@@ -92,8 +92,10 @@ const RolesPage = () => {
           if (selectedRoleId === roleToDelete?.id) {
             handleSelectRole(null);
           }
+        } else if (data.errors) {
+          data.errors.forEach(e => toast.error(e.message));
         } else {
-          toast.error(data.errors?.[0]?.message || 'Failed to delete role');
+          toast.error(data.message || 'Failed to delete role');
         }
       }
     }

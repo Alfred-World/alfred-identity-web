@@ -206,7 +206,12 @@ export function AdvancedTable<TData>({
           />
         ),
         enableSorting: false,
-        enableHiding: false
+        enableHiding: false,
+        size: 50,
+        meta: {
+          align: 'center',
+          width: 50
+        }
       };
 
       finalColumns.unshift(selectionColumn);
