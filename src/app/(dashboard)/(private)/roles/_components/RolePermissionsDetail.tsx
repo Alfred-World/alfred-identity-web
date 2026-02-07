@@ -85,7 +85,7 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
   }, [role]);
 
   // -- 3. Mutations --
-  /* eslint-disable @typescript-eslint/no-explicit-any */
+   
   const { mutate: updatePermissions, isPending: isUpdating } = usePostRolesIdPermissions({
     mutation: {
       onSuccess: (data: any) => {
@@ -100,7 +100,7 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
       }
     }
   });
-  /* eslint-enable @typescript-eslint/no-explicit-any */
+   
 
   // -- 4. Infinite Scroll Observer --
   const handleObserver = useCallback(

@@ -90,6 +90,7 @@ const CheckboxSkeleton = styled(Box)(({ theme }) => ({
 // ============================================================
 
 export interface TableSkeletonProps {
+
   /** Number of rows to display */
   rowCount?: number;
 

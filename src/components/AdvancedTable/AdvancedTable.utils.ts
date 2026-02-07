@@ -10,6 +10,7 @@ import type { FieldConfig } from '@/components/dsl-query-builder/types';
 // ============================================================
 
 export interface AdvancedTableProps<TData> {
+
   /** Data to display in the table */
   data: TData[];
 

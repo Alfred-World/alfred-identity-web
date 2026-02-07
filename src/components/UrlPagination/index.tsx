@@ -10,6 +10,7 @@ import { Box, FormControl, MenuItem, Pagination, Select, Typography, type Select
 import { DEFAULT_PAGE_SIZE_OPTIONS, DEFAULT_PAGE_SIZE } from '@/constants/pagination';
 
 export interface UrlPaginationProps {
+
   /** Current page (1-indexed) */
   page: number;
 
