@@ -8,7 +8,7 @@ import { Box, Grid, Typography, Button, Chip } from '@mui/material';
 
 import { DslQueryBuilder, type FieldConfig, type FilterCondition } from '@/components/dsl-query-builder';
 import { useUrlPagination, useUrlSorting } from '@/components/UrlPagination';
-import { AdvancedTable } from '@/components/AdvancedTable';
+import { AdvancedTable, type ColumnConfig } from '@/components/AdvancedTable';
 import { useGetApplications } from '@/generated';
 import type { ApplicationDto } from '@/generated';
 
@@ -39,8 +39,23 @@ export default function ApplicationsPage() {
 
   const result = data?.success ? data.result : null;
 
-  // Field config for Applications - memoized to include refetch in actions
-  const applicationFields: FieldConfig<ApplicationDto>[] = useMemo(
+  // Filter field config for DslQueryBuilder (filterable fields only)
+  const filterFields: FieldConfig[] = useMemo(
+    () => [
+      { name: 'Display Name', key: 'displayName', dataType: 'string' },
+      { name: 'Client ID', key: 'clientId', dataType: 'string' },
+      { name: 'Type', key: 'applicationType', dataType: 'string' },
+      { name: 'Client Type', key: 'clientType', dataType: 'string' },
+      { name: 'Active', key: 'isActive', dataType: 'bool' },
+      { name: 'Permissions', key: 'permissions', dataType: 'string' },
+      { name: 'Created At', key: 'createdAt', dataType: 'date' },
+      { name: 'Updated At', key: 'updatedAt', dataType: 'date' }
+    ],
+    []
+  );
+
+  // Column config for AdvancedTable (visible columns with rendering)
+  const applicationColumns: ColumnConfig<ApplicationDto>[] = useMemo(
     () => [
       {
         name: 'Display Name',
@@ -108,9 +123,7 @@ export default function ApplicationsPage() {
           />
         )
       },
-      { name: 'Permissions', key: 'permissions', dataType: 'string', hidden: true },
       { name: 'Created At', key: 'createdAt', dataType: 'date', enableSorting: true, width: 180 },
-      { name: 'Updated At', key: 'updatedAt', dataType: 'date', enableSorting: true, hidden: true },
       {
         name: 'Actions',
         key: 'actions',
@@ -126,7 +139,7 @@ export default function ApplicationsPage() {
       }
     ],
     [refetch]
-  ) as FieldConfig<ApplicationDto>[];
+  );
 
   const handleSearch = useCallback(
     (query: string) => {
@@ -167,7 +180,7 @@ export default function ApplicationsPage() {
         {/* Filter Builder */}
         <Grid size={{ xs: 12 }}>
           <DslQueryBuilder
-            fields={applicationFields}
+            fields={filterFields}
             onChange={handleChange}
             onSearch={handleSearch}
             onReset={handleReset}
@@ -180,7 +193,7 @@ export default function ApplicationsPage() {
         {/* Applications Table */}
         <Grid size={{ xs: 12 }}>
           <AdvancedTable<ApplicationDto>
-            fields={applicationFields}
+            columns={applicationColumns}
             data={result?.items || []}
             total={result?.total || 0}
             page={page}

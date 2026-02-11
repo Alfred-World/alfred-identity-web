@@ -37,7 +37,7 @@ import { AdvancedTableBody } from './AdvancedTableBody';
 import type { AdvancedTableProps } from './AdvancedTable.utils';
 
 // Type Imports
-import type { FieldConfig } from '@/components/dsl-query-builder/types';
+import type { ColumnConfig } from './AdvancedTable.utils';
 
 // Style Imports
 import tableStyles from '@core/styles/table.module.css';
@@ -89,10 +89,10 @@ function TablePagination<TData>({ table, total, onPageChange }: TablePaginationP
 // ============================================================
 
 /**
- * Generates TanStack Table columns from FieldConfig array
+ * Generates TanStack Table columns from ColumnConfig array
  */
 function generateColumnsFromFields<TData>(
-  fields: FieldConfig<TData>[],
+  fields: ColumnConfig<TData>[],
   columnHelper: ReturnType<typeof createColumnHelper<TData>>
 ): ColumnDef<TData, unknown>[] {
   return fields
@@ -140,8 +140,8 @@ function generateColumnsFromFields<TData>(
 
 export function AdvancedTable<TData>({
   data,
-  fields,
-  columns: userColumns,
+  columns,
+  tanstackColumns,
   total,
   page,
   pageSize,
@@ -165,24 +165,24 @@ export function AdvancedTable<TData>({
   const columnHelper = useMemo(() => createColumnHelper<TData>(), []);
 
   const generatedColumns = useMemo<ColumnDef<TData, unknown>[]>(() => {
-    // If userColumns provided, use them directly
-    if (userColumns && userColumns.length > 0) {
-      return userColumns;
+    // If tanstackColumns provided, use them directly
+    if (tanstackColumns && tanstackColumns.length > 0) {
+      return tanstackColumns;
     }
 
-    // If fields provided, generate columns from them
-    if (fields && fields.length > 0) {
-      return generateColumnsFromFields(fields, columnHelper);
+    // If columns provided, generate columns from them
+    if (columns && columns.length > 0) {
+      return generateColumnsFromFields(columns, columnHelper);
     }
 
-    // No columns or fields provided
+    // No columns provided
     return [];
-  }, [userColumns, fields, columnHelper]);
+  }, [tanstackColumns, columns, columnHelper]);
 
   // ============================================================
   // Build columns with optional selection column
   // ============================================================
-  const columns = useMemo<ColumnDef<TData, unknown>[]>(() => {
+  const tableColumns = useMemo<ColumnDef<TData, unknown>[]>(() => {
     const finalColumns = [...generatedColumns];
 
     // Prepend selection column if enabled
@@ -255,12 +255,12 @@ export function AdvancedTable<TData>({
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
   const [columnOrder, setColumnOrder] = useState<ColumnOrderState>(
-    columns.map(column => column.id as string) // Initialize with current columns
+    tableColumns.map(column => column.id as string) // Initialize with current columns
   );
 
   // Sync columnOrder when columns change, but only if IDs are different
   useEffect(() => {
-    const newOrder = columns.map(column => column.id as string);
+    const newOrder = tableColumns.map(column => column.id as string);
 
     setColumnOrder(prev => {
       if (prev.length === newOrder.length && prev.every((id, i) => id === newOrder[i])) {
@@ -269,14 +269,14 @@ export function AdvancedTable<TData>({
 
       return newOrder;
     });
-  }, [columns]);
+  }, [tableColumns]);
 
   // ============================================================
   // Table configuration
   // ============================================================
   const tableOptions: TableOptions<TData> = {
     data,
-    columns,
+    columns: tableColumns,
     pageCount: Math.ceil(total / pageSize),
     state: {
       pagination: {
@@ -356,7 +356,7 @@ export function AdvancedTable<TData>({
             table={table}
             isLoading={isLoading}
             data={data}
-            columns={columns}
+            columns={tableColumns}
             pageSize={pageSize}
             enableRowSelection={enableRowSelection}
           />

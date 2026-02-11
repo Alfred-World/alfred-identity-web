@@ -64,7 +64,7 @@ function deserializeConditions(encoded: string): FilterCondition[] | null {
   }
 }
 
-export function DslQueryBuilder<TData = unknown>({
+export function DslQueryBuilder({
   fields,
   value,
   onChange,
@@ -74,7 +74,7 @@ export function DslQueryBuilder<TData = unknown>({
   title = 'When records match...',
   syncWithUrl = false,
   urlParamName = 'filter'
-}: DslQueryBuilderProps<TData>) {
+}: DslQueryBuilderProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -152,7 +152,7 @@ export function DslQueryBuilder<TData = unknown>({
   // Trigger onInitialLoad when restored from URL
   useEffect(() => {
     if (restoredFromUrl && onInitialLoad && !hasCalledInitialLoad) {
-      const dslQuery = buildDslQuery<TData>(initialConditions, fields);
+      const dslQuery = buildDslQuery(initialConditions, fields);
 
       if (dslQuery) {
         onInitialLoad(dslQuery);
@@ -166,7 +166,7 @@ export function DslQueryBuilder<TData = unknown>({
   // REMOVED auto-sync useEffect to prevent URL updates while typing
 
   // Build current DSL query
-  const currentDslQuery = useMemo(() => buildDslQuery<TData>(conditions, fields), [conditions, fields]);
+  const currentDslQuery = useMemo(() => buildDslQuery(conditions, fields), [conditions, fields]);
 
   const handleConditionChange = useCallback((id: string, updates: Partial<FilterCondition>) => {
     setConditions(prev => prev.map(c => (c.id === id ? { ...c, ...updates } : c)));
@@ -207,7 +207,7 @@ export function DslQueryBuilder<TData = unknown>({
   );
 
   const handleSearch = useCallback(() => {
-    const dslQuery = buildDslQuery<TData>(conditions, fields);
+    const dslQuery = buildDslQuery(conditions, fields);
 
     if (onSearch) {
       onSearch(dslQuery);

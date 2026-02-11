@@ -2,8 +2,47 @@ import { type CSSProperties, type ReactNode } from 'react';
 
 import type { Column, ColumnDef, SortingState, OnChangeFn } from '@tanstack/react-table';
 
-// Type Imports
-import type { FieldConfig } from '@/components/dsl-query-builder/types';
+import type { DataType } from '@/types/field';
+
+// ============================================================
+// COLUMN CONFIG
+// ============================================================
+
+/**
+ * Table column configuration for AdvancedTable.
+ * Describes how a data column should be rendered (header, width, sorting, custom renderer).
+ * Filter field configuration is separate — see FieldConfig in dsl-query-builder.
+ */
+export interface ColumnConfig<TData = unknown> {
+  /** Column header display name */
+  name: string;
+
+  /** Data accessor key (property name on TData) */
+  key: string;
+
+  /** Data type — used for default cell rendering (date formatting, bool display, etc.) */
+  dataType: DataType;
+
+  /** Enable sorting on this column. Default: false */
+  enableSorting?: boolean;
+
+  /** Hide column from table. Default: false */
+  hidden?: boolean;
+
+  /** Column width (CSS value, e.g. 100, '150px', '20%') */
+  width?: number | string;
+
+  /** Text alignment. Default: 'left' */
+  align?: 'left' | 'center' | 'right';
+
+  /**
+   * Custom cell renderer function
+   * @param value - The cell value
+   * @param row - The entire row data
+   * @returns React node to render
+   */
+  renderCell?: (value: unknown, row: TData) => React.ReactNode;
+}
 
 // ============================================================
 // TYPES
@@ -15,17 +54,17 @@ export interface AdvancedTableProps<TData> {
   data: TData[];
 
   /**
-   * Field configurations - auto-generates columns from these
+   * Column configurations - auto-generates columns from these
    * Use this for simple tables where you don't need custom column definitions
    */
-  fields?: FieldConfig<TData>[];
+  columns?: ColumnConfig<TData>[];
 
   /**
    * Column definitions from TanStack Table
    * Use this when you need full control over column rendering
-   * If both fields and columns are provided, columns takes precedence
+   * If both columns (ColumnConfig) and tanstackColumns are provided, tanstackColumns takes precedence
    */
-  columns?: ColumnDef<TData, unknown>[];
+  tanstackColumns?: ColumnDef<TData, unknown>[];
 
   /** Total number of records (for server-side pagination) */
   total: number;

@@ -18,9 +18,9 @@ import {
 import type { FilterCondition, FieldConfig, DataType } from './types';
 import { getOperatorsForDataType, getOperatorConfig } from './operators';
 
-interface FilterRowProps<TData = unknown> {
+interface FilterRowProps {
   condition: FilterCondition;
-  fields: FieldConfig<TData>[];
+  fields: FieldConfig[];
   showOrButton: boolean; // Whether to show OR button
   onChange: (id: string, updates: Partial<FilterCondition>) => void;
   onRemove: (id: string) => void;
@@ -28,7 +28,7 @@ interface FilterRowProps<TData = unknown> {
   canRemove?: boolean;
 }
 
-const FilterRowInner = <TData,>({
+const FilterRowInner = ({
   condition,
   fields,
   showOrButton,
@@ -36,7 +36,7 @@ const FilterRowInner = <TData,>({
   onRemove,
   onAddAfter,
   canRemove = true
-}: FilterRowProps<TData>) => {
+}: FilterRowProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 

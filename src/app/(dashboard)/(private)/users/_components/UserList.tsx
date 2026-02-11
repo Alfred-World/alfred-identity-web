@@ -10,7 +10,7 @@ import Button from '@mui/material/Button';
 
 import { AdvancedTable } from '@/components/AdvancedTable/AdvancedTable';
 import { useUrlPagination, useUrlSorting } from '@/components/UrlPagination';
-import type { FieldConfig } from '@/components/dsl-query-builder';
+import type { ColumnConfig } from '@/components/AdvancedTable';
 
 import CustomAvatar from '@core/components/mui/Avatar';
 import OptionMenu from '@core/components/option-menu';
@@ -50,7 +50,7 @@ const UserList = () => {
     return 0;
   }, [usersResponse]);
 
-  const userFields: FieldConfig<UserDto>[] = useMemo(
+  const userFields: ColumnConfig<UserDto>[] = useMemo(
     () => [
       {
         name: 'User',
@@ -195,7 +195,7 @@ const UserList = () => {
   return (
     <AdvancedTable
       data={users}
-      fields={userFields}
+      columns={userFields}
       total={totalUsers}
       page={page}
       pageSize={pageSize}

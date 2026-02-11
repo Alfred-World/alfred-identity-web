@@ -33,7 +33,7 @@ function hasValidValue(
   return true;
 }
 
-export function buildDslQuery<TData = unknown>(conditions: FilterCondition[], fields: FieldConfig<TData>[]): string {
+export function buildDslQuery(conditions: FilterCondition[], fields: FieldConfig[]): string {
   if (!conditions || conditions.length === 0) return '';
 
   const fieldMap = new Map(fields.map(f => [f.key, f]));
