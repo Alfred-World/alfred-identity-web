@@ -2,7 +2,8 @@
 
 // Third-party Imports
 import classnames from 'classnames';
-import { flexRender, type Table, type ColumnDef } from '@tanstack/react-table';
+import { flexRender   } from '@tanstack/react-table';
+import type {Table, ColumnDef} from '@tanstack/react-table';
 
 // Local Component Imports
 import { TableSkeleton } from './TableSkeleton';

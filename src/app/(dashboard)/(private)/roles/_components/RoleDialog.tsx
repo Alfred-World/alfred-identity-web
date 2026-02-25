@@ -21,7 +21,7 @@ import { valibotResolver } from '@hookform/resolvers/valibot';
 import { object, string, minLength, pipe, optional, boolean } from 'valibot';
 import { toast } from 'react-toastify';
 
-import { usePostRoles, usePutRolesId } from '@/generated/identity-api';
+import { usePostIdentityRoles, usePutIdentityRolesId } from '@/generated/identity-api';
 import type { RoleDto } from '@/generated/identity-api';
 
 import RoleIconPicker from './RoleIconPicker';
@@ -92,7 +92,7 @@ const RoleDialog = ({ open, onClose, role, onSuccess }: RoleDialogProps) => {
     }
   }, [open, role, reset]);
 
-  const { mutate: createRole, isPending: isCreating } = usePostRoles({
+  const { mutate: createRole, isPending: isCreating } = usePostIdentityRoles({
     mutation: {
       onSuccess: data => {
         if (data.success) {
@@ -106,7 +106,7 @@ const RoleDialog = ({ open, onClose, role, onSuccess }: RoleDialogProps) => {
     }
   });
 
-  const { mutate: updateRole, isPending: isUpdating } = usePutRolesId({
+  const { mutate: updateRole, isPending: isUpdating } = usePutIdentityRolesId({
     mutation: {
       onSuccess: data => {
         if (data.success) {

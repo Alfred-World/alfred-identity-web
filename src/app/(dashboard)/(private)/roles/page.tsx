@@ -11,7 +11,7 @@ import RoleList from './_components/RoleList';
 import RolePermissionsDetail from './_components/RolePermissionsDetail';
 import RoleDialog from './_components/RoleDialog';
 import ConfirmationDialog from '@/components/ConfirmationDialog';
-import { useGetRoles, useDeleteRolesId } from '@/generated/identity-api';
+import { useGetIdentityRoles, useDeleteIdentityRolesId } from '@/generated/identity-api';
 import type { RoleDto } from '@/generated/identity-api';
 
 const RolesPage = () => {
@@ -61,7 +61,7 @@ const RolesPage = () => {
     data: rolesResponse,
     isLoading: isLoadingRoles,
     refetch: refetchRoles
-  } = useGetRoles({
+  } = useGetIdentityRoles({
     view: 'detail'
   });
 
@@ -79,7 +79,7 @@ const RolesPage = () => {
   //   }
   // }, [selectedRoleId, roles])
 
-  const { mutate: deleteRole, isPending: isDeleting } = useDeleteRolesId({
+  const { mutate: deleteRole, isPending: isDeleting } = useDeleteIdentityRolesId({
     mutation: {
       onSuccess: data => {
         if (data.success) {

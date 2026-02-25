@@ -5,13 +5,15 @@ import { useRouter } from 'next/navigation';
 import { Box } from '@mui/material';
 import { toast } from 'react-toastify';
 
-import { usePostApplications, type CreateApplicationRequest, type ApplicationDto } from '@/generated';
-import { ApplicationForm, type ApplicationFormSubmitData } from '../_components/ApplicationForm';
+import { usePostIdentityApplications   } from '@/generated';
+import type {CreateApplicationRequest, ApplicationDto} from '@/generated';
+import { ApplicationForm  } from '../_components/ApplicationForm';
+import type {ApplicationFormSubmitData} from '../_components/ApplicationForm';
 import { isApiFailure } from '@/libs/custom-instance';
 
 export default function CreateApplicationPage() {
   const _router = useRouter();
-  const { mutateAsync: createApplication, isPending } = usePostApplications();
+  const { mutateAsync: createApplication, isPending } = usePostIdentityApplications();
 
   // We handle success/error manually to control the redirect/modal flow
 

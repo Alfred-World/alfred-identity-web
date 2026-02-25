@@ -6,10 +6,12 @@ import Link from 'next/link';
 
 import { Box, Grid, Typography, Button, Chip } from '@mui/material';
 
-import { DslQueryBuilder, type FieldConfig, type FilterCondition } from '@/components/dsl-query-builder';
+import { DslQueryBuilder   } from '@/components/dsl-query-builder';
+import type {FieldConfig, FilterCondition} from '@/components/dsl-query-builder';
 import { useUrlPagination, useUrlSorting } from '@/components/UrlPagination';
-import { AdvancedTable, type ColumnConfig } from '@/components/AdvancedTable';
-import { useGetApplications } from '@/generated';
+import { AdvancedTable  } from '@/components/AdvancedTable';
+import type {ColumnConfig} from '@/components/AdvancedTable';
+import { useGetIdentityApplications } from '@/generated';
 import type { ApplicationDto } from '@/generated';
 
 import { ApplicationListActions } from './_components/ApplicationListActions';
@@ -30,7 +32,7 @@ export default function ApplicationsPage() {
   const { sort, sorting, setSorting } = useUrlSorting('-createdAt'); // Default sort by newest
 
   // Fetch applications with the DSL filter and pagination
-  const { data, isLoading, error, refetch } = useGetApplications({
+  const { data, isLoading, error, refetch } = useGetIdentityApplications({
     filter: appliedQuery || undefined,
     page,
     pageSize,

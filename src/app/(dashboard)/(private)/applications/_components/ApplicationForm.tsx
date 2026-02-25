@@ -38,9 +38,9 @@ import { toast } from 'react-toastify';
 
 import type { ApplicationDto } from '@/generated';
 import {
-  useGetApplicationsMetadata,
-  usePatchApplicationsIdStatus,
-  usePostApplicationsIdSecretRegenerate
+  useGetIdentityApplicationsMetadata,
+  usePatchIdentityApplicationsIdStatus,
+  usePostIdentityApplicationsIdSecretRegenerate
 } from '@/generated';
 import { useBreadcrumbs } from '@/contexts/BreadcrumbsContext';
 import { ROUTES } from '@/configs/routes';
@@ -102,11 +102,11 @@ export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false
   }, [isEdit, setBreadcrumbs]);
 
   // Generated API Hooks
-  const { mutateAsync: updateStatus } = usePatchApplicationsIdStatus();
-  const { mutateAsync: regenerateSecret } = usePostApplicationsIdSecretRegenerate();
+  const { mutateAsync: updateStatus } = usePatchIdentityApplicationsIdStatus();
+  const { mutateAsync: regenerateSecret } = usePostIdentityApplicationsIdSecretRegenerate();
 
   // Fetch metadata from API
-  const { data: resp } = useGetApplicationsMetadata();
+  const { data: resp } = useGetIdentityApplicationsMetadata();
   const metadata = resp?.success ? resp.result : undefined;
 
   // Form definition

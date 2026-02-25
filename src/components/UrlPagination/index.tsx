@@ -4,7 +4,8 @@ import { useCallback, useRef, useMemo } from 'react';
 
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 
-import { Box, FormControl, MenuItem, Pagination, Select, Typography, type SelectChangeEvent } from '@mui/material';
+import { Box, FormControl, MenuItem, Pagination, Select, Typography  } from '@mui/material';
+import type {SelectChangeEvent} from '@mui/material';
 
 // Constants
 import { DEFAULT_PAGE_SIZE_OPTIONS, DEFAULT_PAGE_SIZE } from '@/constants/pagination';

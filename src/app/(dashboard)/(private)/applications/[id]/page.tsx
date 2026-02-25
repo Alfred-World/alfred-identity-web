@@ -7,8 +7,10 @@ import { useRouter } from 'next/navigation';
 import { Box, Typography, CircularProgress } from '@mui/material';
 import { toast } from 'react-toastify';
 
-import { useGetApplicationsId, usePutApplicationsId, type UpdateApplicationRequest } from '@/generated';
-import { ApplicationForm, type ApplicationFormSubmitData } from '../_components/ApplicationForm';
+import { useGetIdentityApplicationsId, usePutIdentityApplicationsId  } from '@/generated';
+import type {UpdateApplicationRequest} from '@/generated';
+import { ApplicationForm  } from '../_components/ApplicationForm';
+import type {ApplicationFormSubmitData} from '../_components/ApplicationForm';
 import { isApiFailure } from '@/libs/custom-instance';
 import { ROUTES } from '@/configs/routes';
 
@@ -17,9 +19,9 @@ export default function EditApplicationPage({ params }: { params: Promise<{ id: 
   const id = resolvedParams.id;
   const router = useRouter();
 
-  const { data: applicationData, isLoading: isFetching } = useGetApplicationsId(id);
+  const { data: applicationData, isLoading: isFetching } = useGetIdentityApplicationsId(id);
 
-  const { mutate: updateApplication, isPending: isUpdating } = usePutApplicationsId({
+  const { mutate: updateApplication, isPending: isUpdating } = usePutIdentityApplicationsId({
     mutation: {
       onSuccess: data => {
         if (data?.success) {

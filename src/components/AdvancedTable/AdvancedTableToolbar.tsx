@@ -1,7 +1,8 @@
 'use client';
 
 // React Imports
-import { useState, type ReactNode, type DragEvent, type Dispatch, type SetStateAction } from 'react';
+import { useState     } from 'react';
+import type {ReactNode, DragEvent, Dispatch, SetStateAction} from 'react';
 
 // MUI Imports
 import CardContent from '@mui/material/CardContent';

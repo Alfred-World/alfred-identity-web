@@ -1,4 +1,4 @@
-import { type CSSProperties, type ReactNode } from 'react';
+import type {CSSProperties, ReactNode} from 'react';
 
 import type { Column, ColumnDef, SortingState, OnChangeFn } from '@tanstack/react-table';
 
@@ -14,6 +14,7 @@ import type { DataType } from '@/types/field';
  * Filter field configuration is separate — see FieldConfig in dsl-query-builder.
  */
 export interface ColumnConfig<TData = unknown> {
+
   /** Column header display name */
   name: string;
 

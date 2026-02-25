@@ -18,7 +18,7 @@ import { alpha, useTheme } from '@mui/material/styles';
 
 import { toast } from 'react-toastify';
 
-import { usePostRolesIdPermissions, getPermissions } from '@/generated/identity-api';
+import { usePostIdentityRolesIdPermissions, getIdentityPermissions } from '@/generated/identity-api';
 import type { RoleDto, PermissionDto, PermissionDtoApiPagedResponse } from '@/generated/identity-api';
 
 interface RolePermissionsDetailProps {
@@ -51,7 +51,7 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
     queryKey: ['permissions', 'infinite', 'list'],
     initialPageParam: 1,
     queryFn: async ({ pageParam = 1 }) => {
-      return await getPermissions({
+      return await getIdentityPermissions({
         page: pageParam as number,
         pageSize: 50, // Load 50 items per page
         sort: 'resource,action' // Server sort by resource then action
@@ -86,7 +86,7 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
 
   // -- 3. Mutations --
    
-  const { mutate: updatePermissions, isPending: isUpdating } = usePostRolesIdPermissions({
+  const { mutate: updatePermissions, isPending: isUpdating } = usePostIdentityRolesIdPermissions({
     mutation: {
       onSuccess: (data: any) => {
         if (data.success) {

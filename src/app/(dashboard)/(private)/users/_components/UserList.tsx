@@ -15,7 +15,7 @@ import type { ColumnConfig } from '@/components/AdvancedTable';
 import CustomAvatar from '@core/components/mui/Avatar';
 import OptionMenu from '@core/components/option-menu';
 
-import { useGetUsers } from '@/generated/identity-api';
+import { useGetIdentityUsers } from '@/generated/identity-api';
 import type { UserDto } from '@/generated/identity-api';
 
 const UserList = () => {
@@ -24,7 +24,7 @@ const UserList = () => {
   const { sort, sorting, setSorting } = useUrlSorting();
 
   // Fetch users from API
-  const { data: usersResponse, isLoading } = useGetUsers({
+  const { data: usersResponse, isLoading } = useGetIdentityUsers({
     page,
     pageSize,
     sort
