@@ -103,19 +103,21 @@ const RoleIconPicker = ({ value, onChange, error, helperText }: RoleIconPickerPr
         onClick={handleClick}
         error={error}
         helperText={helperText}
-        InputProps={{
-          readOnly: true,
-          startAdornment: value ? (
-            <InputAdornment position='start'>
-              <i className={`${value} text-xl`} />
-            </InputAdornment>
-          ) : null,
-          endAdornment: (
-            <InputAdornment position='end'>
-              <i className='tabler-chevron-down' />
-            </InputAdornment>
-          ),
-          sx: { cursor: 'pointer' }
+        slotProps={{
+          input: {
+            readOnly: true,
+            startAdornment: value ? (
+              <InputAdornment position='start'>
+                <i className={`${value} text-xl`} />
+              </InputAdornment>
+            ) : null,
+            endAdornment: (
+              <InputAdornment position='end'>
+                <i className='tabler-chevron-down' />
+              </InputAdornment>
+            ),
+            sx: { cursor: 'pointer' }
+          }
         }}
         sx={{
           '& .MuiInputBase-root': { cursor: 'pointer' },
