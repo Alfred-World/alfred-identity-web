@@ -120,7 +120,7 @@ export interface AdvancedTableProps<TData> {
 // HELPERS
 // ============================================================
 
-export const getCommonPinningStyles = (column: Column<unknown>): CSSProperties => {
+export const getCommonPinningStyles = <TData>(column: Column<TData>): CSSProperties => {
   const isPinned = column.getIsPinned();
   const isLastLeftPinnedColumn = isPinned === 'left' && column.getIsLastColumn('left');
   const isFirstRightPinnedColumn = isPinned === 'right' && column.getIsFirstColumn('right');

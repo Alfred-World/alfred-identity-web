@@ -21,7 +21,7 @@ import {
   IconButton
 } from '@mui/material';
 
-import type { RoleDto } from '@/generated/identity-api';
+import type { RoleDto } from '@/generated';
 
 interface RoleListProps {
   roles: RoleDto[];

@@ -11,8 +11,8 @@ import RoleList from './_components/RoleList';
 import RolePermissionsDetail from './_components/RolePermissionsDetail';
 import RoleDialog from './_components/RoleDialog';
 import ConfirmationDialog from '@/components/ConfirmationDialog';
-import { useGetIdentityRoles, useDeleteIdentityRolesId } from '@/generated/identity-api';
-import type { RoleDto } from '@/generated/identity-api';
+import { useGetIdentityRoles, useDeleteIdentityRolesId } from '@/generated';
+import type { RoleDto } from '@/generated';
 
 const RolesPage = () => {
   const searchParams = useSearchParams();

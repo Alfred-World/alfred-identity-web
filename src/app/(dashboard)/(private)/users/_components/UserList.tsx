@@ -15,8 +15,8 @@ import type { ColumnConfig } from '@/components/AdvancedTable';
 import CustomAvatar from '@core/components/mui/Avatar';
 import OptionMenu from '@core/components/option-menu';
 
-import { useGetIdentityUsers } from '@/generated/identity-api';
-import type { UserDto } from '@/generated/identity-api';
+import { useGetIdentityUsers } from '@/generated';
+import type { UserDto } from '@/generated';
 
 const UserList = () => {
   // Get pagination from URL

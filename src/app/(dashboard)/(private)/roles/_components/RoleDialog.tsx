@@ -21,8 +21,8 @@ import { valibotResolver } from '@hookform/resolvers/valibot';
 import { object, string, minLength, pipe, optional, boolean } from 'valibot';
 import { toast } from 'react-toastify';
 
-import { usePostIdentityRoles, usePutIdentityRolesId } from '@/generated/identity-api';
-import type { RoleDto } from '@/generated/identity-api';
+import { usePostIdentityRoles, usePutIdentityRolesId } from '@/generated';
+import type { RoleDto } from '@/generated';
 
 import RoleIconPicker from './RoleIconPicker';
 
@@ -131,7 +131,6 @@ const RoleDialog = ({ open, onClose, role, onSuccess }: RoleDialogProps) => {
           icon: data.icon,
           isImmutable: data.isImmutable,
           isSystem: data.isSystem,
-          id: role.id
         }
       });
     } else {

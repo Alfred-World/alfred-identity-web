@@ -5,10 +5,11 @@ const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL
 // Common output configuration
 const commonOutputConfig = {
     client: 'react-query' as const,
+    httpClient: 'fetch' as const,
     override: {
         mutator: {
             path: 'src/libs/custom-instance.ts',
-            name: 'customInstance'
+            name: 'customFetch'
         },
         query: {
             useQuery: true,
@@ -26,12 +27,13 @@ const commonOutputConfig = {
 
 export default defineConfig({
     // Identity Service API (contains Auth, SSO endpoints)
-    identity: {
-        input: `${gatewayUrl}/api/identity/swagger/v1/swagger.json`,
+    gateway: {
+        input: `${gatewayUrl}/api-docs/v1.json`,
         output: {
             mode: 'single',
-            target: 'src/generated/identity-api.ts',
+            target: 'src/generated/api.ts',
             client: commonOutputConfig.client,
+            httpClient: commonOutputConfig.httpClient,
             override: commonOutputConfig.override
         }
     }

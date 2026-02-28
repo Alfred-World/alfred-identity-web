@@ -7,13 +7,8 @@
  * This ensures if backend changes URLs, regenerating API will catch issues
  */
 
-import { AXIOS_INSTANCE } from './custom-instance';
-import { getIdentityAuthValidateToken, getGetIdentityAuthCheckSsoQueryKey } from '@/generated/identity-api';
-
-/**
- * Gateway base URL - same as generated API client
- */
-export const GATEWAY_URL = AXIOS_INSTANCE.defaults.baseURL || 'https://gateway.test';
+import { GATEWAY_URL } from './custom-instance';
+import { getIdentityAuthValidateToken, getGetIdentityAuthCheckSsoQueryKey } from '@/generated';
 
 /**
  * App base URL - used for post-logout redirect
@@ -48,7 +43,7 @@ export const getSsoLogoutUrl = (postLogoutRedirectUri: string = `${APP_URL}/logi
 
 /**
  * Validate SSO token using generated API function
- * This is the preferred way - uses generated axios function directly
+ * This is the preferred way - uses generated API function directly
  * @param token - SSO token to validate
  */
 export const validateSsoToken = (token: string) => {

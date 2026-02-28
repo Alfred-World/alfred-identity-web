@@ -18,8 +18,8 @@ import { alpha, useTheme } from '@mui/material/styles';
 
 import { toast } from 'react-toastify';
 
-import { usePostIdentityRolesIdPermissions, getIdentityPermissions } from '@/generated/identity-api';
-import type { RoleDto, PermissionDto, PermissionDtoApiPagedResponse } from '@/generated/identity-api';
+import { usePostIdentityRolesIdPermissions, getIdentityPermissions } from '@/generated';
+import type { RoleDto, PermissionDto, PermissionDtoApiPagedResponse } from '@/generated';
 
 interface RolePermissionsDetailProps {
   role: RoleDto | null;
