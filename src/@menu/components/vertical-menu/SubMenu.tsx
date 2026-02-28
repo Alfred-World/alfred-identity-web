@@ -355,7 +355,7 @@ const SubMenu: ForwardRefRenderFunction<HTMLLIElement, SubMenuProps> = (props, r
   );
 
   return (
-     
+
     /* Sub Menu */
     <StyledSubMenu
       ref={ref}
@@ -447,7 +447,7 @@ const SubMenu: ForwardRefRenderFunction<HTMLLIElement, SubMenuProps> = (props, r
                 open: isSubMenuOpen
               })
             ) : (
-               
+
               /* Expanded Arrow Icon */
               <StyledVerticalNavExpandIcon open={isSubMenuOpen} transitionDuration={transitionDuration}>
                 <ChevronRight fontSize='1rem' />

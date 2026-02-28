@@ -1,15 +1,15 @@
 'use client';
 
 // React Imports
-import type {DragEvent, Dispatch, SetStateAction} from 'react';
+import type { DragEvent, Dispatch, SetStateAction } from 'react';
 
 // MUI Imports
 import { styled } from '@mui/material/styles';
 
 // Third-party Imports
 import classnames from 'classnames';
-import { flexRender   } from '@tanstack/react-table';
-import type {Table, ColumnOrderState} from '@tanstack/react-table';
+import { flexRender } from '@tanstack/react-table';
+import type { Table, ColumnOrderState } from '@tanstack/react-table';
 
 // Local Imports
 import { getCommonPinningStyles, createDragGhost, customColumnOrder } from './AdvancedTable.utils';

@@ -5,10 +5,10 @@ import { useRouter } from 'next/navigation';
 import { Box } from '@mui/material';
 import { toast } from 'react-toastify';
 
-import { usePostIdentityApplications   } from '@/generated';
-import type {CreateApplicationRequest, ApplicationDto} from '@/generated';
-import { ApplicationForm  } from '../_components/ApplicationForm';
-import type {ApplicationFormSubmitData} from '../_components/ApplicationForm';
+import { usePostIdentityApplications } from '@/generated';
+import type { CreateApplicationRequest, ApplicationDto } from '@/generated';
+import { ApplicationForm } from '../_components/ApplicationForm';
+import type { ApplicationFormSubmitData } from '../_components/ApplicationForm';
 import { isApiFailure } from '@/libs/custom-instance';
 
 export default function CreateApplicationPage() {

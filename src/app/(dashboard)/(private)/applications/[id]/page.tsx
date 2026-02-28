@@ -7,10 +7,10 @@ import { useRouter } from 'next/navigation';
 import { Box, Typography, CircularProgress } from '@mui/material';
 import { toast } from 'react-toastify';
 
-import { useGetIdentityApplicationsId, usePutIdentityApplicationsId  } from '@/generated';
-import type {UpdateApplicationRequest} from '@/generated';
-import { ApplicationForm  } from '../_components/ApplicationForm';
-import type {ApplicationFormSubmitData} from '../_components/ApplicationForm';
+import { useGetIdentityApplicationsId, usePutIdentityApplicationsId } from '@/generated';
+import type { UpdateApplicationRequest } from '@/generated';
+import { ApplicationForm } from '../_components/ApplicationForm';
+import type { ApplicationFormSubmitData } from '../_components/ApplicationForm';
 import { isApiFailure } from '@/libs/custom-instance';
 import { ROUTES } from '@/configs/routes';
 

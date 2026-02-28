@@ -214,7 +214,7 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id;
         token.name = user.name;
         token.email = user.email;
-        token.exchangeUrl = (user as any).exchangeUrl;
+        token.exchangeUrl = (user as { exchangeUrl?: string }).exchangeUrl;
       }
 
       // Return previous token if not expired (with 10s buffer)

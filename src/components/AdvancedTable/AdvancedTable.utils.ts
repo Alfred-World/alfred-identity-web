@@ -1,4 +1,4 @@
-import type {CSSProperties, ReactNode} from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 
 import type { Column, ColumnDef, SortingState, OnChangeFn } from '@tanstack/react-table';
 
@@ -120,7 +120,7 @@ export interface AdvancedTableProps<TData> {
 // HELPERS
 // ============================================================
 
-export const getCommonPinningStyles = (column: Column<any>): CSSProperties => {
+export const getCommonPinningStyles = (column: Column<unknown>): CSSProperties => {
   const isPinned = column.getIsPinned();
   const isLastLeftPinnedColumn = isPinned === 'left' && column.getIsLastColumn('left');
   const isFirstRightPinnedColumn = isPinned === 'right' && column.getIsFirstColumn('right');

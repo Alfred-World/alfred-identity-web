@@ -90,7 +90,7 @@ const UserList = () => {
         key: 'roles',
         dataType: 'string',
         renderCell: value => {
-          const roles = value as any[];
+          const roles = value as { name: string; icon?: string }[];
 
           if (!roles || roles.length === 0) {
             return <Typography color='text.secondary'>-</Typography>;
@@ -122,7 +122,7 @@ const UserList = () => {
 
           return (
             <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'center' }}>
-              {displayRoles.map((role: any, index: number) => {
+              {displayRoles.map((role: { name: string; icon?: string }, index: number) => {
                 const color = getRoleColor(role.name);
 
                 return (

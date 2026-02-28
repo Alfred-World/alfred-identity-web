@@ -85,10 +85,10 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
   }, [role]);
 
   // -- 3. Mutations --
-   
+
   const { mutate: updatePermissions, isPending: isUpdating } = usePostIdentityRolesIdPermissions({
     mutation: {
-      onSuccess: (data: any) => {
+      onSuccess: (data) => {
         if (data.success) {
           toast.success('Permissions updated successfully');
 
@@ -100,7 +100,6 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
       }
     }
   });
-   
 
   // -- 4. Infinite Scroll Observer --
   const handleObserver = useCallback(

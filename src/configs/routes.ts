@@ -2,7 +2,7 @@ export const ROUTES = {
   HOME: '/',
   DASHBOARDS: {
     ROOT: '/dashboards',
-    CRM: '/dashboards/crm'
+    CRM: '/dashboards'
   },
   APPLICATIONS: {
     LIST: '/applications',

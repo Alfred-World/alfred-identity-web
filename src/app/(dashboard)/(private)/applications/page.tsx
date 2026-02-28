@@ -6,11 +6,11 @@ import Link from 'next/link';
 
 import { Box, Grid, Typography, Button, Chip } from '@mui/material';
 
-import { DslQueryBuilder   } from '@/components/dsl-query-builder';
-import type {FieldConfig, FilterCondition} from '@/components/dsl-query-builder';
+import { DslQueryBuilder } from '@/components/dsl-query-builder';
+import type { FieldConfig, FilterCondition } from '@/components/dsl-query-builder';
 import { useUrlPagination, useUrlSorting } from '@/components/UrlPagination';
-import { AdvancedTable  } from '@/components/AdvancedTable';
-import type {ColumnConfig} from '@/components/AdvancedTable';
+import { AdvancedTable } from '@/components/AdvancedTable';
+import type { ColumnConfig } from '@/components/AdvancedTable';
 import { useGetIdentityApplications } from '@/generated';
 import type { ApplicationDto } from '@/generated';
 

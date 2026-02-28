@@ -2,6 +2,7 @@
 
 // React Imports
 import { forwardRef } from 'react';
+import type { Ref } from 'react';
 
 // Next Imports
 import Link from 'next/link';
@@ -15,7 +16,7 @@ type RouterLinkProps = LinkProps &
     className?: string;
   };
 
-export const RouterLink = forwardRef((props: RouterLinkProps, ref: any) => {
+export const RouterLink = forwardRef((props: RouterLinkProps, ref: Ref<HTMLAnchorElement>) => {
   // Props
   const { href, className, ...other } = props;
 

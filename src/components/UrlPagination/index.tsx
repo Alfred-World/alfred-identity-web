@@ -4,8 +4,8 @@ import { useCallback, useRef, useMemo } from 'react';
 
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 
-import { Box, FormControl, MenuItem, Pagination, Select, Typography  } from '@mui/material';
-import type {SelectChangeEvent} from '@mui/material';
+import { Box, FormControl, MenuItem, Pagination, Select, Typography } from '@mui/material';
+import type { SelectChangeEvent } from '@mui/material';
 
 // Constants
 import { DEFAULT_PAGE_SIZE_OPTIONS, DEFAULT_PAGE_SIZE } from '@/constants/pagination';
@@ -263,7 +263,7 @@ export function useUrlSorting(defaultSort = '', sortParamName = 'sort') {
 
   // Update URL when sorting changes
   const setSorting = useCallback(
-    (updaterOrValue: any) => {
+    (updaterOrValue: ((prev: { id: string; desc: boolean }[]) => { id: string; desc: boolean }[]) | { id: string; desc: boolean }[]) => {
       // Handle both functional updates and direct values
       // TanStack table passes an updater function
       let newSorting = [];
@@ -279,11 +279,11 @@ export function useUrlSorting(defaultSort = '', sortParamName = 'sort') {
         const currentSorting =
           currentSort && currentSort.length > 0
             ? currentSort.split(',').map(part => {
-                const desc = part.startsWith('-');
-                const id = desc ? part.substring(1) : part;
+              const desc = part.startsWith('-');
+              const id = desc ? part.substring(1) : part;
 
-                return { id, desc };
-              })
+              return { id, desc };
+            })
             : [];
 
         newSorting = updaterOrValue(currentSorting);
@@ -295,7 +295,7 @@ export function useUrlSorting(defaultSort = '', sortParamName = 'sort') {
 
       if (newSorting && newSorting.length > 0) {
         // Convert SortingState back to API string
-        const sortString = newSorting.map((s: any) => (s.desc ? `-${s.id}` : s.id)).join(',');
+        const sortString = newSorting.map((s: { id: string; desc: boolean }) => (s.desc ? `-${s.id}` : s.id)).join(',');
 
         params.set(sortParamName, sortString);
       } else {

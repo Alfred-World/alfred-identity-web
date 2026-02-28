@@ -1,6 +1,6 @@
 // React imports
 import { forwardRef } from 'react';
-import type { ElementType } from 'react';
+import type { ElementType, ForwardedRef } from 'react';
 
 // MUI imports
 import Paper from '@mui/material/Paper';
@@ -16,10 +16,9 @@ const CustomAutocomplete = forwardRef(
     ChipComponent extends ElementType
   >(
     props: AutocompleteProps<T, Multiple, DisableClearable, FreeSolo, ChipComponent>,
-    ref: any
+    ref: ForwardedRef<unknown>
   ) => {
     return (
-       
       <Autocomplete
         {...props}
         ref={ref}

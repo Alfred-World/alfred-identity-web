@@ -48,7 +48,7 @@ export type ApiResult<T> = ApiSuccess<T> | ApiFailure;
  *   console.log(data.result.name);  // TS knows result is non-null
  * }
  */
-export function isApiSuccess<T extends { success: boolean; result?: any }>(
+export function isApiSuccess<T extends { success: boolean; result?: unknown }>(
   response: T | null | undefined
 ): response is T & { success: true; result: NonNullable<T['result']> } {
   return response?.success === true;
@@ -62,7 +62,7 @@ export function isApiSuccess<T extends { success: boolean; result?: any }>(
  *   data.errors.forEach(e => toast.error(e.message));
  * }
  */
-export function isApiFailure(response: { success: boolean; errors?: any } | null | undefined): response is ApiFailure {
+export function isApiFailure(response: { success: boolean; errors?: unknown } | null | undefined): response is ApiFailure {
   return response?.success === false && Array.isArray(response?.errors);
 }
 
@@ -203,7 +203,6 @@ AXIOS_INSTANCE.interceptors.response.use(
  * })
  */
 export const customInstance = <T>(url: string, options?: RequestInit): Promise<T> => {
-   
   const source = axios.CancelToken.source();
 
   // Convert RequestInit headers to plain object for Axios
@@ -223,7 +222,7 @@ export const customInstance = <T>(url: string, options?: RequestInit): Promise<T
   // Convert RequestInit options to AxiosRequestConfig
   const axiosConfig: AxiosRequestConfig = {
     url,
-    method: (options?.method as any) || 'GET',
+    method: (options?.method as string) || 'GET',
     headers,
     data: options?.body,
     cancelToken: source.token
