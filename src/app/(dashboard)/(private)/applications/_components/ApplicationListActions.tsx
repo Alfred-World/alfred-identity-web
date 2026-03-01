@@ -93,13 +93,13 @@ export const ApplicationListActions = ({ id, displayName, onDeleteSuccess }: App
       </IconButton>
       <Menu
         id={`application-actions-menu-${id}`}
-        MenuListProps={{
-          'aria-labelledby': `application-actions-button-${id}`
-        }}
         anchorEl={anchorEl}
         open={open}
         onClose={() => handleClose()}
         slotProps={{
+          list: {
+            'aria-labelledby': `application-actions-button-${id}`
+          },
           paper: {
             style: {
               width: '20ch'

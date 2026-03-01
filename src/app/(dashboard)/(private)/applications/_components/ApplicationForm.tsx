@@ -436,14 +436,16 @@ export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false
                       fullWidth
                       label='Client ID'
                       disabled={isEdit}
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position='end'>
-                            <IconButton onClick={handleCopyClientId} edge='end' size='small'>
-                              <i className='tabler-copy' />
-                            </IconButton>
-                          </InputAdornment>
-                        )
+                      slotProps={{
+                        input: {
+                          endAdornment: (
+                            <InputAdornment position='end'>
+                              <IconButton onClick={handleCopyClientId} edge='end' size='small'>
+                                <i className='tabler-copy' />
+                              </IconButton>
+                            </InputAdornment>
+                          )
+                        }
                       }}
                     />
                   )}
@@ -522,6 +524,7 @@ export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false
                       value={field.value}
                       autoSelect
                       onChange={(_, newValue) => field.onChange(newValue as string[])}
+                      // eslint-disable-next-line @typescript-eslint/no-deprecated
                       renderTags={(value: string[], getTagProps) =>
                         value.map((option: string, index: number) => {
                           const { key, ...tagProps } = getTagProps({ index });
@@ -769,8 +772,10 @@ export const ApplicationForm = ({ initialData, isEdit = false, isLoading = false
         onClose={() => setConfirmState(prev => ({ ...prev, open: false }))}
         maxWidth='xs'
         fullWidth
-        PaperProps={{
-          sx: { borderRadius: 3, p: 2 }
+        slotProps={{
+          paper: {
+            sx: { borderRadius: 3, p: 2 }
+          }
         }}
       >
         <DialogTitle sx={{ fontWeight: 600 }}>{confirmState.title}</DialogTitle>

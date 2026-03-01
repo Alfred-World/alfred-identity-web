@@ -137,13 +137,15 @@ const RoleIconPicker = ({ value, onChange, error, helperText }: RoleIconPickerPr
           vertical: 'top',
           horizontal: 'left'
         }}
-        PaperProps={{
-          sx: {
-            width: 620,
-            p: 2,
-            maxHeight: 500,
-            display: 'flex',
-            flexDirection: 'column'
+        slotProps={{
+          paper: {
+            sx: {
+              width: 620,
+              p: 2,
+              maxHeight: 500,
+              display: 'flex',
+              flexDirection: 'column'
+            }
           }
         }}
       >
@@ -161,17 +163,19 @@ const RoleIconPicker = ({ value, onChange, error, helperText }: RoleIconPickerPr
             setVisibleCount(PAGE_SIZE);
           }}
           sx={{ mb: 2 }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position='start'>
-                <i className='tabler-search' />
-              </InputAdornment>
-            ),
-            endAdornment: searchTerm && (
-              <InputAdornment position='end' sx={{ cursor: 'pointer' }} onClick={() => setSearchTerm('')}>
-                <i className='tabler-x' />
-              </InputAdornment>
-            )
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position='start'>
+                  <i className='tabler-search' />
+                </InputAdornment>
+              ),
+              endAdornment: searchTerm && (
+                <InputAdornment position='end' sx={{ cursor: 'pointer' }} onClick={() => setSearchTerm('')}>
+                  <i className='tabler-x' />
+                </InputAdornment>
+              )
+            }
           }}
         />
 

@@ -1,6 +1,6 @@
-import nextConfig from 'eslint-config-next';
-import eslintConfigPrettier from 'eslint-config-prettier';
-import tseslint from 'typescript-eslint';
+import nextConfig from 'eslint-config-next'
+import eslintConfigPrettier from 'eslint-config-prettier'
+import tseslint from 'typescript-eslint'
 
 /** @type {import('eslint').Linter.Config[]} */
 const eslintConfig = [
@@ -63,6 +63,24 @@ const eslintConfig = [
       '@typescript-eslint/no-unused-expressions': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/no-var-requires': 'off'
+    }
+  },
+
+  // Type-aware rules — warn on any @deprecated symbol (function, method, class, React prop…)
+  {
+    files: ['**/*.ts', '**/*.tsx'],
+    ignores: ['src/generated/**'],
+    plugins: {
+      '@typescript-eslint': tseslint.plugin
+    },
+    languageOptions: {
+      parserOptions: {
+        project: true,
+        tsconfigRootDir: import.meta.dirname
+      }
+    },
+    rules: {
+      '@typescript-eslint/no-deprecated': 'warn'
     }
   },
 
@@ -174,6 +192,6 @@ const eslintConfig = [
       }
     }
   }
-];
+]
 
-export default eslintConfig;
+export default eslintConfig

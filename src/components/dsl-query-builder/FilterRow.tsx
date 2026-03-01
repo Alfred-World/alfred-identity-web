@@ -270,7 +270,7 @@ const FilterRowInner = ({
               value={condition.field}
               onChange={e => handleFieldChange(e.target.value)}
               sx={{ flex: 1 }}
-              SelectProps={{ displayEmpty: true }}
+              slotProps={{ select: { displayEmpty: true } }}
             >
               {fields.map(field => (
                 <MenuItem key={field.key} value={field.key}>
@@ -339,7 +339,7 @@ const FilterRowInner = ({
             value={condition.field}
             onChange={e => handleFieldChange(e.target.value)}
             sx={{ minWidth: 140 }}
-            SelectProps={{ displayEmpty: true }}
+            slotProps={{ select: { displayEmpty: true } }}
           >
             {fields.map(field => (
               <MenuItem key={field.key} value={field.key}>

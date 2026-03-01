@@ -235,7 +235,7 @@ const VerticalNav = (props: VerticalNavProps) => {
           tabIndex={0}
           aria-label='backdrop'
           onClick={handleBackdropClick}
-          onKeyPress={handleBackdropClick}
+          onKeyDown={handleBackdropClick}
           className={verticalNavClasses.backdrop}
           backdropColor={backdropColor}
         />
