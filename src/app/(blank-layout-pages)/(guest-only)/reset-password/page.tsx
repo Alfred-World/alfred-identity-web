@@ -2,25 +2,25 @@
 import type { Metadata } from 'next';
 
 // Component Imports
-import Login from './_components/Login';
+import ResetPassword from './_components/ResetPassword';
 
 // Server Action Imports
 import { getServerMode } from '@core/utils/serverHelpers';
 
 export const metadata: Metadata = {
-  title: 'Login',
-  description: 'Login to your account'
+  title: 'Reset Password',
+  description: 'Reset your password'
 };
 
-const LoginPage = async () => {
+const ResetPasswordPage = async () => {
   // Vars
   const mode = await getServerMode();
 
   return (
     <div className='flex flex-col justify-center items-center min-bs-[100dvh] p-6'>
-      <Login mode={mode} />
+      <ResetPassword mode={mode} />
     </div>
   );
 };
 
-export default LoginPage;
+export default ResetPasswordPage;
