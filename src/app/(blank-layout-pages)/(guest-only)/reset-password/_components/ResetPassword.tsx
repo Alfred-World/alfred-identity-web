@@ -84,21 +84,21 @@ const ResetPassword = ({ mode: _mode }: { mode: SystemMode }) => {
     // Check if passwords match
     if (data.newPassword !== data.confirmPassword) {
       setErrorMessage('Passwords do not match');
-      
-return;
+
+      return;
     }
 
     if (!token || !email) {
       setErrorMessage('Invalid reset link. Please request a new one.');
-      
-return;
+
+      return;
     }
 
     setIsSubmitting(true);
     setErrorMessage(null);
 
     try {
-      await resetPassword({
+      const res = await resetPassword({
         data: {
           email,
           token,
@@ -106,18 +106,20 @@ return;
         }
       });
 
-      // Show success message and redirect
-      setTimeout(() => {
-        router.push('/login?reset=success');
-      }, 2000);
-    } catch (error: any) {
-      console.error('Reset password error:', error);
-      setErrorMessage(
-        error?.response?.data?.errors?.[0]?.message ||
-          error?.message ||
-          'Failed to reset password. Please try again.'
-      );
-    } finally {
+      if (res.success) {
+        // Show success message and redirect
+        setTimeout(() => {
+          router.push('/login?reset=success');
+        }, 2000);
+      } else {
+        setErrorMessage(res.errors?.[0]?.message || 'Failed to reset password');
+      }
+    }
+    catch (error) {
+      console.error('Error resetting password:', (error as Error).message);
+      setErrorMessage((error as Error).message);
+    }
+    finally {
       setIsSubmitting(false);
     }
   };

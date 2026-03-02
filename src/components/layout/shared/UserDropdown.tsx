@@ -30,6 +30,9 @@ import { useSettings } from '@core/hooks/useSettings';
 // SSO Imports
 import { getSsoLogoutUrl } from '@/libs/sso-config';
 
+// App Config Imports
+import { ROUTES } from '@/configs/routes';
+
 // Styled component for badge content
 const BadgeContentSpan = styled('span')({
   width: 8,
@@ -39,6 +42,19 @@ const BadgeContentSpan = styled('span')({
   backgroundColor: 'var(--mui-palette-success-main)',
   boxShadow: '0 0 0 2px var(--mui-palette-background-paper)'
 });
+
+const MENU_ITEMS = [
+  {
+    icon: 'tabler-user',
+    label: 'My Profile',
+    route: ROUTES.SETTINGS.ACCOUNT,
+  },
+  {
+    icon: 'tabler-settings',
+    label: 'Settings',
+    route: ROUTES.SETTINGS.ROOT,
+  },
+];
 
 const UserDropdown = () => {
   // States
@@ -126,22 +142,16 @@ const UserDropdown = () => {
                     </div>
                   </div>
                   <Divider className='mlb-1' />
-                  <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/pages/user-profile')}>
-                    <i className='tabler-user' />
-                    <Typography color='text.primary'>My Profile</Typography>
-                  </MenuItem>
-                  <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/pages/account-settings')}>
-                    <i className='tabler-settings' />
-                    <Typography color='text.primary'>Settings</Typography>
-                  </MenuItem>
-                  <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/pages/pricing')}>
-                    <i className='tabler-currency-dollar' />
-                    <Typography color='text.primary'>Pricing</Typography>
-                  </MenuItem>
-                  <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/pages/faq')}>
-                    <i className='tabler-help-circle' />
-                    <Typography color='text.primary'>FAQ</Typography>
-                  </MenuItem>
+                  {MENU_ITEMS.map((item, index) => (
+                    <MenuItem
+                      key={index}
+                      className='mli-2 gap-3'
+                      onClick={e => handleDropdownClose(e, item.route)}
+                    >
+                      <i className={item.icon} />
+                      <Typography color='text.primary'>{item.label}</Typography>
+                    </MenuItem>
+                  ))}
                   <div className='flex items-center plb-2 pli-3'>
                     <Button
                       fullWidth

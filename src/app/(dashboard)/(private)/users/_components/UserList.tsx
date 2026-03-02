@@ -15,7 +15,7 @@ import type { ColumnConfig } from '@/components/AdvancedTable';
 import CustomAvatar from '@core/components/mui/Avatar';
 import OptionMenu from '@core/components/option-menu';
 
-import { useGetIdentityUsers } from '@/generated';
+import { useGetIdentityMgmtUsers } from '@/generated';
 import type { UserDto } from '@/generated';
 
 const UserList = () => {
@@ -24,10 +24,12 @@ const UserList = () => {
   const { sort, sorting, setSorting } = useUrlSorting();
 
   // Fetch users from API
-  const { data: usersResponse, isLoading } = useGetIdentityUsers({
+  // Pass sort only when non-empty — empty string causes backend INVALID_ARGUMENT
+  const { data: usersResponse, isLoading } = useGetIdentityMgmtUsers({
     page,
     pageSize,
-    sort
+    sort: sort,
+    view: "detail"
   });
 
   const users = useMemo(() => {
@@ -84,6 +86,20 @@ const UserList = () => {
         dataType: 'string',
         enableSorting: true,
         renderCell: value => <Typography color='text.primary'>{(value as string) || '-'}</Typography>
+      },
+      {
+        name: 'Email Confirmed',
+        key: 'emailConfirmed',
+        dataType: 'bool',
+        enableSorting: true,
+        renderCell: value => (
+          <Chip
+            size='small'
+            variant='tonal'
+            color={value ? 'success' : 'error'}
+            label={value ? 'Yes' : 'No'}
+          />
+        )
       },
       {
         name: 'Role',
