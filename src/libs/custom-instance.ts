@@ -1,4 +1,5 @@
 import { getSession } from 'next-auth/react';
+import { NEXT_PUBLIC_GATEWAY_URL } from './env';
 
 // ============================================================
 // Discriminated Union Types for API Responses
@@ -64,8 +65,8 @@ export function isApiFailure(response: { success: boolean; errors?: unknown } | 
   return response?.success === false && Array.isArray(response?.errors);
 }
 
-/** Gateway base URL */
-export const GATEWAY_URL = process.env.NEXT_PUBLIC_GATEWAY_URL || 'https://gateway.test';
+/** Gateway base URL — validated at build time via env.ts */
+export const GATEWAY_URL = NEXT_PUBLIC_GATEWAY_URL;
 
 // Track if we're currently refreshing the session
 let isRefreshing = false;

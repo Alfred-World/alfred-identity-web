@@ -191,7 +191,7 @@ export const authOptions: NextAuthOptions = {
       // Allow redirects to the Gateway URL (needed for cross-app SSO flow)
       // After SSO login, identity-web needs to redirect to Gateway's /connect/authorize
       // to complete the OIDC flow for the calling app (e.g., core-web)
-      const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'https://gateway.test';
+      const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL!;
 
       if (url.startsWith(gatewayUrl)) return url;
 

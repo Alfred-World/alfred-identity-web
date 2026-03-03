@@ -8,17 +8,18 @@
  */
 
 import { GATEWAY_URL } from './custom-instance';
+import { NEXT_PUBLIC_APP_URL, NEXT_PUBLIC_OAUTH_CLIENT_ID } from './env';
 import { getIdentityAuthValidateToken, getGetIdentityAuthCheckSsoQueryKey } from '@/generated';
 
 /**
  * App base URL - used for post-logout redirect
  */
-export const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://sso.test';
+export const APP_URL = NEXT_PUBLIC_APP_URL;
 
 /**
  * OAuth client ID for this application
  */
-export const OAUTH_CLIENT_ID = process.env.NEXT_PUBLIC_OAUTH_CLIENT_ID || 'sso_web';
+export const OAUTH_CLIENT_ID = NEXT_PUBLIC_OAUTH_CLIENT_ID;
 
 /**
  * SSO check endpoint URL - for browser redirect (not axios call)

@@ -149,7 +149,7 @@ const Login = ({ mode: _mode }: { mode: SystemMode }) => {
   const onSubmit: SubmitHandler<FormData> = async (data: FormData) => {
     try {
       // Build return URL that will trigger OAuth after SSO cookie is set
-      const ssoAppUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://sso.test';
+      const ssoAppUrl = process.env.NEXT_PUBLIC_APP_URL!;
       const finalDestination = searchParams.get('returnUrl') || '/dashboards';
 
       // After exchange-token, redirect to login with start_oauth=true
