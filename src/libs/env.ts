@@ -1,15 +1,14 @@
 /**
  * Environment variable validation — fail fast at build/startup instead of silently using wrong defaults.
  *
- * NEXT_PUBLIC_* vars are inlined at build time by Next.js.
- * Server-only vars are validated at first import (runtime).
+ * CRITICAL: NEXT_PUBLIC_* vars MUST use static dot-notation (process.env.NEXT_PUBLIC_X)
+ * so Next.js can inline the values into the client-side bundle at build time.
+ * Bracket notation (process.env[name]) bypasses static analysis → undefined in browser.
  */
 
-// ─── Helper ──────────────────────────────────────────────────────────────────
+// ─── Helper (validates after static inlining) ────────────────────────────────
 
-function requireEnv(name: string): string {
-  const value = process.env[name];
-
+function assertEnv(name: string, value: string | undefined): string {
   if (!value) {
     throw new Error(
       `[ENV] Missing required environment variable: ${name}\n` +
@@ -21,12 +20,14 @@ function requireEnv(name: string): string {
 }
 
 // ─── Public (build-time, inlined into client bundle) ─────────────────────────
+// Each line must explicitly reference process.env.NEXT_PUBLIC_* so the bundler
+// can statically replace it with the actual value.
 
 /** Application base URL (e.g. https://sso.example.com) */
-export const NEXT_PUBLIC_APP_URL = requireEnv('NEXT_PUBLIC_APP_URL');
+export const NEXT_PUBLIC_APP_URL = assertEnv('NEXT_PUBLIC_APP_URL', process.env.NEXT_PUBLIC_APP_URL);
 
 /** Gateway base URL (e.g. https://gateway.example.com) */
-export const NEXT_PUBLIC_GATEWAY_URL = requireEnv('NEXT_PUBLIC_GATEWAY_URL');
+export const NEXT_PUBLIC_GATEWAY_URL = assertEnv('NEXT_PUBLIC_GATEWAY_URL', process.env.NEXT_PUBLIC_GATEWAY_URL);
 
 /** OAuth2 client ID for this frontend app */
-export const NEXT_PUBLIC_OAUTH_CLIENT_ID = requireEnv('NEXT_PUBLIC_OAUTH_CLIENT_ID');
+export const NEXT_PUBLIC_OAUTH_CLIENT_ID = assertEnv('NEXT_PUBLIC_OAUTH_CLIENT_ID', process.env.NEXT_PUBLIC_OAUTH_CLIENT_ID);
