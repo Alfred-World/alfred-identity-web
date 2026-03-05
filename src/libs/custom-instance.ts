@@ -1,4 +1,6 @@
-import { getSession } from 'next-auth/react';
+import { getSession, signOut } from 'next-auth/react';
+import type { Session } from 'next-auth';
+
 import { NEXT_PUBLIC_GATEWAY_URL } from './env';
 
 // ============================================================
@@ -68,42 +70,99 @@ export function isApiFailure(response: { success: boolean; errors?: unknown } | 
 /** Gateway base URL — validated at build time via env.ts */
 export const GATEWAY_URL = NEXT_PUBLIC_GATEWAY_URL;
 
-// Track if we're currently refreshing the session
-let isRefreshing = false;
-let refreshPromise: Promise<unknown> | null = null;
+// ============================================================
+// Global redirect guard — prevents multiple redirect attempts
+// and keeps react-query in "loading" state during navigation
+// ============================================================
+let isRedirectingToLogin = false;
 
 /**
- * Force refresh the NextAuth session to get new tokens
+ * Redirect to login and return a never-resolving promise.
+ * This keeps react-query in a "loading" state so AuthGuard/AuthRedirect
+ * won't fire while the browser is navigating away.
  */
-async function forceRefreshSession() {
-  if (isRefreshing && refreshPromise) {
-    return refreshPromise;
+async function redirectToLogin(): Promise<never> {
+  if (isRedirectingToLogin) {
+    return new Promise<never>(() => { });
   }
 
-  isRefreshing = true;
-  refreshPromise = fetch('/api/auth/session', {
-    method: 'GET',
-    credentials: 'include'
-  }).finally(() => {
-    isRefreshing = false;
-    refreshPromise = null;
-  });
+  isRedirectingToLogin = true;
 
-  return refreshPromise;
+  // Clear the NextAuth session cookie first, otherwise GuestOnlyRoute
+  // will see a valid session and redirect back to /dashboards (infinite loop)
+  try {
+    await signOut({ redirect: false });
+  } catch (_e) {
+    // signOut failure is non-critical, continue with redirect
+  }
+
+  window.location.href = '/login?error=session_expired';
+  
+return new Promise<never>(() => { });
+}
+
+// ============================================================
+// Session cache — avoid calling getSession() on every API call
+// ============================================================
+const SESSION_CACHE_TTL_MS = 2 * 60 * 1000; // 2 minutes
+let cachedSession: Session | null = null;
+let sessionFetchedAt = 0;
+let sessionFetchPromise: Promise<Session | null> | null = null;
+
+/**
+ * Invalidate the cached session so next API call re-fetches it.
+ */
+function invalidateSessionCache() {
+  cachedSession = null;
+  sessionFetchedAt = 0;
+  sessionFetchPromise = null;
 }
 
 /**
- * Get authorization headers from NextAuth session.
- * Redirects to login if session is expired.
+ * Get the NextAuth session, with in-memory caching.
+ * - Returns cached session if still fresh (< SESSION_CACHE_TTL_MS)
+ * - Deduplicates concurrent calls (single in-flight request)
+ */
+async function getCachedSession(): Promise<Session | null> {
+  const now = Date.now();
+
+  // Return cached if fresh
+  if (cachedSession && now - sessionFetchedAt < SESSION_CACHE_TTL_MS) {
+    return cachedSession;
+  }
+
+  // Deduplicate: if a fetch is already in-flight, wait for it
+  if (sessionFetchPromise) {
+    return sessionFetchPromise;
+  }
+
+  sessionFetchPromise = getSession()
+    .then(session => {
+      cachedSession = session;
+      sessionFetchedAt = Date.now();
+      
+return session;
+    })
+    .finally(() => {
+      sessionFetchPromise = null;
+    });
+
+  return sessionFetchPromise;
+}
+
+/**
+ * Get authorization headers from NextAuth session (cached).
+ * Redirects to login if session has a permanent error.
  */
 async function getAuthHeaders(): Promise<Record<string, string>> {
   if (typeof window === 'undefined') return {};
 
-  const session = await getSession();
+  const session = await getCachedSession();
 
   if (session?.error === 'RefreshAccessTokenError') {
-    window.location.href = '/login?error=session_expired';
-    throw new Error('Session expired, redirecting to login');
+    console.error('[customFetch] ❌ Session has RefreshAccessTokenError');
+    
+return redirectToLogin() as never;
   }
 
   if (session?.accessToken) {
@@ -118,9 +177,9 @@ async function getAuthHeaders(): Promise<Record<string, string>> {
  *
  * Authentication flow:
  * 1. User logs in via SSO OAuth flow -> NextAuth stores tokens in session
- * 2. Before each request, token is fetched from NextAuth session
+ * 2. Before each request, token is fetched from NextAuth session (cached 2 min)
  * 3. Token is added to Authorization header
- * 4. On 401, session is refreshed and request is retried once
+ * 4. On 401, session cache is busted, session is re-fetched, and request retried once
  *
  * Error handling:
  * - On 2xx: returns parsed JSON body as T
@@ -151,6 +210,11 @@ async function getAuthHeaders(): Promise<Record<string, string>> {
  * })
  */
 export const customFetch = async <T>(url: string, options?: RequestInit): Promise<T> => {
+  // If we're already redirecting to login, don't make any more API calls
+  if (isRedirectingToLogin) {
+    return new Promise<never>(() => { });
+  }
+
   const authHeaders = await getAuthHeaders();
 
   const fullUrl = url.startsWith('http') ? url : `${GATEWAY_URL}${url}`;
@@ -164,10 +228,13 @@ export const customFetch = async <T>(url: string, options?: RequestInit): Promis
     }
   });
 
-  // Handle 401: refresh session and retry once
+  // Handle 401: bust cache, re-fetch session, retry once
   if (response.status === 401 && typeof window !== 'undefined') {
-    await forceRefreshSession();
+    // Bust the cache so we get a fresh session (which triggers JWT callback → token refresh)
+    invalidateSessionCache();
+
     const freshAuthHeaders = await getAuthHeaders();
+    const hasValidToken = 'Authorization' in freshAuthHeaders;
 
     const retryResponse = await fetch(fullUrl, {
       ...options,
@@ -179,8 +246,16 @@ export const customFetch = async <T>(url: string, options?: RequestInit): Promis
     });
 
     if (retryResponse.status === 401) {
-      window.location.href = '/login?error=session_expired';
-      throw new Error('Session expired, redirecting to login');
+      // Differentiate: if we have a valid token but still get 401,
+      // it's an application-level 401 (e.g. permission denied, endpoint-specific).
+      // Return the response body as ApiFailure for the component to handle.
+      // Only redirect to login if the session itself is invalid (no token).
+      if (hasValidToken) {
+        return retryResponse.json() as Promise<T>;
+      }
+
+      // No valid token after refresh → session is truly expired
+      return redirectToLogin();
     }
 
     return retryResponse.json() as Promise<T>;

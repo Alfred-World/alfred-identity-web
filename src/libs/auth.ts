@@ -5,11 +5,19 @@ import type { JWT } from 'next-auth/jwt';
 
 // Generated API
 import { postIdentityAuthSsoLogin } from '@/generated';
+import type { TokenResponseDto } from '@/generated';
 
 // Disable SSL verification for self-signed certificates in development
 if (process.env.NODE_ENV === 'development') {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 }
+
+// ── URL helpers ──────────────────────────────────────────────────────────────
+// Public URL  → used by the **browser** (authorization redirect, issuer claim)
+// Internal URL → used by the **Next.js server** (token exchange, userinfo, jwks)
+//   Falls back to the public URL when INTERNAL_GATEWAY_URL is not set (local dev).
+const PUBLIC_GATEWAY_URL = process.env.NEXT_PUBLIC_GATEWAY_URL!;
+const SERVER_GATEWAY_URL = process.env.INTERNAL_GATEWAY_URL || PUBLIC_GATEWAY_URL;
 
 // Helper to decode JWT without external library validation (we trust our backend)
 function parseJwt(token: string) {
@@ -29,7 +37,7 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
       throw new Error('No refresh token available');
     }
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_GATEWAY_URL}/connect/token`, {
+    const response = await fetch(`${SERVER_GATEWAY_URL}/connect/token`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
@@ -42,18 +50,31 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
       })
     });
 
-    const refreshedTokens = await response.json();
+    // Parse body safely — an empty or non-JSON response (network hiccup, 502, etc.)
+    // should be treated as transient, not as a permanent OAuth rejection.
+    const text = await response.text();
+    let refreshedTokens: TokenResponseDto;
+
+    try {
+      refreshedTokens = JSON.parse(text);
+    } catch {
+      // Transient error — return token as-is (no error flag) so next request retries
+      return token;
+    }
 
     if (!response.ok) {
-      console.error('[AUTH] Refresh failed:', refreshedTokens);
       throw refreshedTokens;
     }
 
-    // Calculate new expiresAt
-    let expiresAt = Date.now() / 1000 + refreshedTokens.expires_in;
+    const accessToken = refreshedTokens.access_token ?? undefined;
+    const refreshToken = refreshedTokens.refresh_token ?? undefined;
+    const expiresIn = refreshedTokens.expires_in ?? 900;
 
-    if (refreshedTokens.access_token) {
-      const decoded = parseJwt(refreshedTokens.access_token);
+    // Calculate new expiresAt
+    let expiresAt = Date.now() / 1000 + expiresIn;
+
+    if (accessToken) {
+      const decoded = parseJwt(accessToken);
 
       if (decoded && decoded.exp) {
         expiresAt = decoded.exp;
@@ -62,34 +83,50 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
 
     return {
       ...token,
-      accessToken: refreshedTokens.access_token,
-      refreshToken: refreshedTokens.refresh_token ?? token.refreshToken,
+      accessToken: accessToken,
+      refreshToken: refreshToken ?? token.refreshToken,
       expiresAt: expiresAt,
       error: undefined
     };
   } catch (error) {
-    console.error('[AUTH] Error refreshing access token', error);
+    const isOAuthError =
+      error !== null &&
+      typeof error === 'object' &&
+      'error' in (error as object);
 
     return {
       ...token,
-      error: 'RefreshAccessTokenError'
+      error: isOAuthError ? 'RefreshAccessTokenError' : undefined,
     };
   }
 }
 
 export const authOptions: NextAuthOptions = {
   providers: [
-    // OAuth provider for OIDC flow - used to get access tokens for API calls
+    // OAuth provider for OIDC flow — gets access/refresh tokens via Authorization Code + PKCE
     {
       id: 'sso-oauth',
       name: 'SSO OAuth',
       type: 'oauth',
-      wellKnown: `${process.env.NEXT_PUBLIC_GATEWAY_URL}/.well-known/openid-configuration`,
-      authorization: { params: { scope: 'openid profile email offline_access' } },
+
+      // ── Browser-facing (public URL) ──────────────────────────────────────
+      authorization: {
+        url: `${PUBLIC_GATEWAY_URL}/connect/authorize`,
+        params: { scope: 'openid profile email offline_access' }
+      },
+
+      // ── Server-facing (internal URL) — token exchange / userinfo / JWKS ──
+      token: `${SERVER_GATEWAY_URL}/connect/token`,
+      userinfo: `${SERVER_GATEWAY_URL}/connect/userinfo`,
+      jwks_endpoint: `${SERVER_GATEWAY_URL}/.well-known/jwks.json`,
+
+      // Issuer MUST match the `iss` claim in the ID token which uses the public URL
+      issuer: PUBLIC_GATEWAY_URL,
+
       idToken: true,
       checks: ['pkce', 'state'],
       clientId: process.env.OIDC_CLIENT_ID!,
-      clientSecret: process.env.OIDC_CLIENT_SECRET,
+      clientSecret: process.env.OIDC_CLIENT_SECRET!,
       client: {
         token_endpoint_auth_method: 'client_secret_post'
       },
@@ -180,7 +217,8 @@ export const authOptions: NextAuthOptions = {
   },
 
   pages: {
-    signIn: '/login'
+    signIn: '/login',
+    error: '/login' // Show OIDC errors on the login page with query param ?error=...
   },
 
   // Use secure cookies for HTTPS
@@ -191,9 +229,8 @@ export const authOptions: NextAuthOptions = {
       // Allow redirects to the Gateway URL (needed for cross-app SSO flow)
       // After SSO login, identity-web needs to redirect to Gateway's /connect/authorize
       // to complete the OIDC flow for the calling app (e.g., core-web)
-      const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL!;
-
-      if (url.startsWith(gatewayUrl)) return url;
+      if (url.startsWith(PUBLIC_GATEWAY_URL)) return url;
+      if (SERVER_GATEWAY_URL !== PUBLIC_GATEWAY_URL && url.startsWith(SERVER_GATEWAY_URL)) return url;
 
       // Allow relative URLs
       if (url.startsWith('/')) return `${baseUrl}${url}`;
@@ -226,7 +263,8 @@ export const authOptions: NextAuthOptions = {
           ...token,
           accessToken: account.access_token,
           refreshToken: account.refresh_token,
-          expiresAt: expiresAt
+          expiresAt: expiresAt,
+          error: undefined // Clear any stale error from previous broken session
         };
       }
 
@@ -243,6 +281,11 @@ export const authOptions: NextAuthOptions = {
       const expiresAt = token.expiresAt as number;
 
       if (token.expiresAt && now < expiresAt - 10) {
+        return token;
+      }
+
+      // Already failed before — don't retry, show login
+      if (token.error === 'RefreshAccessTokenError') {
         return token;
       }
 

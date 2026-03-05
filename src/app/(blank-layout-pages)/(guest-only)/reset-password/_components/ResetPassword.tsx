@@ -66,7 +66,6 @@ const ResetPassword = ({ mode: _mode }: { mode: SystemMode }) => {
   const {
     control,
     handleSubmit,
-    watch,
     formState: { errors }
   } = useForm<FormData>({
     resolver: valibotResolver(schema),
@@ -75,8 +74,6 @@ const ResetPassword = ({ mode: _mode }: { mode: SystemMode }) => {
       confirmPassword: ''
     }
   });
-
-  const newPassword = watch('newPassword');
 
   const { mutateAsync: resetPassword } = usePostIdentityAuthResetPassword();
 

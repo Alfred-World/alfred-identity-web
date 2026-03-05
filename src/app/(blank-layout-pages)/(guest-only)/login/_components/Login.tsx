@@ -17,6 +17,7 @@ import Checkbox from '@mui/material/Checkbox';
 import Button from '@mui/material/Button';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Divider from '@mui/material/Divider';
+import Alert from '@mui/material/Alert';
 
 // Third-party Imports
 import { signIn } from 'next-auth/react';
@@ -41,12 +42,27 @@ import themeConfig from '@configs/themeConfig';
 // SSO Imports
 import { validateSsoToken } from '@/libs/sso-config';
 import { postIdentityAuthSsoLogin } from '@/generated';
+import type { SessionUserInfoDto } from '@/generated';
 
 type ErrorType = {
   message: string[];
 };
 
 type FormData = InferInput<typeof schema>;
+
+// ── Map NextAuth error codes to human-readable messages ──────────────────────
+const NEXTAUTH_ERROR_MESSAGES: Record<string, string> = {
+  OAuthSignin: 'Could not start the sign-in flow. Please try again.',
+  OAuthCallback: 'Sign-in callback failed. The identity server may have rejected the request (e.g. missing redirect URI).',
+  OAuthCreateAccount: 'Could not create your account from the identity provider.',
+  OAuthAccountNotLinked: 'This email is already linked to another sign-in method.',
+  Callback: 'Authentication callback error. Please try again.',
+  AccessDenied: 'Access denied. You do not have permission to sign in.',
+  Verification: 'The verification link has expired or has already been used.',
+  Configuration: 'Server configuration error. Please contact the administrator.',
+  session_expired: 'Your session has expired. Please sign in again.',
+  Default: 'An unexpected authentication error occurred. Please try again.'
+};
 
 const schema = object({
   email: pipe(string(), minLength(1, 'This field is required'), email('Email is invalid')),
@@ -75,13 +91,14 @@ const Login = ({ mode: _mode }: { mode: SystemMode }) => {
   } = useForm<FormData>({
     resolver: valibotResolver(schema),
     defaultValues: {
-      email: 'admin@gmail.com',
-      password: 'Admin@123'
+      email: '',
+      password: ''
     }
   });
 
   // Handle SSO token from redirect flow (from AuthRedirect -> check-sso -> back here)
   // Also handle start_oauth param to trigger OAuth flow after SSO login
+  // Also handle NextAuth error param (e.g. OIDC callback failures)
   useEffect(() => {
     if (ssoCheckRef.current) return;
     ssoCheckRef.current = true;
@@ -90,8 +107,24 @@ const Login = ({ mode: _mode }: { mode: SystemMode }) => {
       const ssoToken = searchParams.get('sso_token');
       const ssoError = searchParams.get('sso_error');
       const startOAuth = searchParams.get('start_oauth');
+      const nextAuthError = searchParams.get('error');
       const callbackUrl = searchParams.get('callbackUrl') || '/dashboards';
       const redirectTo = searchParams.get('redirectTo') || '/dashboards';
+
+      // ── NextAuth / OIDC error (e.g. OAuthCallback, OAuthSignin) ─────────
+      // Also handles backend redirect errors (error + error_description params)
+      if (nextAuthError) {
+        const errorDescription = searchParams.get('error_description');
+
+        const message = errorDescription
+          || NEXTAUTH_ERROR_MESSAGES[nextAuthError]
+          || NEXTAUTH_ERROR_MESSAGES.Default;
+
+        setErrorState({ message: [message] });
+        setIsCheckingSso(false);
+
+        return;
+      }
 
       // If start_oauth=true, trigger OAuth flow to get access tokens
       // This happens after SSO login sets the cookie
@@ -118,11 +151,11 @@ const Login = ({ mode: _mode }: { mode: SystemMode }) => {
 
           if (response.success && response.result) {
             // Sign in using SSO session
-            const user = response.result as { userId: string; email: string; fullName?: string; userName?: string };
+            const user = response.result as SessionUserInfoDto;
 
             const result = await signIn('sso-session', {
               redirect: false,
-              userId: user.userId.toString(),
+              userId: user.id?.toString(),
               email: user.email,
               name: user.fullName || user.userName || user.email
             });
@@ -206,6 +239,16 @@ const Login = ({ mode: _mode }: { mode: SystemMode }) => {
             onSubmit={handleSubmit(onSubmit)}
             className='flex flex-col gap-6'
           >
+            {/* ── Error banner (OIDC / NextAuth / login errors) ──────────── */}
+            {errorState && (
+              <Alert severity='error' onClose={() => setErrorState(null)}>
+                {errorState.message.map((msg, i) => (
+                  <Typography key={i} variant='body2'>
+                    {msg}
+                  </Typography>
+                ))}
+              </Alert>
+            )}
             <Controller
               name='email'
               control={control}
@@ -222,9 +265,9 @@ const Login = ({ mode: _mode }: { mode: SystemMode }) => {
                     field.onChange(e.target.value);
                     errorState !== null && setErrorState(null);
                   }}
-                  {...((errors.email || errorState !== null) && {
+                  {...(errors.email && {
                     error: true,
-                    helperText: errors?.email?.message || errorState?.message[0]
+                    helperText: errors.email.message
                   })}
                 />
               )}
@@ -260,7 +303,10 @@ const Login = ({ mode: _mode }: { mode: SystemMode }) => {
                       )
                     }
                   }}
-                  {...(errors.password && { error: true, helperText: errors.password.message })}
+                  {...(errors.password && {
+                    error: true,
+                    helperText: errors.password.message
+                  })}
                 />
               )}
             />

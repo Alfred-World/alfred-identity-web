@@ -416,6 +416,40 @@ export interface PermissionDtoListApiResponse {
 }
 
 /**
+ * Current user profile response
+ */
+export interface ProfileResponse {
+  id?: string;
+  fullName?: string;
+  email?: string;
+  userName?: string;
+  /** @nullable */
+  phoneNumber?: string | null;
+  /** @nullable */
+  avatar?: string | null;
+  twoFactorEnabled?: boolean;
+  emailConfirmed?: boolean;
+}
+
+/**
+ * Unified API response wrapper for all API responses (success + error).
+- On success: Success=true, Result is populated, Errors is null.
+- On failure: Success=false, Errors is populated, Result is null.
+            
+This enables discriminated union pattern on the frontend:
+  if (data.success) { data.result... } else { data.errors... }
+ */
+export interface ProfileResponseApiResponse {
+  success: boolean;
+  /** @nullable */
+  message?: string | null;
+  /** Current user profile response */
+  result?: ProfileResponse | null;
+  /** @nullable */
+  errors?: ApiError[] | null;
+}
+
+/**
  * Returns how many recovery codes remain unused vs the total generated.
  */
 export interface RecoveryCodeStatusResponse {
@@ -533,6 +567,41 @@ export interface RotateSigningKeyResultApiResponse {
   /** @nullable */
   message?: string | null;
   result?: RotateSigningKeyResult | null;
+  /** @nullable */
+  errors?: ApiError[] | null;
+}
+
+/**
+ * An active session (refresh token) for the current user
+ */
+export interface SessionDto {
+  id?: string;
+  /** @nullable */
+  device?: string | null;
+  /** @nullable */
+  ipAddress?: string | null;
+  /** @nullable */
+  location?: string | null;
+  createdAt?: string;
+  /** @nullable */
+  expiresAt?: string | null;
+  isCurrentSession?: boolean;
+}
+
+/**
+ * Unified API response wrapper for all API responses (success + error).
+- On success: Success=true, Result is populated, Errors is null.
+- On failure: Success=false, Errors is populated, Result is null.
+            
+This enables discriminated union pattern on the frontend:
+  if (data.success) { data.result... } else { data.errors... }
+ */
+export interface SessionDtoIEnumerableApiResponse {
+  success: boolean;
+  /** @nullable */
+  message?: string | null;
+  /** @nullable */
+  result?: SessionDto[] | null;
   /** @nullable */
   errors?: ApiError[] | null;
 }
@@ -693,6 +762,17 @@ export interface StringIEnumerableApiResponse {
   errors?: ApiError[] | null;
 }
 
+export interface TokenResponseDto {
+  /** @nullable */
+  access_token?: string | null;
+  /** @nullable */
+  refresh_token?: string | null;
+  /** @nullable */
+  id_token?: string | null;
+  token_type?: string;
+  expires_in?: number;
+}
+
 /**
  * Request model for updating an OAuth2 client application
  */
@@ -722,6 +802,20 @@ export interface UpdateApplicationRequest {
 
 export interface UpdateApplicationStatusRequest {
   isActive?: boolean;
+}
+
+/**
+ * Request to update current user's profile
+ */
+export interface UpdateProfileRequest {
+  fullName?: string;
+  /** @nullable */
+  phoneNumber?: string | null;
+  /**
+   * Base64 encoded image or URL. Null to keep existing.
+   * @nullable
+   */
+  avatar?: string | null;
 }
 
 export interface UpdateRoleRequest {
@@ -2217,6 +2311,502 @@ export type GetApiV1UnitsConvertParams = {
 };
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+/**
+ * @summary [TEST] Always returns 401 — used to verify FE redirect behavior.
+Remove this endpoint after testing.
+ */
+export const getGetIdentityAccountTest401Url = () => {
+  return `/identity/account/test-401`;
+};
+
+export const getIdentityAccountTest401 = async (options?: RequestInit): Promise<void> => {
+  return customFetch<void>(getGetIdentityAccountTest401Url(), {
+    ...options,
+    method: 'GET'
+  });
+};
+
+export const getGetIdentityAccountTest401QueryKey = () => {
+  return [`/identity/account/test-401`] as const;
+};
+
+export const getGetIdentityAccountTest401QueryOptions = <
+  TData = Awaited<ReturnType<typeof getIdentityAccountTest401>>,
+  TError = ErrorType<unknown>
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getIdentityAccountTest401>>, TError, TData>>;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetIdentityAccountTest401QueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getIdentityAccountTest401>>> = ({ signal }) =>
+    getIdentityAccountTest401({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, staleTime: 10000, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getIdentityAccountTest401>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetIdentityAccountTest401QueryResult = NonNullable<Awaited<ReturnType<typeof getIdentityAccountTest401>>>;
+export type GetIdentityAccountTest401QueryError = ErrorType<unknown>;
+
+export function useGetIdentityAccountTest401<
+  TData = Awaited<ReturnType<typeof getIdentityAccountTest401>>,
+  TError = ErrorType<unknown>
+>(
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getIdentityAccountTest401>>, TError, TData>> &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getIdentityAccountTest401>>,
+          TError,
+          Awaited<ReturnType<typeof getIdentityAccountTest401>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetIdentityAccountTest401<
+  TData = Awaited<ReturnType<typeof getIdentityAccountTest401>>,
+  TError = ErrorType<unknown>
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getIdentityAccountTest401>>, TError, TData>> &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getIdentityAccountTest401>>,
+          TError,
+          Awaited<ReturnType<typeof getIdentityAccountTest401>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetIdentityAccountTest401<
+  TData = Awaited<ReturnType<typeof getIdentityAccountTest401>>,
+  TError = ErrorType<unknown>
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getIdentityAccountTest401>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary [TEST] Always returns 401 — used to verify FE redirect behavior.
+Remove this endpoint after testing.
+ */
+
+export function useGetIdentityAccountTest401<
+  TData = Awaited<ReturnType<typeof getIdentityAccountTest401>>,
+  TError = ErrorType<unknown>
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getIdentityAccountTest401>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getGetIdentityAccountTest401QueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Get current user's profile
+ */
+export const getGetIdentityAccountMeUrl = () => {
+  return `/identity/account/me`;
+};
+
+export const getIdentityAccountMe = async (options?: RequestInit): Promise<ProfileResponseApiResponse> => {
+  return customFetch<ProfileResponseApiResponse>(getGetIdentityAccountMeUrl(), {
+    ...options,
+    method: 'GET'
+  });
+};
+
+export const getGetIdentityAccountMeQueryKey = () => {
+  return [`/identity/account/me`] as const;
+};
+
+export const getGetIdentityAccountMeQueryOptions = <
+  TData = Awaited<ReturnType<typeof getIdentityAccountMe>>,
+  TError = ErrorType<ApiErrorResponse>
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getIdentityAccountMe>>, TError, TData>>;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetIdentityAccountMeQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getIdentityAccountMe>>> = ({ signal }) =>
+    getIdentityAccountMe({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, staleTime: 10000, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getIdentityAccountMe>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetIdentityAccountMeQueryResult = NonNullable<Awaited<ReturnType<typeof getIdentityAccountMe>>>;
+export type GetIdentityAccountMeQueryError = ErrorType<ApiErrorResponse>;
+
+export function useGetIdentityAccountMe<
+  TData = Awaited<ReturnType<typeof getIdentityAccountMe>>,
+  TError = ErrorType<ApiErrorResponse>
+>(
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getIdentityAccountMe>>, TError, TData>> &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getIdentityAccountMe>>,
+          TError,
+          Awaited<ReturnType<typeof getIdentityAccountMe>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetIdentityAccountMe<
+  TData = Awaited<ReturnType<typeof getIdentityAccountMe>>,
+  TError = ErrorType<ApiErrorResponse>
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getIdentityAccountMe>>, TError, TData>> &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getIdentityAccountMe>>,
+          TError,
+          Awaited<ReturnType<typeof getIdentityAccountMe>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetIdentityAccountMe<
+  TData = Awaited<ReturnType<typeof getIdentityAccountMe>>,
+  TError = ErrorType<ApiErrorResponse>
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getIdentityAccountMe>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Get current user's profile
+ */
+
+export function useGetIdentityAccountMe<
+  TData = Awaited<ReturnType<typeof getIdentityAccountMe>>,
+  TError = ErrorType<ApiErrorResponse>
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getIdentityAccountMe>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getGetIdentityAccountMeQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Update current user's profile (full name, phone number, avatar)
+ */
+export const getPutIdentityAccountProfileUrl = () => {
+  return `/identity/account/profile`;
+};
+
+export const putIdentityAccountProfile = async (
+  updateProfileRequest: UpdateProfileRequest,
+  options?: RequestInit
+): Promise<ProfileResponseApiResponse> => {
+  return customFetch<ProfileResponseApiResponse>(getPutIdentityAccountProfileUrl(), {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(updateProfileRequest)
+  });
+};
+
+export const getPutIdentityAccountProfileMutationOptions = <
+  TError = ErrorType<ApiErrorResponse>,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof putIdentityAccountProfile>>,
+    TError,
+    { data: UpdateProfileRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof putIdentityAccountProfile>>,
+  TError,
+  { data: UpdateProfileRequest },
+  TContext
+> => {
+  const mutationKey = ['putIdentityAccountProfile'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof putIdentityAccountProfile>>,
+    { data: UpdateProfileRequest }
+  > = props => {
+    const { data } = props ?? {};
+
+    return putIdentityAccountProfile(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PutIdentityAccountProfileMutationResult = NonNullable<
+  Awaited<ReturnType<typeof putIdentityAccountProfile>>
+>;
+export type PutIdentityAccountProfileMutationBody = UpdateProfileRequest;
+export type PutIdentityAccountProfileMutationError = ErrorType<ApiErrorResponse>;
+
+/**
+ * @summary Update current user's profile (full name, phone number, avatar)
+ */
+export const usePutIdentityAccountProfile = <TError = ErrorType<ApiErrorResponse>, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof putIdentityAccountProfile>>,
+      TError,
+      { data: UpdateProfileRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof putIdentityAccountProfile>>,
+  TError,
+  { data: UpdateProfileRequest },
+  TContext
+> => {
+  return useMutation(getPutIdentityAccountProfileMutationOptions(options), queryClient);
+};
+
+/**
+ * @summary Get all active sessions (devices) for the current user
+ */
+export const getGetIdentityAccountSessionsUrl = () => {
+  return `/identity/account/sessions`;
+};
+
+export const getIdentityAccountSessions = async (options?: RequestInit): Promise<SessionDtoIEnumerableApiResponse> => {
+  return customFetch<SessionDtoIEnumerableApiResponse>(getGetIdentityAccountSessionsUrl(), {
+    ...options,
+    method: 'GET'
+  });
+};
+
+export const getGetIdentityAccountSessionsQueryKey = () => {
+  return [`/identity/account/sessions`] as const;
+};
+
+export const getGetIdentityAccountSessionsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getIdentityAccountSessions>>,
+  TError = ErrorType<ApiErrorResponse>
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getIdentityAccountSessions>>, TError, TData>>;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetIdentityAccountSessionsQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getIdentityAccountSessions>>> = ({ signal }) =>
+    getIdentityAccountSessions({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, staleTime: 10000, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getIdentityAccountSessions>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetIdentityAccountSessionsQueryResult = NonNullable<Awaited<ReturnType<typeof getIdentityAccountSessions>>>;
+export type GetIdentityAccountSessionsQueryError = ErrorType<ApiErrorResponse>;
+
+export function useGetIdentityAccountSessions<
+  TData = Awaited<ReturnType<typeof getIdentityAccountSessions>>,
+  TError = ErrorType<ApiErrorResponse>
+>(
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getIdentityAccountSessions>>, TError, TData>> &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getIdentityAccountSessions>>,
+          TError,
+          Awaited<ReturnType<typeof getIdentityAccountSessions>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetIdentityAccountSessions<
+  TData = Awaited<ReturnType<typeof getIdentityAccountSessions>>,
+  TError = ErrorType<ApiErrorResponse>
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getIdentityAccountSessions>>, TError, TData>> &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getIdentityAccountSessions>>,
+          TError,
+          Awaited<ReturnType<typeof getIdentityAccountSessions>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetIdentityAccountSessions<
+  TData = Awaited<ReturnType<typeof getIdentityAccountSessions>>,
+  TError = ErrorType<ApiErrorResponse>
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getIdentityAccountSessions>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Get all active sessions (devices) for the current user
+ */
+
+export function useGetIdentityAccountSessions<
+  TData = Awaited<ReturnType<typeof getIdentityAccountSessions>>,
+  TError = ErrorType<ApiErrorResponse>
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getIdentityAccountSessions>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getGetIdentityAccountSessionsQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Revoke a specific session (device) — takes immediate effect via Redis
+ */
+export const getDeleteIdentityAccountSessionsIdUrl = (id: string) => {
+  return `/identity/account/sessions/${id}`;
+};
+
+export const deleteIdentityAccountSessionsId = async (
+  id: string,
+  options?: RequestInit
+): Promise<ObjectApiResponse> => {
+  return customFetch<ObjectApiResponse>(getDeleteIdentityAccountSessionsIdUrl(id), {
+    ...options,
+    method: 'DELETE'
+  });
+};
+
+export const getDeleteIdentityAccountSessionsIdMutationOptions = <
+  TError = ErrorType<ApiErrorResponse>,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteIdentityAccountSessionsId>>,
+    TError,
+    { id: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteIdentityAccountSessionsId>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  const mutationKey = ['deleteIdentityAccountSessionsId'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteIdentityAccountSessionsId>>,
+    { id: string }
+  > = props => {
+    const { id } = props ?? {};
+
+    return deleteIdentityAccountSessionsId(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteIdentityAccountSessionsIdMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteIdentityAccountSessionsId>>
+>;
+
+export type DeleteIdentityAccountSessionsIdMutationError = ErrorType<ApiErrorResponse>;
+
+/**
+ * @summary Revoke a specific session (device) — takes immediate effect via Redis
+ */
+export const useDeleteIdentityAccountSessionsId = <TError = ErrorType<ApiErrorResponse>, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof deleteIdentityAccountSessionsId>>,
+      TError,
+      { id: string },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<Awaited<ReturnType<typeof deleteIdentityAccountSessionsId>>, TError, { id: string }, TContext> => {
+  return useMutation(getDeleteIdentityAccountSessionsIdMutationOptions(options), queryClient);
+};
 
 /**
  * @summary Change current user's password
@@ -4515,7 +5105,7 @@ export const getPostConnectTokenUrl = () => {
 export const postConnectToken = async (
   postConnectTokenBody: PostConnectTokenBody,
   options?: RequestInit
-): Promise<void> => {
+): Promise<TokenResponseDto> => {
   const formUrlEncoded = new URLSearchParams();
   if (postConnectTokenBody.grant_type !== undefined) {
     formUrlEncoded.append(`grant_type`, postConnectTokenBody.grant_type);
@@ -4542,7 +5132,7 @@ export const postConnectToken = async (
     formUrlEncoded.append(`scope`, postConnectTokenBody.scope);
   }
 
-  return customFetch<void>(getPostConnectTokenUrl(), {
+  return customFetch<TokenResponseDto>(getPostConnectTokenUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded', ...options?.headers },
@@ -4550,7 +5140,7 @@ export const postConnectToken = async (
   });
 };
 
-export const getPostConnectTokenMutationOptions = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
+export const getPostConnectTokenMutationOptions = <TError = ErrorType<ProblemDetails>, TContext = unknown>(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postConnectToken>>,
     TError,
@@ -4585,12 +5175,12 @@ export const getPostConnectTokenMutationOptions = <TError = ErrorType<unknown>, 
 
 export type PostConnectTokenMutationResult = NonNullable<Awaited<ReturnType<typeof postConnectToken>>>;
 export type PostConnectTokenMutationBody = PostConnectTokenBody;
-export type PostConnectTokenMutationError = ErrorType<unknown>;
+export type PostConnectTokenMutationError = ErrorType<ProblemDetails>;
 
 /**
  * @summary OAuth2/OIDC Token Endpoint
  */
-export const usePostConnectToken = <TError = ErrorType<unknown>, TContext = unknown>(
+export const usePostConnectToken = <TError = ErrorType<ProblemDetails>, TContext = unknown>(
   options?: {
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof postConnectToken>>,

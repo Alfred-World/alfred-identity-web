@@ -1,7 +1,7 @@
 'use client'
 
 // React Imports
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { ChangeEvent } from 'react'
 
 // MUI Imports
@@ -10,63 +10,61 @@ import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
-import MenuItem from '@mui/material/MenuItem'
-import Chip from '@mui/material/Chip'
-import type { SelectChangeEvent } from '@mui/material/Select'
+import CircularProgress from '@mui/material/CircularProgress'
+import Alert from '@mui/material/Alert'
+
+// Third-party Imports
+import { useQueryClient } from '@tanstack/react-query'
+import { toast } from 'react-toastify'
+
+// Generated Imports
+import {
+  useGetIdentityAccountMe,
+  usePutIdentityAccountProfile,
+  getGetIdentityAccountMeQueryKey,
+  useGetIdentityAccountTest401
+} from '@/generated/api'
 
 // Component Imports
 import CustomTextField from '@core/components/mui/TextField'
 
-type Data = {
-  firstName: string
-  lastName: string
-  email: string
-  organization: string
-  phoneNumber: number | string
-  address: string
-  state: string
-  zipCode: string
-  country: string
-  language: string
-  timezone: string
-  currency: string
+type FormData = {
+  fullName: string
+  phoneNumber: string
 }
 
-// Vars
-const initialData: Data = {
-  firstName: 'John',
-  lastName: 'Doe',
-  email: 'john.doe@example.com',
-  organization: 'Pixinvent',
-  phoneNumber: '+1 (917) 543-9876',
-  address: '123 Main St, New York, NY 10001',
-  state: 'New York',
-  zipCode: '634880',
-  country: 'usa',
-  language: 'english',
-  timezone: 'gmt-12',
-  currency: 'usd'
-}
-
-const languageData = ['English', 'Arabic', 'French', 'German', 'Portuguese']
-
+// ─── Component ───────────────────────────────────────────────────────────────
 const AccountDetails = () => {
-  // States
-  const [formData, setFormData] = useState<Data>(initialData)
+  const queryClient = useQueryClient()
+
+  // ── Load profile ─────────────────────────────────────────────────────────
+  const { data: profileResponse, isLoading, isError } = useGetIdentityAccountMe()
+
+  useGetIdentityAccountTest401()
+
+  const profile = profileResponse?.success ? profileResponse.result ?? null : null
+
+  // ── Form state ────────────────────────────────────────────────────────────
+  const [formData, setFormData] = useState<FormData>({ fullName: '', phoneNumber: '' })
   const [fileInput, setFileInput] = useState<string>('')
   const [imgSrc, setImgSrc] = useState<string>('/images/avatars/1.png')
-  const [language, setLanguage] = useState<string[]>(['English'])
+  const [avatarBase64, setAvatarBase64] = useState<string | null>(null)
+  const [isDirty, setIsDirty] = useState(false)
 
-  const handleDelete = (value: string) => {
-    setLanguage(current => current.filter(item => item !== value))
-  }
+  // Sync form with loaded profile
+  useEffect(() => {
+    if (profile) {
+      setFormData({
+        fullName: profile.fullName ?? '',
+        phoneNumber: profile.phoneNumber ?? ''
+      })
+      if (profile.avatar) setImgSrc(profile.avatar)
+    }
+  }, [profile])
 
-  const handleChange = (event: SelectChangeEvent<string[]>) => {
-    setLanguage(event.target.value as string[])
-  }
-
-  const handleFormChange = (field: keyof Data, value: Data[keyof Data]) => {
-    setFormData({ ...formData, [field]: value })
+  const handleFormChange = (field: keyof FormData, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }))
+    setIsDirty(true)
   }
 
   const handleFileInputChange = (file: ChangeEvent) => {
@@ -74,18 +72,94 @@ const AccountDetails = () => {
     const { files } = file.target as HTMLInputElement
 
     if (files && files.length !== 0) {
-      reader.onload = () => setImgSrc(reader.result as string)
-      reader.readAsDataURL(files[0])
+      reader.onload = () => {
+        const result = reader.result as string
 
-      if (reader.result !== null) {
-        setFileInput(reader.result as string)
+        setImgSrc(result)
+        setAvatarBase64(result)
+        setFileInput(result)
+        setIsDirty(true)
       }
+
+      reader.readAsDataURL(files[0])
     }
   }
 
   const handleFileInputReset = () => {
     setFileInput('')
-    setImgSrc('/images/avatars/1.png')
+    setImgSrc(profile?.avatar ?? '/images/avatars/1.png')
+    setAvatarBase64(null)
+    setIsDirty(false)
+  }
+
+  // ── Update profile ────────────────────────────────────────────────────────
+  const { mutate: updateProfile, isPending } = usePutIdentityAccountProfile({
+    mutation: {
+      onSuccess(data) {
+        if (data.success) {
+          queryClient.invalidateQueries({ queryKey: getGetIdentityAccountMeQueryKey() })
+          setIsDirty(false)
+          setAvatarBase64(null)
+          toast.success('Profile updated successfully')
+        } else {
+          const msg = data?.errors?.[0]?.message ?? 'Failed to update profile'
+
+          toast.error(msg)
+        }
+      },
+      onError() {
+        toast.error('An unexpected error occurred')
+      }
+    }
+  })
+
+  const handleSubmit = (e: React.SyntheticEvent) => {
+    e.preventDefault()
+
+    if (!formData.fullName.trim()) {
+      toast.error('Full name is required')
+
+      return
+    }
+
+    updateProfile({
+      data: {
+        fullName: formData.fullName,
+        phoneNumber: formData.phoneNumber || undefined,
+        avatar: avatarBase64 ?? undefined
+      }
+    })
+  }
+
+  const handleReset = () => {
+    if (profile) {
+      setFormData({ fullName: profile.fullName ?? '', phoneNumber: profile.phoneNumber ?? '' })
+      setImgSrc(profile.avatar ?? '/images/avatars/1.png')
+      setAvatarBase64(null)
+      setFileInput('')
+      setIsDirty(false)
+    }
+  }
+
+  // ── Render ────────────────────────────────────────────────────────────────
+  if (isLoading) {
+    return (
+      <Card>
+        <CardContent className='flex justify-center p-8'>
+          <CircularProgress />
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (isError || !profile) {
+    return (
+      <Card>
+        <CardContent>
+          <Alert severity='error'>Failed to load profile. Please refresh the page.</Alert>
+        </CardContent>
+      </Card>
+    )
   }
 
   return (
@@ -114,43 +188,37 @@ const AccountDetails = () => {
           </div>
         </div>
       </CardContent>
+
       <CardContent>
-        <form onSubmit={e => e.preventDefault()}>
+        <form onSubmit={handleSubmit}>
           <Grid container spacing={6}>
             <Grid size={{ xs: 12, sm: 6 }}>
               <CustomTextField
                 fullWidth
-                label='First Name'
-                value={formData.firstName}
-                placeholder='John'
-                onChange={e => handleFormChange('firstName', e.target.value)}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <CustomTextField
-                fullWidth
-                label='Last Name'
-                value={formData.lastName}
-                placeholder='Doe'
-                onChange={e => handleFormChange('lastName', e.target.value)}
+                label='Full Name'
+                value={formData.fullName}
+                placeholder='John Doe'
+                onChange={e => handleFormChange('fullName', e.target.value)}
+                required
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
               <CustomTextField
                 fullWidth
                 label='Email'
-                value={formData.email}
+                value={profile.email}
                 placeholder='john.doe@gmail.com'
-                onChange={e => handleFormChange('email', e.target.value)}
+                disabled
+                helperText='Email cannot be changed here'
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
               <CustomTextField
                 fullWidth
-                label='Organization'
-                value={formData.organization}
-                placeholder='Pixinvent'
-                onChange={e => handleFormChange('organization', e.target.value)}
+                label='Username'
+                value={profile.userName}
+                disabled
+                helperText='Username cannot be changed'
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
@@ -162,131 +230,11 @@ const AccountDetails = () => {
                 onChange={e => handleFormChange('phoneNumber', e.target.value)}
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <CustomTextField
-                fullWidth
-                label='Address'
-                value={formData.address}
-                placeholder='Address'
-                onChange={e => handleFormChange('address', e.target.value)}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <CustomTextField
-                fullWidth
-                label='State'
-                value={formData.state}
-                placeholder='New York'
-                onChange={e => handleFormChange('state', e.target.value)}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <CustomTextField
-                fullWidth
-                type='number'
-                label='Zip Code'
-                value={formData.zipCode}
-                placeholder='123456'
-                onChange={e => handleFormChange('zipCode', e.target.value)}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <CustomTextField
-                select
-                fullWidth
-                label='Country'
-                value={formData.country}
-                onChange={e => handleFormChange('country', e.target.value)}
-              >
-                <MenuItem value='usa'>USA</MenuItem>
-                <MenuItem value='uk'>UK</MenuItem>
-                <MenuItem value='australia'>Australia</MenuItem>
-                <MenuItem value='germany'>Germany</MenuItem>
-              </CustomTextField>
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <CustomTextField
-                select
-                fullWidth
-                label='Language'
-                value={language}
-                slotProps={{
-                  select: {
-                    multiple: true, // @ts-ignore
-                    onChange: handleChange,
-                    renderValue: selected => (
-                      <div className='flex flex-wrap gap-2'>
-                        {(selected as string[]).map(value => (
-                          <Chip
-                            key={value}
-                            clickable
-                            onMouseDown={event => event.stopPropagation()}
-                            size='small'
-                            label={value}
-                            onDelete={() => handleDelete(value)}
-                          />
-                        ))}
-                      </div>
-                    )
-                  }
-                }}
-              >
-                {languageData.map(name => (
-                  <MenuItem key={name} value={name}>
-                    {name}
-                  </MenuItem>
-                ))}
-              </CustomTextField>
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <CustomTextField
-                select
-                fullWidth
-                label='TimeZone'
-                value={formData.timezone}
-                onChange={e => handleFormChange('timezone', e.target.value)}
-                slotProps={{
-                  select: { MenuProps: { PaperProps: { style: { maxHeight: 250 } } } }
-                }}
-              >
-                <MenuItem value='gmt-12'>(GMT-12:00) International Date Line West</MenuItem>
-                <MenuItem value='gmt-11'>(GMT-11:00) Midway Island, Samoa</MenuItem>
-                <MenuItem value='gmt-10'>(GMT-10:00) Hawaii</MenuItem>
-                <MenuItem value='gmt-09'>(GMT-09:00) Alaska</MenuItem>
-                <MenuItem value='gmt-08'>(GMT-08:00) Pacific Time (US & Canada)</MenuItem>
-                <MenuItem value='gmt-08-baja'>(GMT-08:00) Tijuana, Baja California</MenuItem>
-                <MenuItem value='gmt-07'>(GMT-07:00) Chihuahua, La Paz, Mazatlan</MenuItem>
-                <MenuItem value='gmt-07-mt'>(GMT-07:00) Mountain Time (US & Canada)</MenuItem>
-                <MenuItem value='gmt-06'>(GMT-06:00) Central America</MenuItem>
-                <MenuItem value='gmt-06-ct'>(GMT-06:00) Central Time (US & Canada)</MenuItem>
-                <MenuItem value='gmt-06-mc'>(GMT-06:00) Guadalajara, Mexico City, Monterrey</MenuItem>
-                <MenuItem value='gmt-06-sk'>(GMT-06:00) Saskatchewan</MenuItem>
-                <MenuItem value='gmt-05'>(GMT-05:00) Bogota, Lima, Quito, Rio Branco</MenuItem>
-                <MenuItem value='gmt-05-et'>(GMT-05:00) Eastern Time (US & Canada)</MenuItem>
-                <MenuItem value='gmt-05-ind'>(GMT-05:00) Indiana (East)</MenuItem>
-                <MenuItem value='gmt-04'>(GMT-04:00) Atlantic Time (Canada)</MenuItem>
-                <MenuItem value='gmt-04-clp'>(GMT-04:00) Caracas, La Paz</MenuItem>
-              </CustomTextField>
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <CustomTextField
-                select
-                fullWidth
-                label='Currency'
-                value={formData.currency}
-                onChange={e => handleFormChange('currency', e.target.value)}
-              >
-                <MenuItem value='usd'>USD</MenuItem>
-                <MenuItem value='euro'>EUR</MenuItem>
-                <MenuItem value='pound'>Pound</MenuItem>
-                <MenuItem value='bitcoin'>Bitcoin</MenuItem>
-              </CustomTextField>
-            </Grid>
-            <Grid size={{ xs: 12 }} className='flex gap-4 flex-wrap'>
-              <Button variant='contained' type='submit'>
-                Save Changes
+            <Grid size={{ xs: 12 }} className='flex gap-4'>
+              <Button variant='contained' type='submit' disabled={isPending || !isDirty}>
+                {isPending ? <CircularProgress size={20} color='inherit' /> : 'Save Changes'}
               </Button>
-              <Button variant='tonal' type='reset' color='secondary' onClick={() => setFormData(initialData)}>
+              <Button variant='tonal' type='button' color='secondary' onClick={handleReset} disabled={!isDirty}>
                 Reset
               </Button>
             </Grid>
