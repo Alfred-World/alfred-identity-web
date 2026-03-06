@@ -5,7 +5,6 @@ import type { JWT } from 'next-auth/jwt';
 
 // Generated API
 import { postIdentityAuthSsoLogin } from '@/generated';
-import type { TokenResponseDto } from '@/generated';
 
 // Disable SSL verification for self-signed certificates in development
 if (process.env.NODE_ENV === 'development') {
@@ -28,78 +27,13 @@ function parseJwt(token: string) {
   }
 }
 
-/**
- * Refresh access token using refresh_token grant
- */
-async function refreshAccessToken(token: JWT): Promise<JWT> {
-  try {
-    if (!token.refreshToken) {
-      throw new Error('No refresh token available');
-    }
-
-    const response = await fetch(`${SERVER_GATEWAY_URL}/connect/token`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      body: new URLSearchParams({
-        client_id: process.env.OIDC_CLIENT_ID!,
-        client_secret: process.env.OIDC_CLIENT_SECRET!,
-        grant_type: 'refresh_token',
-        refresh_token: token.refreshToken as string
-      })
-    });
-
-    // Parse body safely — an empty or non-JSON response (network hiccup, 502, etc.)
-    // should be treated as transient, not as a permanent OAuth rejection.
-    const text = await response.text();
-    let refreshedTokens: TokenResponseDto;
-
-    try {
-      refreshedTokens = JSON.parse(text);
-    } catch {
-      // Transient error — return token as-is (no error flag) so next request retries
-      return token;
-    }
-
-    if (!response.ok) {
-      throw refreshedTokens;
-    }
-
-    const accessToken = refreshedTokens.access_token ?? undefined;
-    const refreshToken = refreshedTokens.refresh_token ?? undefined;
-    const expiresIn = refreshedTokens.expires_in ?? 900;
-
-    // Calculate new expiresAt
-    let expiresAt = Date.now() / 1000 + expiresIn;
-
-    if (accessToken) {
-      const decoded = parseJwt(accessToken);
-
-      if (decoded && decoded.exp) {
-        expiresAt = decoded.exp;
-      }
-    }
-
-    return {
-      ...token,
-      accessToken: accessToken,
-      refreshToken: refreshToken ?? token.refreshToken,
-      expiresAt: expiresAt,
-      error: undefined
-    };
-  } catch (error) {
-    const isOAuthError =
-      error !== null &&
-      typeof error === 'object' &&
-      'error' in (error as object);
-
-    return {
-      ...token,
-      error: isOAuthError ? 'RefreshAccessTokenError' : undefined,
-    };
-  }
-}
+// NOTE: Token refresh is handled exclusively by the BFF proxy (route.ts).
+// getServerSession() is read-only — it processes callbacks but never writes
+// the updated JWT back to the cookie. Refreshing here would consume the RT
+// without persisting the new tokens, causing the proxy to fail on the next
+// 401 (the RT is already spent). The proxy calls doRefreshAccessToken() on
+// every 401, retries the request, and re-encodes the cookie — this is the
+// only safe place to refresh.
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -276,25 +210,8 @@ export const authOptions: NextAuthOptions = {
         token.exchangeUrl = (user as { exchangeUrl?: string }).exchangeUrl;
       }
 
-      // Return previous token if not expired (with 10s buffer)
-      const now = Math.floor(Date.now() / 1000);
-      const expiresAt = token.expiresAt as number;
-
-      if (token.expiresAt && now < expiresAt - 10) {
-        return token;
-      }
-
-      // Already failed before — don't retry, show login
-      if (token.error === 'RefreshAccessTokenError') {
-        return token;
-      }
-
-      // Token expired - only try to refresh if we have a refresh token
-      if (token.refreshToken) {
-        return await refreshAccessToken(token);
-      }
-
-      // No refresh token available, just return token as-is
+      // Return token as-is — the BFF proxy (route.ts) handles refresh on 401.
+      // getServerSession() is read-only and must never consume the refresh token.
       return token;
     },
 
@@ -305,8 +222,8 @@ export const authOptions: NextAuthOptions = {
         session.user.email = token.email as string;
       }
 
-      // Pass tokens to client
-      session.accessToken = token.accessToken as string | undefined;
+      // BFF pattern: accessToken stays in the JWT cookie (HttpOnly, server-side only).
+      // The proxy route reads it via getToken() — never exposed to client JS.
       session.exchangeUrl = token.exchangeUrl as string | undefined;
       session.error = token.error as string | undefined;
 

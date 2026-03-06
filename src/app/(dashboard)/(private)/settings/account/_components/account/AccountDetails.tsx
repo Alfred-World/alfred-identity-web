@@ -22,7 +22,6 @@ import {
   useGetIdentityAccountMe,
   usePutIdentityAccountProfile,
   getGetIdentityAccountMeQueryKey,
-  useGetIdentityAccountTest401
 } from '@/generated/api'
 
 // Component Imports
@@ -39,8 +38,6 @@ const AccountDetails = () => {
 
   // ── Load profile ─────────────────────────────────────────────────────────
   const { data: profileResponse, isLoading, isError } = useGetIdentityAccountMe()
-
-  useGetIdentityAccountTest401()
 
   const profile = profileResponse?.success ? profileResponse.result ?? null : null
 

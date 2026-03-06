@@ -9,7 +9,7 @@ declare module 'next-auth' {
       email?: string | null;
       image?: string | null;
     };
-    accessToken?: string;
+    // accessToken is NOT exposed — kept in JWT cookie for BFF proxy only
     error?: string;
   }
 
@@ -24,6 +24,10 @@ declare module 'next-auth' {
 declare module 'next-auth/jwt' {
   interface JWT {
     id?: string;
+    accessToken?: string;
+    refreshToken?: string;
+    expiresAt?: number;
     exchangeUrl?: string;
+    error?: string;
   }
 }
