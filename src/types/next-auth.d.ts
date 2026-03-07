@@ -9,6 +9,7 @@ declare module 'next-auth' {
       email?: string | null;
       image?: string | null;
     };
+
     // accessToken is NOT exposed — kept in JWT cookie for BFF proxy only
     error?: string;
   }

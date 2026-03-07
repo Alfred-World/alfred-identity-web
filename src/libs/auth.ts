@@ -1,7 +1,6 @@
 // Third-party Imports
 import CredentialProvider from 'next-auth/providers/credentials';
 import type { NextAuthOptions } from 'next-auth';
-import type { JWT } from 'next-auth/jwt';
 
 // Generated API
 import { postIdentityAuthSsoLogin } from '@/generated';
