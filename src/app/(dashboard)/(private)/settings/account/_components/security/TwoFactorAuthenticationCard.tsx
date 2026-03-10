@@ -21,6 +21,7 @@ import IconButton from '@mui/material/IconButton'
 // Third-party Imports
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
+import { QRCodeSVG } from 'qrcode.react'
 
 // Generated Imports
 import {
@@ -97,11 +98,11 @@ const EnableTwoFactorDialog = ({ open, onClose, setupData, onConfirmed }: Enable
 
         {setupData?.qrCodeUri && (
           <div className='flex justify-center'>
-            <img
-              src={setupData.qrCodeUri}
-              alt='2FA QR Code'
-              width={200}
-              height={200}
+            <QRCodeSVG
+              value={setupData.qrCodeUri}
+              size={200}
+              level='M'
+              marginSize={1}
               style={{ border: '1px solid #eee', borderRadius: 8 }}
             />
           </div>

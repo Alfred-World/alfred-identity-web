@@ -130,7 +130,7 @@ const RoleDialog = ({ open, onClose, role, onSuccess }: RoleDialogProps) => {
           name: data.name,
           icon: data.icon,
           isImmutable: data.isImmutable,
-          isSystem: data.isSystem,
+          isSystem: data.isSystem
         }
       });
     } else {

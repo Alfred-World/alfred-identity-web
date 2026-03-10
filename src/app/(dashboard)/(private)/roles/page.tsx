@@ -6,12 +6,13 @@ import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 
 import { Grid, Box } from '@mui/material';
 import { toast } from 'react-toastify';
+import { useInfiniteQuery } from '@tanstack/react-query';
 
 import RoleList from './_components/RoleList';
 import RolePermissionsDetail from './_components/RolePermissionsDetail';
 import RoleDialog from './_components/RoleDialog';
 import ConfirmationDialog from '@/components/ConfirmationDialog';
-import { useGetIdentityRoles, useDeleteIdentityRolesId } from '@/generated';
+import { getIdentityRoles, useDeleteIdentityRolesId } from '@/generated';
 import type { RoleDto } from '@/generated';
 
 const RolesPage = () => {
@@ -58,14 +59,36 @@ const RolesPage = () => {
   };
 
   const {
-    data: rolesResponse,
+    data: infiniteRolesData,
     isLoading: isLoadingRoles,
+    fetchNextPage: fetchNextRolesPage,
+    hasNextPage: hasNextRolesPage,
+    isFetchingNextPage: isFetchingNextRolesPage,
     refetch: refetchRoles
-  } = useGetIdentityRoles({
-    view: 'detail'
+  } = useInfiniteQuery({
+    queryKey: ['roles', 'infinite'],
+    initialPageParam: 1,
+    queryFn: async ({ pageParam = 1 }) => {
+      return await getIdentityRoles({
+        page: pageParam as number,
+        pageSize: 20,
+        view: 'detail'
+      });
+    },
+    getNextPageParam: lastPage => {
+      if (lastPage.success && lastPage.result?.hasNextPage) {
+        return (lastPage.result.page || 0) + 1;
+      }
+
+      return undefined;
+    }
   });
 
-  const roles = useMemo(() => (rolesResponse?.success ? rolesResponse.result?.items || [] : []), [rolesResponse]);
+  const roles = useMemo(() => {
+    return (
+      infiniteRolesData?.pages.flatMap(page => (page.success && page.result?.items ? page.result.items : [])) || []
+    );
+  }, [infiniteRolesData]);
 
   const selectedRole = useMemo(() => {
     return roles.find(role => role.id === selectedRoleId) || null;
@@ -130,7 +153,7 @@ const RolesPage = () => {
     <Box sx={{ p: { xs: 0, md: 2 }, height: '100%' }}>
       <Grid container spacing={4} sx={{ height: '100%', minHeight: 'calc(100vh - 200px)' }}>
         {/* Left Column: Role List */}
-        <Grid size={{ xs: 12, md: 4, lg: 3 }}>
+        <Grid size={{ xs: 12, md: 4, lg: 3 }} sx={{ height: { xs: 'auto', md: 'calc(100vh - 200px)' } }}>
           <RoleList
             roles={roles}
             selectedRoleId={selectedRoleId}
@@ -139,12 +162,19 @@ const RolesPage = () => {
             onEditRole={handleEditClick}
             onDeleteRole={handleDeleteClick}
             isLoading={isLoadingRoles}
+            fetchNextPage={fetchNextRolesPage}
+            hasNextPage={!!hasNextRolesPage}
+            isFetchingNextPage={isFetchingNextRolesPage}
           />
         </Grid>
 
         {/* Right Column: Permission Details */}
         <Grid size={{ xs: 12, md: 8, lg: 9 }}>
-          <RolePermissionsDetail role={selectedRole} isLoading={!selectedRole && isLoadingRoles} />
+          <RolePermissionsDetail
+            key={selectedRole?.id || 'empty-role'}
+            role={selectedRole}
+            isLoading={!selectedRole && isLoadingRoles}
+          />
         </Grid>
       </Grid>
 

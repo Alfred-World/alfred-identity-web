@@ -39,6 +39,7 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
   const theme = useTheme();
   const themeColor = theme.palette.primary.main;
   const loadMoreRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // -- 1. Infinite Query for Permissions --
   const {
@@ -53,8 +54,8 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
     queryFn: async ({ pageParam = 1 }) => {
       return await getIdentityPermissions({
         page: pageParam as number,
-        pageSize: 50, // Load 50 items per page
-        sort: 'resource,action' // Server sort by resource then action
+        pageSize: 20,
+        sort: 'resource,action'
       });
     },
     getNextPageParam: lastPage => {
@@ -73,22 +74,31 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
   }, [infiniteData]);
 
   // -- 2. Current Role Permissions --
-  const [selectedPermissionIds, setSelectedPermissionIds] = useState<string[]>([]);
-
-  // Sync state with role permissions
-  useEffect(() => {
+  const [selectedPermissionIds, setSelectedPermissionIds] = useState<string[]>(() => {
     if (role?.permissions && Array.isArray(role.permissions)) {
-      const newIds = role.permissions.map(p => p.id!).filter(id => id !== undefined);
-
-      setSelectedPermissionIds(newIds);
+      return role.permissions.map(p => p.id!).filter(id => id !== undefined);
     }
-  }, [role]);
 
-  // -- 3. Mutations --
+    return [];
+  });
+
+  // -- 3. Fake Loading for Smooth Transition --
+  const [isFakeLoading, setIsFakeLoading] = useState(true);
+
+  useEffect(() => {
+    // Artificial 300ms delay to make role switching feel smoother
+    const timer = setTimeout(() => {
+      setIsFakeLoading(false);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [role?.id]);
+
+  // -- 4. Mutations --
 
   const { mutate: updatePermissions, isPending: isUpdating } = usePostIdentityRolesIdPermissions({
     mutation: {
-      onSuccess: (data) => {
+      onSuccess: data => {
         if (data.success) {
           toast.success('Permissions updated successfully');
 
@@ -101,7 +111,7 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
     }
   });
 
-  // -- 4. Infinite Scroll Observer --
+  // -- 5. Infinite Scroll Observer --
   const handleObserver = useCallback(
     (entries: IntersectionObserverEntry[]) => {
       const target = entries[0];
@@ -115,9 +125,9 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
 
   useEffect(() => {
     const observer = new IntersectionObserver(handleObserver, {
-      root: null,
-      rootMargin: '20px',
-      threshold: 1.0
+      root: scrollContainerRef.current,
+      rootMargin: '100px',
+      threshold: 0.1
     });
 
     const currentRef = loadMoreRef.current;
@@ -131,7 +141,7 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
     };
   }, [handleObserver]);
 
-  // -- 5. Grouping Logic --
+  // -- 6. Grouping Logic --
   // Group by 'resource'
   const groupedPermissions = useMemo(() => {
     const groups: Record<string, PermissionDto[]> = {};
@@ -146,7 +156,7 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
     return groups;
   }, [allPermissions]);
 
-  // -- 6. Action Handlers --
+  // -- 7. Action Handlers --
 
   const handleToggle = (id: string) => {
     setSelectedPermissionIds(prev => (prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]));
@@ -190,7 +200,7 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
 
   // -- Render --
 
-  if (isLoading || isLoadingAll) {
+  if (isLoading || isLoadingAll || isFakeLoading) {
     return (
       <Card sx={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <CircularProgress />
@@ -264,6 +274,7 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
 
       <CardContent
         id='permissions-scroll-container'
+        ref={scrollContainerRef}
         sx={{
           flexGrow: 1,
           overflowY: 'auto',
@@ -389,7 +400,10 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
             mt: 4,
             display: 'flex',
             justifyContent: 'center',
+            alignItems: 'center',
             width: '100%',
+            minHeight: '40px',
+            py: 2,
             opacity: hasNextPage ? 1 : 0
           }}
         >
