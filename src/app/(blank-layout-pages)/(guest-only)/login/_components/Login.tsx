@@ -20,7 +20,7 @@ import Divider from '@mui/material/Divider';
 import Alert from '@mui/material/Alert';
 
 // Third-party Imports
-import { signIn } from 'next-auth/react';
+import { signIn, signOut } from 'next-auth/react';
 import { Controller, useForm } from 'react-hook-form';
 import { valibotResolver } from '@hookform/resolvers/valibot';
 import { email, object, minLength, string, pipe, nonEmpty } from 'valibot';
@@ -49,6 +49,7 @@ type ErrorType = {
 };
 
 type FormData = InferInput<typeof schema>;
+const LOGIN_RETURN_URL_STORAGE_KEY = 'identity_login_return_url';
 
 // ── Map NextAuth error codes to human-readable messages ──────────────────────
 const NEXTAUTH_ERROR_MESSAGES: Record<string, string> = {
@@ -104,11 +105,18 @@ const Login = ({ mode: _mode }: { mode: SystemMode }) => {
     ssoCheckRef.current = true;
 
     const handleSsoToken = async () => {
+      const queryReturnUrl = searchParams.get('returnUrl');
+
+      if (queryReturnUrl) {
+        sessionStorage.setItem(LOGIN_RETURN_URL_STORAGE_KEY, queryReturnUrl);
+      }
+
+      const persistedReturnUrl = sessionStorage.getItem(LOGIN_RETURN_URL_STORAGE_KEY);
       const ssoToken = searchParams.get('sso_token');
       const ssoError = searchParams.get('sso_error');
       const startOAuth = searchParams.get('start_oauth');
       const nextAuthError = searchParams.get('error');
-      const callbackUrl = searchParams.get('callbackUrl') || '/dashboards';
+      const callbackUrl = searchParams.get('callbackUrl') || persistedReturnUrl || '/dashboards';
       const redirectTo = searchParams.get('redirectTo') || '/dashboards';
 
       // ── NextAuth / OIDC error (e.g. OAuthCallback, OAuthSignin) ─────────
@@ -120,6 +128,9 @@ const Login = ({ mode: _mode }: { mode: SystemMode }) => {
           || NEXTAUTH_ERROR_MESSAGES[nextAuthError]
           || NEXTAUTH_ERROR_MESSAGES.Default;
 
+        // Ensure previous authenticated session is cleared when OAuth fails
+        // so UI doesn't bounce to dashboard with stale session.
+        await signOut({ redirect: false });
         setErrorState({ message: [message] });
         setIsCheckingSso(false);
 
@@ -129,6 +140,8 @@ const Login = ({ mode: _mode }: { mode: SystemMode }) => {
       // If start_oauth=true, trigger OAuth flow to get access tokens
       // This happens after SSO login sets the cookie
       if (startOAuth === 'true') {
+        sessionStorage.setItem(LOGIN_RETURN_URL_STORAGE_KEY, callbackUrl);
+
         // Call signIn with sso-oauth provider - this will redirect to Gateway
         // Gateway will see SSO cookie and auto-approve, returning with tokens
         signIn('sso-oauth', { callbackUrl });
@@ -183,7 +196,11 @@ const Login = ({ mode: _mode }: { mode: SystemMode }) => {
     try {
       // Build return URL that will trigger OAuth after SSO cookie is set
       const ssoAppUrl = process.env.NEXT_PUBLIC_APP_URL!;
-      const finalDestination = searchParams.get('returnUrl') || '/dashboards';
+
+      const finalDestination =
+        searchParams.get('returnUrl') || sessionStorage.getItem(LOGIN_RETURN_URL_STORAGE_KEY) || '/dashboards';
+
+      sessionStorage.setItem(LOGIN_RETURN_URL_STORAGE_KEY, finalDestination);
 
       // After exchange-token, redirect to login with start_oauth=true
       // This will trigger signIn('sso-oauth') to complete the OAuth flow
@@ -197,7 +214,7 @@ const Login = ({ mode: _mode }: { mode: SystemMode }) => {
       });
 
       if (!response.success || !response.result) {
-        setErrorState({ message: [response.message || 'Login failed'] });
+        setErrorState({ message: [response.errors?.[0].message || 'Login failed'] });
 
         return;
       }
