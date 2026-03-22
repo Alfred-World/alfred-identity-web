@@ -30,8 +30,8 @@ import {
   usePostIdentityAccount2faConfirm,
   usePostIdentityAccount2faDisable,
   getGetIdentityAccountMeQueryKey
-} from '@/generated/api'
-import type { InitiateEnableTwoFactorResult } from '@/generated/api'
+} from '@/generated/identity-api'
+import type { InitiateEnableTwoFactorResult } from '@/generated/identity-api'
 
 // Component Imports
 import CustomTextField from '@core/components/mui/TextField'

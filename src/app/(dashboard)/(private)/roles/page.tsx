@@ -12,8 +12,8 @@ import RoleList from './_components/RoleList';
 import RolePermissionsDetail from './_components/RolePermissionsDetail';
 import RoleDialog from './_components/RoleDialog';
 import ConfirmationDialog from '@/components/ConfirmationDialog';
-import { getIdentityRoles, useDeleteIdentityRolesId } from '@/generated';
-import type { RoleDto } from '@/generated';
+import { getIdentityRoles, useDeleteIdentityRolesId } from '@/generated/identity-api';
+import type { RoleDto } from '@/generated/identity-api';
 
 const RolesPage = () => {
   const searchParams = useSearchParams();
@@ -61,6 +61,8 @@ const RolesPage = () => {
   const {
     data: infiniteRolesData,
     isLoading: isLoadingRoles,
+    isError: isRolesError,
+    error: rolesError,
     fetchNextPage: fetchNextRolesPage,
     hasNextPage: hasNextRolesPage,
     isFetchingNextPage: isFetchingNextRolesPage,
@@ -85,10 +87,14 @@ const RolesPage = () => {
   });
 
   const roles = useMemo(() => {
-    return (
-      infiniteRolesData?.pages.flatMap(page => (page.success && page.result?.items ? page.result.items : [])) || []
-    );
+    return infiniteRolesData?.pages.flatMap(page => page.result?.items ?? []) || [];
   }, [infiniteRolesData]);
+
+  useEffect(() => {
+    if (isRolesError) {
+      toast.error(rolesError instanceof Error ? rolesError.message : 'Failed to load roles');
+    }
+  }, [isRolesError, rolesError]);
 
   const selectedRole = useMemo(() => {
     return roles.find(role => role.id === selectedRoleId) || null;

@@ -30,7 +30,7 @@ import DirectionalIcon from '@components/DirectionalIcon';
 import Logo from '@components/layout/shared/Logo';
 
 // Generated API Imports
-import { usePostIdentityAuthForgotPassword } from '@/generated';
+import { usePostIdentityAuthForgotPassword } from '@/generated/identity-api';
 import AuthIllustrationWrapper from '@/components/AuthIllustrationWrapper';
 
 // Validation schema

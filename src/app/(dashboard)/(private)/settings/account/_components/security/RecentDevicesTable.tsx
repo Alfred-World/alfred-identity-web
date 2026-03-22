@@ -21,7 +21,7 @@ import {
   useGetIdentityAccountSessions,
   useDeleteIdentityAccountSessionsId,
   getGetIdentityAccountSessionsQueryKey
-} from '@/generated/api'
+} from '@/generated/identity-api'
 
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'

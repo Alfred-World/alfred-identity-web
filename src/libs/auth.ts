@@ -3,7 +3,7 @@ import CredentialProvider from 'next-auth/providers/credentials';
 import type { NextAuthOptions } from 'next-auth';
 
 // Generated API
-import { postIdentityAuthSsoLogin } from '@/generated';
+import { postIdentityAuthSsoLogin } from '@/generated/identity-api';
 
 // Disable SSL verification for self-signed certificates in development
 if (process.env.NODE_ENV === 'development') {

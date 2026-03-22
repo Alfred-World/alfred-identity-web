@@ -22,7 +22,7 @@ import {
   CircularProgress
 } from '@mui/material';
 
-import type { RoleDto } from '@/generated';
+import type { RoleDto } from '@/generated/identity-api';
 
 interface RoleListProps {
   roles: RoleDto[];

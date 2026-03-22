@@ -22,7 +22,7 @@ import {
   useGetIdentityAccountMe,
   usePutIdentityAccountProfile,
   getGetIdentityAccountMeQueryKey,
-} from '@/generated/api'
+} from '@/generated/identity-api'
 
 // Component Imports
 import CustomTextField from '@core/components/mui/TextField'

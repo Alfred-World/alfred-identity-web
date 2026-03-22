@@ -90,8 +90,8 @@ const OptionMenu = (props: OptionsMenuType) => {
         anchorEl={anchorRef.current}
         placement={leftAlignMenu ? 'bottom-start' : 'bottom-end'}
         transition
-        disablePortal
-        sx={{ zIndex: 1 }}
+        disablePortal={false}
+        sx={{ zIndex: theme => theme.zIndex.modal + 1 }}
       >
         {({ TransitionProps }) => (
           <Fade {...TransitionProps}>

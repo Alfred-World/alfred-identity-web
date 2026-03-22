@@ -5,11 +5,10 @@ import { useRouter } from 'next/navigation';
 import { Box } from '@mui/material';
 import { toast } from 'react-toastify';
 
-import { usePostIdentityApplications } from '@/generated';
-import type { CreateApplicationRequest, ApplicationDto } from '@/generated';
+import { usePostIdentityApplications } from '@/generated/identity-api';
+import type { CreateApplicationRequest, ApplicationDto } from '@/generated/identity-api';
 import { ApplicationForm } from '../_components/ApplicationForm';
 import type { ApplicationFormSubmitData } from '../_components/ApplicationForm';
-import { isApiFailure } from '@/libs/custom-instance';
 
 export default function CreateApplicationPage() {
   const _router = useRouter();
@@ -33,7 +32,7 @@ export default function CreateApplicationPage() {
       toast.success('Application created successfully');
 
       return result.result || undefined;
-    } else if (isApiFailure(result)) {
+    } else if (result.errors?.length) {
       result.errors.forEach(err => toast.error(err.message));
     } else {
       toast.error(result.message || 'Failed to create application');

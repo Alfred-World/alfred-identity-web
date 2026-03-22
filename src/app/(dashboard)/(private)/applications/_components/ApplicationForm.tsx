@@ -36,12 +36,12 @@ import Grid from '@mui/material/Grid';
 import { LoadingButton } from '@mui/lab';
 import { toast } from 'react-toastify';
 
-import type { ApplicationDto } from '@/generated';
+import type { ApplicationDto } from '@/generated/identity-api';
 import {
   useGetIdentityApplicationsMetadata,
   usePatchIdentityApplicationsIdStatus,
   usePostIdentityApplicationsIdSecretRegenerate
-} from '@/generated';
+} from '@/generated/identity-api';
 import { useBreadcrumbs } from '@/contexts/BreadcrumbsContext';
 import { ROUTES } from '@/configs/routes';
 

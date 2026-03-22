@@ -18,7 +18,7 @@ import CircularProgress from '@mui/material/CircularProgress'
 import { toast } from 'react-toastify'
 
 // Generated Imports
-import { usePostIdentityAccountChangePassword } from '@/generated/api'
+import { usePostIdentityAccountChangePassword } from '@/generated/identity-api'
 
 // Component Imports
 import CustomTextField from '@core/components/mui/TextField'

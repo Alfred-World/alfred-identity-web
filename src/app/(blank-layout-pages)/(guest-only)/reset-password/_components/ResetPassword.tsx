@@ -33,7 +33,7 @@ import DirectionalIcon from '@components/DirectionalIcon';
 import Logo from '@components/layout/shared/Logo';
 
 // Generated API Imports
-import { usePostIdentityAuthResetPassword } from '@/generated';
+import { usePostIdentityAuthResetPassword } from '@/generated/identity-api';
 
 // Validation schema
 const schema = object({

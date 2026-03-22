@@ -1,70 +1,18 @@
 import { signOut } from 'next-auth/react';
 
 import { NEXT_PUBLIC_GATEWAY_URL } from './env';
+import type { ApiErrorResponse } from '@/generated/identity-api';
 
-// ============================================================
-// Discriminated Union Types for API Responses
-// ============================================================
-// Backend sends unified response shape:
-//   Success: { success: true, result: T, message?: string }
-//   Error:   { success: false, errors: [{ message, code }] }
-//
-// Usage:
-//   const { data } = useDeleteRolesId(...)
-//   if (isApiSuccess(data)) {
-//     data.result  // TS narrows to T (non-null)
-//   } else {
-//     data.errors  // TS narrows to ApiError[]
-//   }
-// ============================================================
+const isApiEnvelopeFailure = (payload: unknown): payload is ApiErrorResponse => {
+  if (!payload || typeof payload !== 'object') {
+    return false;
+  }
 
-export interface ApiError {
-  message: string;
-  code: string;
-}
+  const candidate = payload as ApiErrorResponse;
 
-export interface ApiSuccess<T> {
-  success: true;
-  message?: string;
-  result: T;
-}
+  return candidate.success === false && Array.isArray(candidate.errors);
+};
 
-export interface ApiFailure {
-  success: false;
-  errors: ApiError[];
-}
-
-/**
- * Discriminated union type for API responses.
- * Use isApiSuccess() / isApiFailure() type guards for narrowing.
- */
-export type ApiResult<T> = ApiSuccess<T> | ApiFailure;
-
-/**
- * Type guard: narrows to success response with result.
- *
- * @example
- * if (isApiSuccess(data)) {
- *   console.log(data.result.name);  // TS knows result is non-null
- * }
- */
-export function isApiSuccess<T extends { success: boolean; result?: unknown }>(
-  response: T | null | undefined
-): response is T & { success: true; result: NonNullable<T['result']> } {
-  return response?.success === true;
-}
-
-/**
- * Type guard: narrows to failure response with errors array.
- *
- * @example
- * if (isApiFailure(data)) {
- *   data.errors.forEach(e => toast.error(e.message));
- * }
- */
-export function isApiFailure(response: { success: boolean; errors?: unknown } | null | undefined): response is ApiFailure {
-  return response?.success === false && Array.isArray(response?.errors);
-}
 
 /**
  * Gateway base URL (public, build-time inlined).
@@ -117,19 +65,27 @@ async function redirectToLogin(): Promise<never> {
  *
  * @example
  * const { data } = useGetRoles()
- * if (isApiSuccess(data)) {
+ * if (data.success) {
  *   console.log(data.result?.items)
  * }
  */
 export const customFetch = async <T>(url: string, options?: RequestInit): Promise<T> => {
+  const requestMethod = (options?.method ?? 'GET').toUpperCase();
+  const shouldThrowHookError = requestMethod === 'GET';
+
   // Server-side (NextAuth callbacks, SSR): call gateway directly — no proxy needed
   if (typeof window === 'undefined') {
     const serverGatewayUrl = process.env.INTERNAL_GATEWAY_URL || GATEWAY_URL;
     const fullUrl = url.startsWith('http') ? url : `${serverGatewayUrl}${url}`;
 
     const response = await fetch(fullUrl, { ...options });
+    const body = await response.json() as T;
 
-    return response.json() as Promise<T>;
+    if (shouldThrowHookError && (!response.ok || isApiEnvelopeFailure(body))) {
+      throw body;
+    }
+
+    return body;
   }
 
   if (isRedirectingToLogin) {
@@ -161,15 +117,23 @@ export const customFetch = async <T>(url: string, options?: RequestInit): Promis
     const isPermissionError = apiBody.errors?.some(e => e.code !== 'UNAUTHORIZED');
 
     if (isPermissionError) {
+      if (shouldThrowHookError && isApiEnvelopeFailure(body)) {
+        throw body;
+      }
+
       return body;
     }
 
     return redirectToLogin();
   }
 
-  // For all responses (including 4xx/5xx), return JSON body
-  // so react-query can use isApiSuccess/isApiFailure for type narrowing
-  return response.json() as Promise<T>;
+  const body = await response.json() as T;
+
+  if (shouldThrowHookError && (!response.ok || isApiEnvelopeFailure(body))) {
+    throw body;
+  }
+
+  return body;
 };
 
 // Error type for react-query

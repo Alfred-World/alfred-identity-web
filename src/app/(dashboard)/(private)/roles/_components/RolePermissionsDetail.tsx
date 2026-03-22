@@ -18,8 +18,8 @@ import { alpha, useTheme } from '@mui/material/styles';
 
 import { toast } from 'react-toastify';
 
-import { usePostIdentityRolesIdPermissions, getIdentityPermissions } from '@/generated';
-import type { RoleDto, PermissionDto, PermissionDtoApiPagedResponse } from '@/generated';
+import { usePostIdentityRolesIdPermissions, getIdentityPermissions } from '@/generated/identity-api';
+import type { RoleDto, PermissionDto, PermissionDtoApiPagedResponse } from '@/generated/identity-api';
 
 interface RolePermissionsDetailProps {
   role: RoleDto | null;
@@ -47,7 +47,9 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-    isLoading: isLoadingAll
+    isLoading: isLoadingAll,
+    isError: isPermissionsError,
+    error: permissionsError
   } = useInfiniteQuery({
     queryKey: ['permissions', 'infinite', 'list'],
     initialPageParam: 1,
@@ -199,6 +201,12 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
   };
 
   // -- Render --
+
+  useEffect(() => {
+    if (isPermissionsError) {
+      toast.error(permissionsError instanceof Error ? permissionsError.message : 'Failed to load permissions');
+    }
+  }, [isPermissionsError, permissionsError]);
 
   if (isLoading || isLoadingAll || isFakeLoading) {
     return (

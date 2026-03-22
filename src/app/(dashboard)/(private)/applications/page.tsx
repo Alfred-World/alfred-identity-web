@@ -5,14 +5,15 @@ import { useState, useCallback, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 
 import { Box, Grid, Typography, Button, Chip } from '@mui/material';
+import { toast } from 'react-toastify';
 
 import { DslQueryBuilder } from '@/components/dsl-query-builder';
 import type { FieldConfig, FilterCondition } from '@/components/dsl-query-builder';
 import { useUrlPagination, useUrlSorting } from '@/components/UrlPagination';
 import { AdvancedTable } from '@/components/AdvancedTable';
 import type { ColumnConfig } from '@/components/AdvancedTable';
-import { useGetIdentityApplications } from '@/generated';
-import type { ApplicationDto } from '@/generated';
+import { useGetIdentityApplications } from '@/generated/identity-api';
+import type { ApiErrorResponse, ApplicationDto } from '@/generated/identity-api';
 
 import { ApplicationListActions } from './_components/ApplicationListActions';
 import { useBreadcrumbs } from '@/contexts/BreadcrumbsContext';
@@ -40,6 +41,26 @@ export default function ApplicationsPage() {
   });
 
   const result = data?.success ? data.result : null;
+
+  const apiErrorMessage = useMemo(() => {
+    if (!error) {
+      return null;
+    }
+
+    if (error instanceof Error) {
+      return error.message;
+    }
+
+    const apiError = error as ApiErrorResponse;
+
+    return apiError.errors?.[0]?.message || 'Failed to load applications';
+  }, [error]);
+
+  useEffect(() => {
+    if (apiErrorMessage) {
+      toast.error(apiErrorMessage);
+    }
+  }, [apiErrorMessage]);
 
   // Filter field config for DslQueryBuilder (filterable fields only)
   const filterFields: FieldConfig[] = useMemo(
@@ -159,10 +180,6 @@ export default function ApplicationsPage() {
   const handleChange = useCallback((_conditions: FilterCondition[], _query: string) => {
     // Optional: track changes without triggering search
   }, []);
-
-  if (error) {
-    return <Typography color='error'>Error loading data: {String(error)}</Typography>;
-  }
 
   return (
     <Box sx={{ p: 3 }}>

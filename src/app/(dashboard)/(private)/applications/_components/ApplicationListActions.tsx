@@ -20,7 +20,7 @@ import {
 
 import { toast } from 'react-toastify';
 
-import { useDeleteIdentityApplicationsId } from '@/generated';
+import { useDeleteIdentityApplicationsId } from '@/generated/identity-api';
 
 interface ApplicationListActionsProps {
   id: string;

@@ -21,8 +21,8 @@ import { valibotResolver } from '@hookform/resolvers/valibot';
 import { object, string, minLength, pipe, optional, boolean } from 'valibot';
 import { toast } from 'react-toastify';
 
-import { usePostIdentityRoles, usePutIdentityRolesId } from '@/generated';
-import type { RoleDto } from '@/generated';
+import { usePostIdentityRoles, usePutIdentityRolesId } from '@/generated/identity-api';
+import type { RoleDto } from '@/generated/identity-api';
 
 import RoleIconPicker from './RoleIconPicker';
 

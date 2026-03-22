@@ -7,11 +7,10 @@ import { useRouter } from 'next/navigation';
 import { Box, Typography, CircularProgress } from '@mui/material';
 import { toast } from 'react-toastify';
 
-import { useGetIdentityApplicationsId, usePutIdentityApplicationsId } from '@/generated';
-import type { UpdateApplicationRequest } from '@/generated';
+import { useGetIdentityApplicationsId, usePutIdentityApplicationsId } from '@/generated/identity-api';
+import type { UpdateApplicationRequest } from '@/generated/identity-api';
 import { ApplicationForm } from '../_components/ApplicationForm';
 import type { ApplicationFormSubmitData } from '../_components/ApplicationForm';
-import { isApiFailure } from '@/libs/custom-instance';
 import { ROUTES } from '@/configs/routes';
 
 export default function EditApplicationPage({ params }: { params: Promise<{ id: string }> }) {
@@ -27,7 +26,7 @@ export default function EditApplicationPage({ params }: { params: Promise<{ id: 
         if (data?.success) {
           toast.success('Application updated successfully');
           router.push(ROUTES.APPLICATIONS.LIST);
-        } else if (isApiFailure(data)) {
+        } else if (data?.errors?.length) {
           data.errors.forEach(err => toast.error(err.message));
         } else {
           toast.error(data?.message || 'Failed to update application');

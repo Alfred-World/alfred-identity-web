@@ -41,8 +41,8 @@ import themeConfig from '@configs/themeConfig';
 
 // SSO Imports
 import { validateSsoToken } from '@/libs/sso-config';
-import { postIdentityAuthSsoLogin } from '@/generated';
-import type { SessionUserInfoDto } from '@/generated';
+import { postIdentityAuthSsoLogin } from '@/generated/identity-api';
+import type { SessionUserInfoDto } from '@/generated/identity-api';
 
 type ErrorType = {
   message: string[];
