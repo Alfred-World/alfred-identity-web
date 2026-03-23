@@ -5,6 +5,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Box,
   Card,
+  CardHeader,
   Typography,
   TextField,
   InputAdornment,
@@ -103,11 +104,26 @@ const RoleList = ({
 
   return (
     <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', bgcolor: 'background.paper' }}>
-      <Box sx={{ p: 4, pb: 2 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-          <Typography variant='h5' fontWeight={600}>
-            Roles
-          </Typography>
+      <CardHeader
+        title={
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <Box
+              sx={{
+                p: 2,
+                borderRadius: 1,
+                bgcolor: alpha(theme.palette.primary.main, 0.1),
+                color: 'primary.main',
+                display: 'flex'
+              }}
+            >
+              <i className='tabler-users' style={{ fontSize: '1.5rem' }} />
+            </Box>
+            <Typography variant='h5' fontWeight={600}>
+              Roles
+            </Typography>
+          </Box>
+        }
+        action={
           <Chip
             label={`${roles.length} Total`}
             size='small'
@@ -115,7 +131,21 @@ const RoleList = ({
             color='secondary'
             sx={{ fontWeight: 500 }}
           />
-        </Box>
+        }
+        sx={{
+          p: 4,
+          pb: 2,
+          minHeight: 92,
+          display: 'flex',
+          alignItems: 'center',
+          '& .MuiCardHeader-content': { overflow: 'hidden' },
+          '& .MuiCardHeader-action': { mt: 0, alignSelf: 'center' }
+        }}
+      />
+
+      <Divider />
+
+      <Box sx={{ p: 4, pb: 2 }}>
 
         <TextField
           fullWidth
@@ -132,14 +162,13 @@ const RoleList = ({
               ),
               endAdornment: search && (
                 <InputAdornment position='end'>
-                  <IconButton size='small' onClick={() => setSearch('')} edge='end' sx={{ color: 'text.secondary' }}>
+                  <IconButton size='small' edge='end' onClick={() => setSearch('')} sx={{ color: 'text.secondary' }}>
                     <i className='tabler-x' style={{ fontSize: '1.1rem' }} />
                   </IconButton>
                 </InputAdornment>
               )
             }
           }}
-          sx={{ mb: 2 }}
         />
       </Box>
 

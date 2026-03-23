@@ -19,8 +19,11 @@ import OptionMenu from '@core/components/option-menu';
 import { customFetch } from '@/libs/custom-instance';
 
 import {
+  useDeleteIdentityMgmtUsersUserIdRoles,
   getGetIdentityMgmtUsersQueryKey,
+  useGetIdentityRoles,
   useGetIdentityMgmtUsers,
+  usePostIdentityMgmtUsersUserIdRoles,
   usePostIdentityMgmtUsersUserIdBan,
   usePostIdentityMgmtUsersUserIdUnban
 } from '@/generated/identity-api';
@@ -28,16 +31,34 @@ import type { UserDto } from '@/generated/identity-api';
 
 import AddUserDialog from './AddUserDialog';
 import BanUserDialog from './BanUserDialog';
+import UserRolesDialog from './UserRolesDialog';
 
 type BanDialogState = {
   userId: string;
   userDisplayName: string;
 };
 
+type RoleDialogState = {
+  userId: string;
+  userDisplayName: string;
+  initialRoleIds: string[];
+};
+
+const getApiEnvelopeErrorMessage = (response: unknown, fallback: string) => {
+  if (!response || typeof response !== 'object') {
+    return fallback;
+  }
+
+  const candidate = response as { errors?: Array<{ message?: string }> };
+
+  return candidate.errors?.[0]?.message || fallback;
+};
+
 const UserList = () => {
   const queryClient = useQueryClient();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [banDialogState, setBanDialogState] = useState<BanDialogState | null>(null);
+  const [roleDialogState, setRoleDialogState] = useState<RoleDialogState | null>(null);
   const [isConfirmingEmail, setIsConfirmingEmail] = useState(false);
   const [isSyncingUsers, setIsSyncingUsers] = useState(false);
 
@@ -94,6 +115,78 @@ const UserList = () => {
       }
     }
   });
+
+  const { mutateAsync: assignRolesToUser, isPending: isAssigningRoles } = usePostIdentityMgmtUsersUserIdRoles();
+  const { mutateAsync: revokeRolesFromUser, isPending: isRevokingRoles } = useDeleteIdentityMgmtUsersUserIdRoles();
+
+  const { data: rolesResponse, isLoading: isLoadingRoles } = useGetIdentityRoles({
+    page: 1,
+    pageSize: 200,
+    sort: 'name',
+    view: 'list'
+  });
+
+  const roles = useMemo(() => {
+    if (!rolesResponse?.success) {
+      return [];
+    }
+
+    return rolesResponse.result?.items ?? [];
+  }, [rolesResponse]);
+
+  const handleSaveUserRoles = useCallback(
+    async (selectedRoleIds: string[]) => {
+      if (!roleDialogState?.userId) {
+        return;
+      }
+
+      const initialRoleIds = roleDialogState.initialRoleIds;
+      const roleIdsToAdd = selectedRoleIds.filter(roleId => !initialRoleIds.includes(roleId));
+      const roleIdsToRemove = initialRoleIds.filter(roleId => !selectedRoleIds.includes(roleId));
+
+      if (roleIdsToAdd.length === 0 && roleIdsToRemove.length === 0) {
+        setRoleDialogState(null);
+
+        return;
+      }
+
+      try {
+        const pendingRequests: Promise<unknown>[] = [];
+
+        if (roleIdsToAdd.length > 0) {
+          pendingRequests.push(assignRolesToUser({ userId: roleDialogState.userId, data: roleIdsToAdd }));
+        }
+
+        if (roleIdsToRemove.length > 0) {
+          pendingRequests.push(revokeRolesFromUser({ userId: roleDialogState.userId, data: roleIdsToRemove }));
+        }
+
+        const mutationResults = await Promise.all(pendingRequests);
+
+        const firstFailure = mutationResults.find(result => {
+          if (!result || typeof result !== 'object') {
+            return true;
+          }
+
+          const response = result as { success?: boolean };
+
+          return response.success !== true;
+        });
+
+        if (firstFailure) {
+          throw new Error(getApiEnvelopeErrorMessage(firstFailure, 'Failed to update user roles'));
+        }
+
+        toast.success('User roles updated successfully');
+        setRoleDialogState(null);
+        refreshUsers();
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Failed to update user roles';
+        toast.error(message);
+      }
+    },
+    [assignRolesToUser, refreshUsers, revokeRolesFromUser, roleDialogState]
+  );
 
   const confirmUserEmail = useCallback(
     async (userId: string) => {
@@ -336,6 +429,24 @@ const UserList = () => {
                 options={[
                   { text: 'View Details', menuItemProps: { disabled: true } },
                   {
+                    text: 'Manage Roles',
+                    icon: <i className='ri-shield-user-line' />,
+                    menuItemProps: {
+                      disabled: !userId,
+                      onClick: () => {
+                        if (!userId) {
+                          return;
+                        }
+
+                        setRoleDialogState({
+                          userId,
+                          userDisplayName,
+                          initialRoleIds: (row.roles || []).map(role => role.id).filter((id): id is string => !!id)
+                        });
+                      }
+                    }
+                  },
+                  {
                     text: isEmailConfirmed ? 'Email Verified' : 'Verify Email',
                     icon: <i className={isEmailConfirmed ? 'ri-checkbox-circle-line' : 'ri-mail-check-line'} />,
                     menuItemProps: {
@@ -445,6 +556,17 @@ const UserList = () => {
             }
           });
         }}
+      />
+
+      <UserRolesDialog
+        open={!!roleDialogState}
+        userDisplayName={roleDialogState?.userDisplayName || 'this user'}
+        roles={roles}
+        initialRoleIds={roleDialogState?.initialRoleIds || []}
+        isLoadingRoles={isLoadingRoles}
+        isSaving={isAssigningRoles || isRevokingRoles}
+        onClose={() => setRoleDialogState(null)}
+        onSave={handleSaveUserRoles}
       />
     </>
   );

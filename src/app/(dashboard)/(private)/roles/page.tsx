@@ -157,9 +157,9 @@ const RolesPage = () => {
 
   return (
     <Box sx={{ p: { xs: 0, md: 2 }, height: '100%' }}>
-      <Grid container spacing={4} sx={{ height: '100%', minHeight: 'calc(100vh - 200px)' }}>
+      <Grid container spacing={4} sx={{ height: '100%', minHeight: 'calc(100vh - 180px)' }}>
         {/* Left Column: Role List */}
-        <Grid size={{ xs: 12, md: 4, lg: 3 }} sx={{ height: { xs: 'auto', md: 'calc(100vh - 200px)' } }}>
+        <Grid size={{ xs: 12, md: 4, lg: 3 }} sx={{ height: { xs: 'auto', md: 'calc(100vh - 180px)' } }}>
           <RoleList
             roles={roles}
             selectedRoleId={selectedRoleId}
@@ -175,7 +175,7 @@ const RolesPage = () => {
         </Grid>
 
         {/* Right Column: Permission Details */}
-        <Grid size={{ xs: 12, md: 8, lg: 9 }}>
+        <Grid size={{ xs: 12, md: 8, lg: 9 }} sx={{ height: { xs: 'auto', md: 'calc(100vh - 180px)' } }}>
           <RolePermissionsDetail
             key={selectedRole?.id || 'empty-role'}
             role={selectedRole}

@@ -11,6 +11,9 @@ import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Switch from '@mui/material/Switch';
+import TextField from '@mui/material/TextField';
+import InputAdornment from '@mui/material/InputAdornment';
+import IconButton from '@mui/material/IconButton';
 import Divider from '@mui/material/Divider';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
@@ -75,6 +78,8 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
     return infiniteData?.pages.flatMap(getItemsFromPage) || [];
   }, [infiniteData]);
 
+  const [search, setSearch] = useState('');
+
   // -- 2. Current Role Permissions --
   const [selectedPermissionIds, setSelectedPermissionIds] = useState<string[]>(() => {
     if (role?.permissions && Array.isArray(role.permissions)) {
@@ -128,8 +133,8 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
   useEffect(() => {
     const observer = new IntersectionObserver(handleObserver, {
       root: scrollContainerRef.current,
-      rootMargin: '100px',
-      threshold: 0.1
+      rootMargin: '160px',
+      threshold: 0
     });
 
     const currentRef = loadMoreRef.current;
@@ -140,15 +145,41 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
 
     return () => {
       if (currentRef) observer.unobserve(currentRef);
+      observer.disconnect();
     };
   }, [handleObserver]);
 
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+
+    if (!container || !hasNextPage || isFetchingNextPage || isLoadingAll) {
+      return;
+    }
+
+    const shouldPrefetch = container.scrollHeight <= container.clientHeight + 16;
+
+    if (shouldPrefetch) {
+      fetchNextPage();
+    }
+  }, [allPermissions.length, fetchNextPage, hasNextPage, isFetchingNextPage, isLoadingAll]);
+
   // -- 6. Grouping Logic --
-  // Group by 'resource'
+  // Group by 'resource' and apply search filter
   const groupedPermissions = useMemo(() => {
     const groups: Record<string, PermissionDto[]> = {};
 
-    allPermissions.forEach(p => {
+    const filtered = allPermissions.filter(p => {
+      if (!search) return true;
+      const searchLower = search.toLowerCase();
+
+      return (
+        p.name?.toLowerCase().includes(searchLower) ||
+        p.resource?.toLowerCase().includes(searchLower) ||
+        p.description?.toLowerCase().includes(searchLower)
+      );
+    });
+
+    filtered.forEach(p => {
       const resource = p.resource || 'Other';
 
       if (!groups[resource]) groups[resource] = [];
@@ -156,7 +187,7 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
     });
 
     return groups;
-  }, [allPermissions]);
+  }, [allPermissions, search]);
 
   // -- 7. Action Handlers --
 
@@ -251,32 +282,80 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
           </Box>
         }
         action={
-          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', height: 24 }}>
             <Typography variant='caption' color='text.secondary'>
-              {selectedPermissionIds.length} permissions selected
+              {selectedPermissionIds.length} selected
             </Typography>
-            <Button variant='text' color='secondary' onClick={handleReset} disabled={isUpdating || !!role.isImmutable}>
+            <Button
+              variant='text'
+              color='secondary'
+              onClick={handleReset}
+              disabled={isUpdating || !!role.isImmutable}
+              sx={{ minWidth: 'auto', p: 0 }}
+            >
               Reset
             </Button>
             <Button
               variant='contained'
+              size='small'
               startIcon={
-                isUpdating ? <CircularProgress size={20} color='inherit' /> : <i className='tabler-device-floppy' />
+                isUpdating ? <CircularProgress size={16} color='inherit' /> : <i className='tabler-device-floppy' />
               }
               onClick={handleSave}
               disabled={isUpdating || !!role.isImmutable}
               sx={{
                 bgcolor: role.isImmutable ? 'action.disabledBackground' : 'info.main',
                 '&:hover': { bgcolor: role.isImmutable ? 'action.disabledBackground' : 'info.dark' },
-                boxShadow: role.isImmutable ? 'none' : `0 0 15px ${alpha(theme.palette.info.main, 0.4)}`
+                boxShadow: role.isImmutable ? 'none' : `0 0 10px ${alpha(theme.palette.info.main, 0.3)}`
               }}
             >
-              Save Changes
+              Save
             </Button>
           </Box>
         }
-        sx={{ p: 4, pb: 2 }}
+        sx={{
+          p: 4,
+          pb: 2,
+          minHeight: 92,
+          display: 'flex',
+          alignItems: 'center',
+          '& .MuiCardHeader-content': { overflow: 'hidden' },
+          '& .MuiCardHeader-action': { mt: 0, alignSelf: 'center' }
+        }}
       />
+
+      <Divider />
+
+      <Box sx={{ p: 4, pb: 2 }}>
+        <TextField
+          fullWidth
+          size='small'
+          placeholder='Search permissions...'
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position='start'>
+                  <i className='tabler-search text-secondary' />
+                </InputAdornment>
+              ),
+              endAdornment: search && (
+                <InputAdornment position='end'>
+                  <IconButton
+                    size='small'
+                    onClick={() => setSearch('')}
+                    edge='end'
+                    sx={{ color: 'text.secondary' }}
+                  >
+                    <i className='tabler-x' style={{ fontSize: '1.1rem' }} />
+                  </IconButton>
+                </InputAdornment>
+              )
+            }
+          }}
+        />
+      </Box>
 
       <Divider />
 
@@ -287,115 +366,109 @@ const RolePermissionsDetail = ({ role, isLoading }: RolePermissionsDetailProps) 
           flexGrow: 1,
           overflowY: 'auto',
           p: 4,
-          maxHeight: 'calc(100vh - 300px)'
+          maxHeight: 'none'
         }}
       >
         <Grid container spacing={6}>
           {Object.entries(groupedPermissions).map(([resource, perms]) => {
-            // Note: This logic only considers *loaded* permissions for "All Selected" check
-            const groupIds = perms.map(p => p.id!);
-
-            const _isAllLoadedSelected =
-              groupIds.length > 0 && groupIds.every(id => selectedPermissionIds.includes(id));
-
             return (
               <Grid size={{ xs: 12 }} key={resource}>
-                {/* Sticky Header for Resource Group */}
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    mb: 3,
-                    position: 'sticky',
-                    top: -24, // Offset for padding
-                    zIndex: 10,
-                    bgcolor: 'background.paper',
-                    py: 2,
-                    borderBottom: '1px dashed',
-                    borderColor: 'divider'
-                  }}
-                >
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <i className='tabler-lock-open' style={{ color: theme.palette.info.main }} />
-                    <Typography variant='subtitle1' fontWeight={600} color='text.primary'>
-                      {resource} Management
-                    </Typography>
-                  </Box>
-                  {!role.isImmutable && (
-                    <Box sx={{ display: 'flex', gap: 4 }}>
-                      <Typography
-                        variant='caption'
-                        sx={{
-                          cursor: 'pointer',
-                          color: 'primary.main',
-                          fontWeight: 600,
-                          '&:hover': { textDecoration: 'underline' }
-                        }}
-                        onClick={() => handleSelectAllGroup(perms)}
-                      >
-                        Select All
-                      </Typography>
-                      <Typography
-                        variant='caption'
-                        sx={{
-                          cursor: 'pointer',
-                          color: 'error.main',
-                          fontWeight: 600,
-                          '&:hover': { textDecoration: 'underline' }
-                        }}
-                        onClick={() => handleRevokeAllGroup(perms)}
-                      >
-                        Revoke All
+                  {/* Sticky Header for Resource Group */}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      mb: 3,
+                      position: 'sticky',
+                      top: -24, // Offset for padding
+                      zIndex: 10,
+                      bgcolor: 'background.paper',
+                      py: 2,
+                      borderBottom: '1px dashed',
+                      borderColor: 'divider'
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <i className='tabler-lock-open' style={{ color: theme.palette.info.main }} />
+                      <Typography variant='subtitle1' fontWeight={600} color='text.primary'>
+                        {resource} Management
                       </Typography>
                     </Box>
-                  )}
-                </Box>
-
-                <Grid container spacing={3}>
-                  {perms.map(perm => {
-                    const isSelected = selectedPermissionIds.includes(perm.id!);
-
-                    return (
-                      <Grid size={{ xs: 12 }} key={perm.id}>
-                        <Box
+                    {!role.isImmutable && (
+                      <Box sx={{ display: 'flex', gap: 4 }}>
+                        <Typography
+                          variant='caption'
                           sx={{
-                            p: 3,
-                            borderRadius: 1,
-                            bgcolor: isSelected
-                              ? alpha(themeColor, 0.04)
-                              : alpha(theme.palette.background.default, 0.4),
-                            border: '1px solid',
-                            borderColor: isSelected ? alpha(themeColor, 0.5) : 'divider',
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            transition: 'all 0.2s',
-                            '&:hover': {
-                              borderColor: alpha(themeColor, 0.8),
-                              bgcolor: alpha(themeColor, 0.08)
-                            }
+                            cursor: 'pointer',
+                            color: 'primary.main',
+                            fontWeight: 600,
+                            '&:hover': { textDecoration: 'underline' }
                           }}
+                          onClick={() => handleSelectAllGroup(perms)}
                         >
-                          <Box>
-                            <Typography variant='body2' fontWeight={600}>
-                              {perm.name}
-                            </Typography>
-                            <Typography variant='caption' color='text.secondary'>
-                              {perm.description || 'Allow access to this permission'}
-                            </Typography>
+                          Select All
+                        </Typography>
+                        <Typography
+                          variant='caption'
+                          sx={{
+                            cursor: 'pointer',
+                            color: 'error.main',
+                            fontWeight: 600,
+                            '&:hover': { textDecoration: 'underline' }
+                          }}
+                          onClick={() => handleRevokeAllGroup(perms)}
+                        >
+                          Revoke All
+                        </Typography>
+                      </Box>
+                    )}
+                  </Box>
+
+                  <Grid container spacing={3}>
+                    {perms.map(perm => {
+                      const isSelected = selectedPermissionIds.includes(perm.id!);
+
+                      return (
+                        <Grid size={{ xs: 12 }} key={perm.id}>
+                          <Box
+                            sx={{
+                              p: 3,
+                              borderRadius: 1,
+                              bgcolor: isSelected
+                                ? alpha(themeColor, 0.04)
+                                : alpha(theme.palette.background.default, 0.4),
+                              border: '1px solid',
+                              borderColor: isSelected ? alpha(themeColor, 0.5) : 'divider',
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              transition: 'all 0.2s',
+                              '&:hover': {
+                                borderColor: alpha(themeColor, 0.8),
+                                bgcolor: alpha(themeColor, 0.08)
+                              }
+                            }}
+                          >
+                            <Box>
+                              <Typography variant='body2' fontWeight={600}>
+                                {perm.name}
+                              </Typography>
+                              <Typography variant='caption' color='text.secondary'>
+                                {perm.description || 'Allow access to this permission'}
+                              </Typography>
+                            </Box>
+                            <Switch
+                              checked={isSelected}
+                              onChange={() => handleToggle(perm.id!)}
+                              size='small'
+                              disabled={!!role.isImmutable}
+                            />
                           </Box>
-                          <Switch
-                            checked={isSelected}
-                            onChange={() => handleToggle(perm.id!)}
-                            size='small'
-                            disabled={!!role.isImmutable}
-                          />
-                        </Box>
-                      </Grid>
-                    );
-                  })}
-                </Grid>
+                        </Grid>
+                      );
+                    })}
+                  </Grid>
               </Grid>
             );
           })}
