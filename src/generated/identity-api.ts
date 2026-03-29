@@ -88,7 +88,8 @@ export interface ApiErrorResponse {
 
 export interface ApplicationDto {
   id?: string;
-  clientId?: string;
+  /** @nullable */
+  clientId?: string | null;
   /** @nullable */
   clientSecret?: string | null;
   /** @nullable */
@@ -368,8 +369,10 @@ export interface ObjectApiResponse {
 
 export interface PermissionDto {
   id?: string;
-  code?: string;
-  name?: string;
+  /** @nullable */
+  code?: string | null;
+  /** @nullable */
+  name?: string | null;
   /** @nullable */
   description?: string | null;
   /** @nullable */
@@ -4508,7 +4511,7 @@ export function useGetHealth<TData = Awaited<ReturnType<typeof getHealth>>, TErr
 /**
  * Forces the generation of a new signing key and adds it to the key ring.
 Old keys remain valid for verification until they expire.
-Requires Admin or Owner role.
+Requires system-level permission.
  * @summary Manually rotate authentication signing keys
  */
 export const getPostIdentityKeysRotateUrl = () => {
