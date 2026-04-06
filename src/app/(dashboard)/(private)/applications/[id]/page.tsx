@@ -7,11 +7,12 @@ import { useRouter } from 'next/navigation';
 import { Box, Typography, CircularProgress } from '@mui/material';
 import { toast } from 'react-toastify';
 
-import { useGetIdentityApplicationsId, usePutIdentityApplicationsId } from '@/generated/identity-api';
+import { useGetIdentityApplicationsId, usePatchIdentityApplicationsId } from '@/generated/identity-api';
 import type { UpdateApplicationRequest } from '@/generated/identity-api';
 import { ApplicationForm } from '../_components/ApplicationForm';
 import type { ApplicationFormSubmitData } from '../_components/ApplicationForm';
 import { ROUTES } from '@/configs/routes';
+import { getChangedFields } from '@/utils/getChangedFields';
 
 export default function EditApplicationPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
@@ -20,7 +21,7 @@ export default function EditApplicationPage({ params }: { params: Promise<{ id: 
 
   const { data: applicationData, isLoading: isFetching } = useGetIdentityApplicationsId(id);
 
-  const { mutate: updateApplication, isPending: isUpdating } = usePutIdentityApplicationsId({
+  const { mutate: updateApplication, isPending: isUpdating } = usePatchIdentityApplicationsId({
     mutation: {
       onSuccess: data => {
         if (data?.success) {
@@ -55,14 +56,27 @@ export default function EditApplicationPage({ params }: { params: Promise<{ id: 
   }
 
   const handleSubmit = (data: ApplicationFormSubmitData) => {
-    const payload: UpdateApplicationRequest = {
+    const current: UpdateApplicationRequest = {
       displayName: data.displayName,
       redirectUris: data.redirectUris,
       postLogoutRedirectUris: data.postLogoutRedirectUris || null,
       permissions: data.permissions || null
     };
 
-    updateApplication({ id, data: payload });
+    const original: UpdateApplicationRequest = {
+      displayName: result.displayName ?? '',
+      redirectUris: Array.isArray(result.redirectUris) ? result.redirectUris.join(',') : (result.redirectUris ?? null),
+      postLogoutRedirectUris: Array.isArray(result.postLogoutRedirectUris)
+        ? result.postLogoutRedirectUris.join(',')
+        : (result.postLogoutRedirectUris ?? null),
+      permissions: Array.isArray(result.permissions) ? result.permissions.join(',') : (result.permissions ?? null)
+    };
+
+    const changes = getChangedFields(original, current);
+
+    if (!changes) return;
+
+    updateApplication({ id, data: changes });
   };
 
   return (

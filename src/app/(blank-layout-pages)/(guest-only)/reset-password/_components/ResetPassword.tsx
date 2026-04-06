@@ -37,14 +37,8 @@ import { usePostIdentityAuthResetPassword } from '@/generated/identity-api';
 
 // Validation schema
 const schema = object({
-  newPassword: pipe(
-    string(),
-    minLength(8, 'Password must be at least 8 characters long')
-  ),
-  confirmPassword: pipe(
-    string(),
-    minLength(1, 'Confirm password is required')
-  )
+  newPassword: pipe(string(), minLength(8, 'Password must be at least 8 characters long')),
+  confirmPassword: pipe(string(), minLength(1, 'Confirm password is required'))
 });
 
 type FormData = InferInput<typeof schema>;
@@ -77,7 +71,7 @@ const ResetPassword = ({ mode: _mode }: { mode: SystemMode }) => {
 
   const { mutateAsync: resetPassword } = usePostIdentityAuthResetPassword();
 
-  const onSubmit: SubmitHandler<FieldValues> = async (data) => {
+  const onSubmit: SubmitHandler<FieldValues> = async data => {
     // Check if passwords match
     if (data.newPassword !== data.confirmPassword) {
       setErrorMessage('Passwords do not match');
@@ -111,12 +105,10 @@ const ResetPassword = ({ mode: _mode }: { mode: SystemMode }) => {
       } else {
         setErrorMessage(res.errors?.[0]?.message || 'Failed to reset password');
       }
-    }
-    catch (error) {
+    } catch (error) {
       console.error('Error resetting password:', (error as Error).message);
       setErrorMessage((error as Error).message);
-    }
-    finally {
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -158,7 +150,9 @@ const ResetPassword = ({ mode: _mode }: { mode: SystemMode }) => {
             </div>
 
             {errorMessage && (
-              <Alert severity='error' className='mbe-4'>{errorMessage}</Alert>
+              <Alert severity='error' className='mbe-4'>
+                {errorMessage}
+              </Alert>
             )}
 
             <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-6'>

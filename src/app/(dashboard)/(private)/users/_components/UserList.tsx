@@ -182,6 +182,7 @@ const UserList = () => {
         refreshUsers();
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Failed to update user roles';
+
         toast.error(message);
       }
     },
@@ -220,7 +221,11 @@ const UserList = () => {
   const { page, pageSize, setPage, setPageSize } = useUrlPagination();
   const { sort, sorting, setSorting } = useUrlSorting();
 
-  const { data: usersResponse, isLoading, error } = useGetIdentityMgmtUsers({
+  const {
+    data: usersResponse,
+    isLoading,
+    error
+  } = useGetIdentityMgmtUsers({
     page,
     pageSize,
     sort,
@@ -313,12 +318,7 @@ const UserList = () => {
         dataType: 'bool',
         enableSorting: true,
         renderCell: value => (
-          <Chip
-            size='small'
-            variant='tonal'
-            color={value ? 'success' : 'error'}
-            label={value ? 'Yes' : 'No'}
-          />
+          <Chip size='small' variant='tonal' color={value ? 'success' : 'error'} label={value ? 'Yes' : 'No'} />
         )
       },
       {
@@ -519,9 +519,7 @@ const UserList = () => {
             <Button
               variant='outlined'
               color='secondary'
-              startIcon={
-                <i className={isSyncingUsers ? 'ri-loader-4-line animate-spin' : 'ri-refresh-line'} />
-              }
+              startIcon={<i className={isSyncingUsers ? 'ri-loader-4-line animate-spin' : 'ri-refresh-line'} />}
               disabled={isSyncingUsers || isLoading}
               onClick={() => {
                 void syncUsers();
@@ -529,7 +527,11 @@ const UserList = () => {
             >
               Sync Users
             </Button>
-            <Button variant='contained' startIcon={<i className='ri-add-line' />} onClick={() => setIsAddDialogOpen(true)}>
+            <Button
+              variant='contained'
+              startIcon={<i className='ri-add-line' />}
+              onClick={() => setIsAddDialogOpen(true)}
+            >
               Add New User
             </Button>
           </Box>

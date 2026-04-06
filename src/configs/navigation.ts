@@ -50,7 +50,7 @@ export const BREADCRUMB_TITLES: Record<string, string> = {
   [ROUTES.APPLICATIONS.CREATE]: 'Create Application',
   [ROUTES.USERS.ROOT]: 'Users',
   [ROUTES.ROLES.ROOT]: 'Roles',
-  [ROUTES.SETTINGS.ROOT]: 'Settings',
+  [ROUTES.SETTINGS.ROOT]: 'Settings'
 };
 
 /**

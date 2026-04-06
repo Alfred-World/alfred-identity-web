@@ -146,7 +146,6 @@ const RoleList = ({
       <Divider />
 
       <Box sx={{ p: 4, pb: 2 }}>
-
         <TextField
           fullWidth
           size='small'

@@ -23,8 +23,8 @@ const SKIP_REQUEST_HEADERS = new Set([
   'te',
   'trailer',
   'upgrade',
-  'cookie',        // Never leak browser cookies to gateway
-  'authorization', // Replaced with JWT from session cookie
+  'cookie', // Never leak browser cookies to gateway
+  'authorization' // Replaced with JWT from session cookie
 ]);
 
 // ── Cookie name detection ───────────────────────────────────────────────────
@@ -70,13 +70,13 @@ async function doRefreshAccessToken(refreshToken: string): Promise<RefreshResult
         grant_type: 'refresh_token',
         client_id: process.env.OIDC_CLIENT_ID!,
         client_secret: process.env.OIDC_CLIENT_SECRET!,
-        refresh_token: refreshToken,
+        refresh_token: refreshToken
       });
 
       if (!data.access_token) {
         console.error('[proxy] doRefreshAccessToken: no access_token in response', data);
-        
-return null;
+
+        return null;
       }
 
       let expiresAt = Math.floor(Date.now() / 1000) + (data.expires_in || 900);
@@ -85,12 +85,14 @@ return null;
         const payload = JSON.parse(Buffer.from(data.access_token.split('.')[1], 'base64').toString());
 
         if (payload.exp) expiresAt = payload.exp;
-      } catch { /* use calculated expiresAt */ }
+      } catch {
+        /* use calculated expiresAt */
+      }
 
       const result: RefreshResult = {
         accessToken: data.access_token,
         refreshToken: data.refresh_token || refreshToken,
-        expiresAt,
+        expiresAt
       };
 
       // Cache under the OLD RT so near-concurrent requests reuse this result
@@ -100,8 +102,8 @@ return null;
       return result;
     } catch (err) {
       console.error('[proxy] doRefreshAccessToken: exception during token refresh', err);
-      
-return null;
+
+      return null;
     }
   })();
 
@@ -123,9 +125,7 @@ function buildProxyHeaders(request: NextRequest): Headers {
 
   // Forward real client IP
   const clientIp =
-    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-    request.headers.get('x-real-ip') ||
-    '127.0.0.1';
+    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || request.headers.get('x-real-ip') || '127.0.0.1';
 
   headers.set('X-Forwarded-For', clientIp);
   headers.set('X-Real-IP', clientIp);
@@ -174,7 +174,7 @@ async function handler(request: NextRequest) {
     let response = await fetch(targetUrl, {
       method: request.method,
       headers,
-      body: bodyToSend,
+      body: bodyToSend
     });
 
     // ── 401 + refresh token → server-side token refresh & retry ───────────
@@ -189,7 +189,7 @@ async function handler(request: NextRequest) {
         response = await fetch(targetUrl, {
           method: request.method,
           headers,
-          body: bodyToSend,
+          body: bodyToSend
         });
 
         // Update JWT cookie so subsequent requests use the new token
@@ -198,7 +198,7 @@ async function handler(request: NextRequest) {
           accessToken: refreshed.accessToken,
           refreshToken: refreshed.refreshToken,
           expiresAt: refreshed.expiresAt,
-          error: undefined,
+          error: undefined
         };
 
         const encodedJwt = await encode({ token: updatedToken, secret: NEXTAUTH_SECRET });
@@ -206,7 +206,7 @@ async function handler(request: NextRequest) {
 
         const proxyResponse = new NextResponse(response.body, {
           status: response.status,
-          headers: buildResponseHeaders(response),
+          headers: buildResponseHeaders(response)
         });
 
         proxyResponse.cookies.set(cookieName, encodedJwt, {
@@ -214,7 +214,7 @@ async function handler(request: NextRequest) {
           secure: isSecure,
           sameSite: 'lax',
           path: '/',
-          maxAge: 30 * 24 * 60 * 60, // 30 days — matches session.maxAge in authOptions
+          maxAge: 30 * 24 * 60 * 60 // 30 days — matches session.maxAge in authOptions
         });
 
         return proxyResponse;
@@ -223,12 +223,12 @@ async function handler(request: NextRequest) {
 
     return new NextResponse(response.body, {
       status: response.status,
-      headers: buildResponseHeaders(response),
+      headers: buildResponseHeaders(response)
     });
   } catch {
     return NextResponse.json(
       { success: false, errors: [{ message: 'Gateway unreachable', code: 'BAD_GATEWAY' }] },
-      { status: 502 },
+      { status: 502 }
     );
   }
 }

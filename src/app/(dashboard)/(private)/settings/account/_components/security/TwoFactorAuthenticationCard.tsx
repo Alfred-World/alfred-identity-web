@@ -1,27 +1,27 @@
-'use client'
+'use client';
 
 // React Imports
-import { useState } from 'react'
+import { useState } from 'react';
 
 // MUI Imports
-import Card from '@mui/material/Card'
-import Button from '@mui/material/Button'
-import CardHeader from '@mui/material/CardHeader'
-import CardContent from '@mui/material/CardContent'
-import Typography from '@mui/material/Typography'
-import Dialog from '@mui/material/Dialog'
-import DialogTitle from '@mui/material/DialogTitle'
-import DialogContent from '@mui/material/DialogContent'
-import DialogActions from '@mui/material/DialogActions'
-import CircularProgress from '@mui/material/CircularProgress'
-import Alert from '@mui/material/Alert'
-import InputAdornment from '@mui/material/InputAdornment'
-import IconButton from '@mui/material/IconButton'
+import Card from '@mui/material/Card';
+import Button from '@mui/material/Button';
+import CardHeader from '@mui/material/CardHeader';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import CircularProgress from '@mui/material/CircularProgress';
+import Alert from '@mui/material/Alert';
+import InputAdornment from '@mui/material/InputAdornment';
+import IconButton from '@mui/material/IconButton';
 
 // Third-party Imports
-import { useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-toastify'
-import { QRCodeSVG } from 'qrcode.react'
+import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'react-toastify';
+import { QRCodeSVG } from 'qrcode.react';
 
 // Generated Imports
 import {
@@ -30,70 +30,69 @@ import {
   usePostIdentityAccount2faConfirm,
   usePostIdentityAccount2faDisable,
   getGetIdentityAccountMeQueryKey
-} from '@/generated/identity-api'
-import type { InitiateEnableTwoFactorResult } from '@/generated/identity-api'
+} from '@/generated/identity-api';
+import type { InitiateEnableTwoFactorResult } from '@/generated/identity-api';
 
 // Component Imports
-import CustomTextField from '@core/components/mui/TextField'
-import Link from '@components/Link'
-
+import CustomTextField from '@core/components/mui/TextField';
+import Link from '@components/Link';
 
 // ─── Enable 2FA Dialog ───────────────────────────────────────────────────────
 type EnableDialogProps = {
-  open: boolean
-  onClose: () => void
-  setupData: InitiateEnableTwoFactorResult | null
-  onConfirmed: () => void
-}
+  open: boolean;
+  onClose: () => void;
+  setupData: InitiateEnableTwoFactorResult | null;
+  onConfirmed: () => void;
+};
 
 const EnableTwoFactorDialog = ({ open, onClose, setupData, onConfirmed }: EnableDialogProps) => {
-  const [code, setCode] = useState('')
-  const [error, setError] = useState('')
+  const [code, setCode] = useState('');
+  const [error, setError] = useState('');
 
   const { mutate: confirm, isPending } = usePostIdentityAccount2faConfirm({
     mutation: {
       onSuccess(data) {
         if (data.success) {
-          toast.success('Two-factor authentication enabled')
-          setCode('')
-          setError('')
-          onConfirmed()
+          toast.success('Two-factor authentication enabled');
+          setCode('');
+          setError('');
+          onConfirmed();
         } else {
-          const msg = data.errors?.[0]?.message ?? 'Invalid code'
+          const msg = data.errors?.[0]?.message ?? 'Invalid code';
 
-          setError(msg)
+          setError(msg);
         }
       },
       onError() {
-        setError('An unexpected error occurred')
+        setError('An unexpected error occurred');
       }
     }
-  })
+  });
 
   const handleSubmit = () => {
     if (!code.trim()) {
       setError('Please enter the 6-digit code');
 
-      return
+      return;
     }
 
-    setError('')
-    confirm({ data: { code } })
-  }
+    setError('');
+    confirm({ data: { code } });
+  };
 
   const handleClose = () => {
-    setCode('')
-    setError('')
-    onClose()
-  }
+    setCode('');
+    setError('');
+    onClose();
+  };
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth='sm' fullWidth>
       <DialogTitle>Enable Two-Factor Authentication</DialogTitle>
       <DialogContent className='flex flex-col gap-6 pt-4'>
         <Typography>
-          Scan the QR code below with your authenticator app (e.g. Google Authenticator, Authy), then enter the
-          6-digit code to confirm setup.
+          Scan the QR code below with your authenticator app (e.g. Google Authenticator, Authy), then enter the 6-digit
+          code to confirm setup.
         </Typography>
 
         {setupData?.qrCodeUri && (
@@ -128,7 +127,10 @@ const EnableTwoFactorDialog = ({ open, onClose, setupData, onConfirmed }: Enable
           label='Verification Code'
           placeholder='000000'
           value={code}
-          onChange={e => { setCode(e.target.value); setError('') }}
+          onChange={e => {
+            setCode(e.target.value);
+            setError('');
+          }}
           error={!!error}
           helperText={error}
           slotProps={{
@@ -154,67 +156,67 @@ const EnableTwoFactorDialog = ({ open, onClose, setupData, onConfirmed }: Enable
         </Button>
       </DialogActions>
     </Dialog>
-  )
-}
+  );
+};
 
 // ─── Main Component ──────────────────────────────────────────────────────────
 const TwoFactorAuthenticationCard = () => {
-  const queryClient = useQueryClient()
-  const [enableDialogOpen, setEnableDialogOpen] = useState(false)
-  const [setupData, setSetupData] = useState<InitiateEnableTwoFactorResult | null>(null)
+  const queryClient = useQueryClient();
+  const [enableDialogOpen, setEnableDialogOpen] = useState(false);
+  const [setupData, setSetupData] = useState<InitiateEnableTwoFactorResult | null>(null);
 
   // Load 2FA status from same profile cache
-  const { data: profileResponse, isLoading } = useGetIdentityAccountMe()
+  const { data: profileResponse, isLoading } = useGetIdentityAccountMe();
 
-  const twoFactorEnabled = profileResponse?.success ? (profileResponse.result?.twoFactorEnabled ?? false) : false
+  const twoFactorEnabled = profileResponse?.success ? (profileResponse.result?.twoFactorEnabled ?? false) : false;
 
   // Enable 2FA: initiate
   const { mutate: initiateEnable, isPending: isInitiating } = usePostIdentityAccount2faEnable({
     mutation: {
       onSuccess(data) {
         if (data.success && data.result) {
-          setSetupData(data.result)
-          setEnableDialogOpen(true)
+          setSetupData(data.result);
+          setEnableDialogOpen(true);
         } else {
-          toast.error(data.errors?.[0]?.message ?? 'Failed to initiate 2FA setup')
+          toast.error(data.errors?.[0]?.message ?? 'Failed to initiate 2FA setup');
         }
       },
       onError() {
-        toast.error('An unexpected error occurred')
+        toast.error('An unexpected error occurred');
       }
     }
-  })
+  });
 
   // Disable 2FA
   const { mutate: disable2fa, isPending: isDisabling } = usePostIdentityAccount2faDisable({
     mutation: {
       onSuccess(data) {
         if (data.success) {
-          toast.success('Two-factor authentication disabled')
-          queryClient.invalidateQueries({ queryKey: getGetIdentityAccountMeQueryKey() })
+          toast.success('Two-factor authentication disabled');
+          queryClient.invalidateQueries({ queryKey: getGetIdentityAccountMeQueryKey() });
         } else {
-          toast.error('Failed to disable two-factor authentication')
+          toast.error('Failed to disable two-factor authentication');
         }
       },
       onError() {
-        toast.error('An unexpected error occurred')
+        toast.error('An unexpected error occurred');
       }
     }
-  })
+  });
 
   const handleEnableClick = () => {
-    initiateEnable()
-  }
+    initiateEnable();
+  };
 
   const handleDisableClick = () => {
-    disable2fa()
-  }
+    disable2fa();
+  };
 
   const handleConfirmed = () => {
-    setEnableDialogOpen(false)
-    setSetupData(null)
-    queryClient.invalidateQueries({ queryKey: getGetIdentityAccountMeQueryKey() })
-  }
+    setEnableDialogOpen(false);
+    setSetupData(null);
+    queryClient.invalidateQueries({ queryKey: getGetIdentityAccountMeQueryKey() });
+  };
 
   return (
     <>
@@ -270,13 +272,15 @@ const TwoFactorAuthenticationCard = () => {
 
       <EnableTwoFactorDialog
         open={enableDialogOpen}
-        onClose={() => { setEnableDialogOpen(false); setSetupData(null) }}
+        onClose={() => {
+          setEnableDialogOpen(false);
+          setSetupData(null);
+        }}
         setupData={setupData}
         onConfirmed={handleConfirmed}
       />
     </>
-  )
-}
+  );
+};
 
-export default TwoFactorAuthenticationCard
-
+export default TwoFactorAuthenticationCard;

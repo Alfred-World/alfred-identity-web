@@ -1,37 +1,37 @@
-'use client'
+'use client';
 
 // MUI Imports
-import Dialog from '@mui/material/Dialog'
-import DialogTitle from '@mui/material/DialogTitle'
-import DialogContent from '@mui/material/DialogContent'
-import DialogActions from '@mui/material/DialogActions'
-import Button from '@mui/material/Button'
-import Grid from '@mui/material/Grid'
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
 
 // Component Imports
-import CustomTextField from '@core/components/mui/TextField'
+import CustomTextField from '@core/components/mui/TextField';
 
 type AddressData = {
-  firstName?: string
-  lastName?: string
-  email?: string
-  country?: string
-  address1?: string
-  address2?: string
-  landmark?: string
-  city?: string
-  state?: string
-  zipCode?: string
-  taxId?: string
-  vatNumber?: string
-  contact?: string
-}
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  country?: string;
+  address1?: string;
+  address2?: string;
+  landmark?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  taxId?: string;
+  vatNumber?: string;
+  contact?: string;
+};
 
 type AddNewAddressProps = {
-  open: boolean
-  setOpen: (open: boolean) => void
-  data?: AddressData
-}
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  data?: AddressData;
+};
 
 const AddNewAddress = ({ open, setOpen, data }: AddNewAddressProps) => {
   return (
@@ -83,7 +83,7 @@ const AddNewAddress = ({ open, setOpen, data }: AddNewAddressProps) => {
         </Button>
       </DialogActions>
     </Dialog>
-  )
-}
+  );
+};
 
-export default AddNewAddress
+export default AddNewAddress;

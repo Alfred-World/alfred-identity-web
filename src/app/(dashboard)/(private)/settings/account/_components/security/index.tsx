@@ -1,10 +1,10 @@
 // MUI Imports
-import Grid from '@mui/material/Grid'
+import Grid from '@mui/material/Grid';
 
 // Component Imports
-import ChangePasswordCard from './ChangePasswordCard'
-import TwoFactorAuthenticationCard from './TwoFactorAuthenticationCard'
-import RecentDevicesTable from './RecentDevicesTable'
+import ChangePasswordCard from './ChangePasswordCard';
+import TwoFactorAuthenticationCard from './TwoFactorAuthenticationCard';
+import RecentDevicesTable from './RecentDevicesTable';
 
 const Security = () => {
   return (
@@ -19,7 +19,7 @@ const Security = () => {
         <RecentDevicesTable />
       </Grid>
     </Grid>
-  )
-}
+  );
+};
 
-export default Security
+export default Security;

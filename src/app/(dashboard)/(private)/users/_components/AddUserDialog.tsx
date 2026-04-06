@@ -122,7 +122,13 @@ const AddUserDialog = ({ open, onClose, onSuccess }: AddUserDialogProps) => {
   };
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth='sm' sx={{ '& .MuiDialog-paper': { overflow: 'visible' } }}>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      fullWidth
+      maxWidth='sm'
+      sx={{ '& .MuiDialog-paper': { overflow: 'visible' } }}
+    >
       <DialogTitle variant='h4' sx={{ textAlign: 'center', p: 5 }}>
         Add New User
         <Typography variant='body2' color='text.secondary' sx={{ mt: 1 }}>

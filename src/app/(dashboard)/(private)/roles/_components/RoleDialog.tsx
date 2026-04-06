@@ -21,10 +21,11 @@ import { valibotResolver } from '@hookform/resolvers/valibot';
 import { object, string, minLength, pipe, optional, boolean } from 'valibot';
 import { toast } from 'react-toastify';
 
-import { usePostIdentityRoles, usePutIdentityRolesId } from '@/generated/identity-api';
+import { usePostIdentityRoles, usePatchIdentityRolesId } from '@/generated/identity-api';
 import type { RoleDto } from '@/generated/identity-api';
 
 import RoleIconPicker from './RoleIconPicker';
+import { getChangedFields } from '@/utils/getChangedFields';
 
 interface RoleDialogProps {
   open: boolean;
@@ -106,7 +107,7 @@ const RoleDialog = ({ open, onClose, role, onSuccess }: RoleDialogProps) => {
     }
   });
 
-  const { mutate: updateRole, isPending: isUpdating } = usePutIdentityRolesId({
+  const { mutate: updateRole, isPending: isUpdating } = usePatchIdentityRolesId({
     mutation: {
       onSuccess: data => {
         if (data.success) {
@@ -124,15 +125,29 @@ const RoleDialog = ({ open, onClose, role, onSuccess }: RoleDialogProps) => {
 
   const onSubmit = (data: FormData) => {
     if (isEdit && role?.id) {
-      updateRole({
-        id: role.id,
-        data: {
-          name: data.name,
-          icon: data.icon,
-          isImmutable: data.isImmutable,
-          isSystem: data.isSystem
-        }
-      });
+      const current = {
+        name: data.name,
+        icon: data.icon,
+        isImmutable: data.isImmutable,
+        isSystem: data.isSystem
+      };
+
+      const original = {
+        name: role.name || '',
+        icon: role.icon || '',
+        isImmutable: role.isImmutable || false,
+        isSystem: role.isSystem || false
+      };
+
+      const changes = getChangedFields(original, current);
+
+      if (!changes) {
+        handleClose();
+
+        return;
+      }
+
+      updateRole({ id: role.id, data: changes });
     } else {
       createRole({
         data: {

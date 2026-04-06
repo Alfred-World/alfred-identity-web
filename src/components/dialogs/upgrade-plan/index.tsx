@@ -1,23 +1,23 @@
-'use client'
+'use client';
 
 // MUI Imports
-import Dialog from '@mui/material/Dialog'
-import DialogTitle from '@mui/material/DialogTitle'
-import DialogContent from '@mui/material/DialogContent'
-import DialogActions from '@mui/material/DialogActions'
-import Button from '@mui/material/Button'
-import Grid from '@mui/material/Grid'
-import Typography from '@mui/material/Typography'
-import Chip from '@mui/material/Chip'
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+import Chip from '@mui/material/Chip';
 
 // Type Imports
-import type { PricingPlanType } from '@/types/pages/pricingTypes'
+import type { PricingPlanType } from '@/types/pages/pricingTypes';
 
 type UpgradePlanProps = {
-  open: boolean
-  setOpen: (open: boolean) => void
-  data?: PricingPlanType[]
-}
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  data?: PricingPlanType[];
+};
 
 const UpgradePlan = ({ open, setOpen, data }: UpgradePlanProps) => {
   return (
@@ -53,7 +53,7 @@ const UpgradePlan = ({ open, setOpen, data }: UpgradePlanProps) => {
         </Button>
       </DialogActions>
     </Dialog>
-  )
-}
+  );
+};
 
-export default UpgradePlan
+export default UpgradePlan;

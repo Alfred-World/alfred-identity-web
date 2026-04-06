@@ -1,32 +1,32 @@
-'use client'
+'use client';
 
 // React Imports
-import { useState } from 'react'
-import type { ChangeEvent } from 'react'
+import { useState } from 'react';
+import type { ChangeEvent } from 'react';
 
 // MUI Imports
-import Dialog from '@mui/material/Dialog'
-import DialogTitle from '@mui/material/DialogTitle'
-import DialogActions from '@mui/material/DialogActions'
-import DialogContent from '@mui/material/DialogContent'
-import Grid from '@mui/material/Grid'
-import Button from '@mui/material/Button'
-import Typography from '@mui/material/Typography'
-import Alert from '@mui/material/Alert'
-import AlertTitle from '@mui/material/AlertTitle'
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import Grid from '@mui/material/Grid';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import Alert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
 
 // Type Imports
-import type { CustomInputHorizontalData } from '@core/components/custom-inputs/types'
+import type { CustomInputHorizontalData } from '@core/components/custom-inputs/types';
 
 // Component Imports
-import CustomInputHorizontal from '@core/components/custom-inputs/Horizontal'
-import DialogCloseButton from '../DialogCloseButton'
-import CustomTextField from '@core/components/mui/TextField'
+import CustomInputHorizontal from '@core/components/custom-inputs/Horizontal';
+import DialogCloseButton from '../DialogCloseButton';
+import CustomTextField from '@core/components/mui/TextField';
 
 type TwoFactorAuthProps = {
-  open: boolean
-  setOpen: (open: boolean) => void
-}
+  open: boolean;
+  setOpen: (open: boolean) => void;
+};
 
 const data: CustomInputHorizontalData[] = [
   {
@@ -54,7 +54,7 @@ const data: CustomInputHorizontalData[] = [
     value: 'sms',
     content: 'We will send a code via SMS if you need to use your backup login method.'
   }
-]
+];
 
 const SMSDialog = (handleAuthDialogClose: () => void) => {
   return (
@@ -83,8 +83,8 @@ const SMSDialog = (handleAuthDialogClose: () => void) => {
         </Button>
       </DialogActions>
     </>
-  )
-}
+  );
+};
 
 const AppDialog = (handleAuthDialogClose: () => void) => {
   return (
@@ -126,45 +126,45 @@ const AppDialog = (handleAuthDialogClose: () => void) => {
         </Button>
       </DialogActions>
     </>
-  )
-}
+  );
+};
 
 const TwoFactorAuth = ({ open, setOpen }: TwoFactorAuthProps) => {
   // Vars
   const initialSelectedOption: string = data.filter(item => item.isSelected)[
     data.filter(item => item.isSelected).length - 1
-  ].value
+  ].value;
 
   // States
-  const [authType, setAuthType] = useState<string>(initialSelectedOption)
-  const [showAuthDialog, setShowAuthDialog] = useState<boolean>(false)
+  const [authType, setAuthType] = useState<string>(initialSelectedOption);
+  const [showAuthDialog, setShowAuthDialog] = useState<boolean>(false);
 
   const handleClose = () => {
-    setOpen(false)
+    setOpen(false);
 
     if (authType !== 'app') {
-      setAuthType('app')
+      setAuthType('app');
     }
-  }
+  };
 
   const handleAuthDialogClose = () => {
-    setShowAuthDialog(false)
-    setShowAuthDialog(false)
+    setShowAuthDialog(false);
+    setShowAuthDialog(false);
 
     if (authType !== 'app') {
       setTimeout(() => {
-        setAuthType('app')
-      }, 250)
+        setAuthType('app');
+      }, 250);
     }
-  }
+  };
 
   const handleOptionChange = (prop: string | ChangeEvent<HTMLInputElement>) => {
     if (typeof prop === 'string') {
-      setAuthType(prop)
+      setAuthType(prop);
     } else {
-      setAuthType((prop.target as HTMLInputElement).value)
+      setAuthType((prop.target as HTMLInputElement).value);
     }
-  }
+  };
 
   return (
     <>
@@ -205,8 +205,8 @@ const TwoFactorAuth = ({ open, setOpen }: TwoFactorAuthProps) => {
           <Button
             variant='contained'
             onClick={() => {
-              setOpen(false)
-              setShowAuthDialog(true)
+              setOpen(false);
+              setShowAuthDialog(true);
             }}
             className='capitalize'
           >
@@ -235,7 +235,7 @@ const TwoFactorAuth = ({ open, setOpen }: TwoFactorAuthProps) => {
         </form>
       </Dialog>
     </>
-  )
-}
+  );
+};
 
-export default TwoFactorAuth
+export default TwoFactorAuth;

@@ -1,28 +1,28 @@
-'use client'
+'use client';
 
 // MUI Imports
-import Card from '@mui/material/Card'
-import CardHeader from '@mui/material/CardHeader'
-import CardContent from '@mui/material/CardContent'
-import Typography from '@mui/material/Typography'
-import Checkbox from '@mui/material/Checkbox'
-import MenuItem from '@mui/material/MenuItem'
-import Grid from '@mui/material/Grid'
-import Button from '@mui/material/Button'
+import Card from '@mui/material/Card';
+import CardHeader from '@mui/material/CardHeader';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
+import Checkbox from '@mui/material/Checkbox';
+import MenuItem from '@mui/material/MenuItem';
+import Grid from '@mui/material/Grid';
+import Button from '@mui/material/Button';
 
 // Component Imports
-import Link from '@components/Link'
-import CustomTextField from '@core/components/mui/TextField'
+import Link from '@components/Link';
+import CustomTextField from '@core/components/mui/TextField';
 
 // Style Imports
-import tableStyles from '@core/styles/table.module.css'
+import tableStyles from '@core/styles/table.module.css';
 
 type TableDataType = {
-  type: string
-  app: boolean
-  email: boolean
-  browser: boolean
-}
+  type: string;
+  app: boolean;
+  email: boolean;
+  browser: boolean;
+};
 
 // Vars
 const tableData: TableDataType[] = [
@@ -50,7 +50,7 @@ const tableData: TableDataType[] = [
     browser: false,
     type: 'A new device is linked'
   }
-]
+];
 
 const Notifications = () => {
   return (
@@ -116,7 +116,7 @@ const Notifications = () => {
         </CardContent>
       </form>
     </Card>
-  )
-}
+  );
+};
 
-export default Notifications
+export default Notifications;

@@ -263,7 +263,11 @@ export function useUrlSorting(defaultSort = '', sortParamName = 'sort') {
 
   // Update URL when sorting changes
   const setSorting = useCallback(
-    (updaterOrValue: ((prev: { id: string; desc: boolean }[]) => { id: string; desc: boolean }[]) | { id: string; desc: boolean }[]) => {
+    (
+      updaterOrValue:
+        | ((prev: { id: string; desc: boolean }[]) => { id: string; desc: boolean }[])
+        | { id: string; desc: boolean }[]
+    ) => {
       // Handle both functional updates and direct values
       // TanStack table passes an updater function
       let newSorting = [];
@@ -279,11 +283,11 @@ export function useUrlSorting(defaultSort = '', sortParamName = 'sort') {
         const currentSorting =
           currentSort && currentSort.length > 0
             ? currentSort.split(',').map(part => {
-              const desc = part.startsWith('-');
-              const id = desc ? part.substring(1) : part;
+                const desc = part.startsWith('-');
+                const id = desc ? part.substring(1) : part;
 
-              return { id, desc };
-            })
+                return { id, desc };
+              })
             : [];
 
         newSorting = updaterOrValue(currentSorting);

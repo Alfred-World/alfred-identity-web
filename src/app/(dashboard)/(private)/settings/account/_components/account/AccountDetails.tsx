@@ -1,52 +1,53 @@
-'use client'
+'use client';
 
 // React Imports
-import { useState, useEffect } from 'react'
-import type { ChangeEvent } from 'react'
+import { useState, useEffect } from 'react';
+import type { ChangeEvent } from 'react';
 
 // MUI Imports
-import Grid from '@mui/material/Grid'
-import Card from '@mui/material/Card'
-import CardContent from '@mui/material/CardContent'
-import Button from '@mui/material/Button'
-import Typography from '@mui/material/Typography'
-import CircularProgress from '@mui/material/CircularProgress'
-import Alert from '@mui/material/Alert'
+import Grid from '@mui/material/Grid';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import CircularProgress from '@mui/material/CircularProgress';
+import Alert from '@mui/material/Alert';
 
 // Third-party Imports
-import { useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-toastify'
+import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'react-toastify';
 
 // Generated Imports
 import {
   useGetIdentityAccountMe,
-  usePutIdentityAccountProfile,
-  getGetIdentityAccountMeQueryKey,
-} from '@/generated/identity-api'
+  usePatchIdentityAccountProfile,
+  getGetIdentityAccountMeQueryKey
+} from '@/generated/identity-api';
 
 // Component Imports
-import CustomTextField from '@core/components/mui/TextField'
+import CustomTextField from '@core/components/mui/TextField';
+import { getChangedFields } from '@/utils/getChangedFields';
 
 type FormData = {
-  fullName: string
-  phoneNumber: string
-}
+  fullName: string;
+  phoneNumber: string;
+};
 
 // ─── Component ───────────────────────────────────────────────────────────────
 const AccountDetails = () => {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   // ── Load profile ─────────────────────────────────────────────────────────
-  const { data: profileResponse, isLoading, isError } = useGetIdentityAccountMe()
+  const { data: profileResponse, isLoading, isError } = useGetIdentityAccountMe();
 
-  const profile = profileResponse?.success ? profileResponse.result ?? null : null
+  const profile = profileResponse?.success ? (profileResponse.result ?? null) : null;
 
   // ── Form state ────────────────────────────────────────────────────────────
-  const [formData, setFormData] = useState<FormData>({ fullName: '', phoneNumber: '' })
-  const [fileInput, setFileInput] = useState<string>('')
-  const [imgSrc, setImgSrc] = useState<string>('/images/avatars/1.png')
-  const [avatarBase64, setAvatarBase64] = useState<string | null>(null)
-  const [isDirty, setIsDirty] = useState(false)
+  const [formData, setFormData] = useState<FormData>({ fullName: '', phoneNumber: '' });
+  const [fileInput, setFileInput] = useState<string>('');
+  const [imgSrc, setImgSrc] = useState<string>('/images/avatars/1.png');
+  const [avatarBase64, setAvatarBase64] = useState<string | null>(null);
+  const [isDirty, setIsDirty] = useState(false);
 
   // Sync form with loaded profile
   useEffect(() => {
@@ -54,89 +55,103 @@ const AccountDetails = () => {
       setFormData({
         fullName: profile.fullName ?? '',
         phoneNumber: profile.phoneNumber ?? ''
-      })
-      if (profile.avatar) setImgSrc(profile.avatar)
+      });
+      if (profile.avatar) setImgSrc(profile.avatar);
     }
-  }, [profile])
+  }, [profile]);
 
   const handleFormChange = (field: keyof FormData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
-    setIsDirty(true)
-  }
+    setFormData(prev => ({ ...prev, [field]: value }));
+    setIsDirty(true);
+  };
 
   const handleFileInputChange = (file: ChangeEvent) => {
-    const reader = new FileReader()
-    const { files } = file.target as HTMLInputElement
+    const reader = new FileReader();
+    const { files } = file.target as HTMLInputElement;
 
     if (files && files.length !== 0) {
       reader.onload = () => {
-        const result = reader.result as string
+        const result = reader.result as string;
 
-        setImgSrc(result)
-        setAvatarBase64(result)
-        setFileInput(result)
-        setIsDirty(true)
-      }
+        setImgSrc(result);
+        setAvatarBase64(result);
+        setFileInput(result);
+        setIsDirty(true);
+      };
 
-      reader.readAsDataURL(files[0])
+      reader.readAsDataURL(files[0]);
     }
-  }
+  };
 
   const handleFileInputReset = () => {
-    setFileInput('')
-    setImgSrc(profile?.avatar ?? '/images/avatars/1.png')
-    setAvatarBase64(null)
-    setIsDirty(false)
-  }
+    setFileInput('');
+    setImgSrc(profile?.avatar ?? '/images/avatars/1.png');
+    setAvatarBase64(null);
+    setIsDirty(false);
+  };
 
   // ── Update profile ────────────────────────────────────────────────────────
-  const { mutate: updateProfile, isPending } = usePutIdentityAccountProfile({
+  const { mutate: updateProfile, isPending } = usePatchIdentityAccountProfile({
     mutation: {
       onSuccess(data) {
         if (data.success) {
-          queryClient.invalidateQueries({ queryKey: getGetIdentityAccountMeQueryKey() })
-          setIsDirty(false)
-          setAvatarBase64(null)
-          toast.success('Profile updated successfully')
+          queryClient.invalidateQueries({ queryKey: getGetIdentityAccountMeQueryKey() });
+          setIsDirty(false);
+          setAvatarBase64(null);
+          toast.success('Profile updated successfully');
         } else {
-          const msg = data?.errors?.[0]?.message ?? 'Failed to update profile'
+          const msg = data?.errors?.[0]?.message ?? 'Failed to update profile';
 
-          toast.error(msg)
+          toast.error(msg);
         }
       },
       onError() {
-        toast.error('An unexpected error occurred')
+        toast.error('An unexpected error occurred');
       }
     }
-  })
+  });
 
   const handleSubmit = (e: React.SyntheticEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!formData.fullName.trim()) {
-      toast.error('Full name is required')
+      toast.error('Full name is required');
 
-      return
+      return;
     }
 
-    updateProfile({
-      data: {
-        fullName: formData.fullName,
-        phoneNumber: formData.phoneNumber || undefined,
-        avatar: avatarBase64 ?? undefined
-      }
-    })
-  }
+    const current = {
+      fullName: formData.fullName,
+      phoneNumber: formData.phoneNumber || undefined,
+      avatar: avatarBase64 ?? undefined
+    };
+
+    const original = {
+      fullName: profile?.fullName ?? '',
+      phoneNumber: profile?.phoneNumber || undefined,
+      avatar: undefined as string | undefined
+    };
+
+    const changes = getChangedFields(original, current);
+
+    if (!changes) {
+      toast.info('No changes detected');
+
+      return;
+    }
+
+    updateProfile({ data: changes });
+  };
 
   const handleReset = () => {
     if (profile) {
-      setFormData({ fullName: profile.fullName ?? '', phoneNumber: profile.phoneNumber ?? '' })
-      setImgSrc(profile.avatar ?? '/images/avatars/1.png')
-      setAvatarBase64(null)
-      setFileInput('')
-      setIsDirty(false)
+      setFormData({ fullName: profile.fullName ?? '', phoneNumber: profile.phoneNumber ?? '' });
+      setImgSrc(profile.avatar ?? '/images/avatars/1.png');
+      setAvatarBase64(null);
+      setFileInput('');
+      setIsDirty(false);
     }
-  }
+  };
 
   // ── Render ────────────────────────────────────────────────────────────────
   if (isLoading) {
@@ -146,7 +161,7 @@ const AccountDetails = () => {
           <CircularProgress />
         </CardContent>
       </Card>
-    )
+    );
   }
 
   if (isError || !profile) {
@@ -156,7 +171,7 @@ const AccountDetails = () => {
           <Alert severity='error'>Failed to load profile. Please refresh the page.</Alert>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (
@@ -239,7 +254,7 @@ const AccountDetails = () => {
         </form>
       </CardContent>
     </Card>
-  )
-}
+  );
+};
 
-export default AccountDetails
+export default AccountDetails;

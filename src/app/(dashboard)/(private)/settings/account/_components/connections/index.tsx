@@ -1,26 +1,26 @@
-'use client'
+'use client';
 
 // MUI Imports
-import Box from '@mui/material/Box'
-import Card from '@mui/material/Card'
-import CardContent from '@mui/material/CardContent'
-import Grid from '@mui/material/Grid'
-import Typography from '@mui/material/Typography'
-import Button from '@mui/material/Button'
-import Chip from '@mui/material/Chip'
+import Box from '@mui/material/Box';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import Chip from '@mui/material/Chip';
 
 // Third-party Imports
-import { toast } from 'react-toastify'
+import { toast } from 'react-toastify';
 
 // Core Imports
-import CustomIconButton from '@core/components/mui/IconButton'
+import CustomIconButton from '@core/components/mui/IconButton';
 
 type SocialAccountsType = {
-  title: string
-  logo: string
-  description: string
-  isConnected: boolean
-}
+  title: string;
+  logo: string;
+  description: string;
+  isConnected: boolean;
+};
 
 const socialAccountsArr: SocialAccountsType[] = [
   {
@@ -40,19 +40,21 @@ const socialAccountsArr: SocialAccountsType[] = [
     description: 'Connect your Facebook profile',
     isConnected: false,
     logo: '/images/logos/facebook.png'
-  },
-]
+  }
+];
 
 const Connections = () => {
   const handleConnect = (provider: string) => {
-    toast.info(`The connection feature for ${provider} is currently under development.`)
-  }
+    toast.info(`The connection feature for ${provider} is currently under development.`);
+  };
 
   return (
     <Card>
       <CardContent className='flex flex-col gap-6'>
         <Box>
-          <Typography variant='h5' className='font-bold mb-1'>Social Connections</Typography>
+          <Typography variant='h5' className='font-bold mb-1'>
+            Social Connections
+          </Typography>
           <Typography color='text.secondary'>
             Manage your linked social accounts to enable Single Sign-On (SSO) and personalize your platform experience.
           </Typography>
@@ -76,7 +78,8 @@ const Connections = () => {
                   },
                   transition: 'box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out',
                   '&:hover': {
-                    boxShadow: (theme) => `0 4px 18px 0 ${theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.1)'}`,
+                    boxShadow: theme =>
+                      `0 4px 18px 0 ${theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.1)'}`,
                     transform: 'translateY(-4px)'
                   }
                 }}
@@ -87,14 +90,28 @@ const Connections = () => {
                       <img height={24} width={24} src={item.logo} alt={item.title} className='object-contain' />
                     </div>
                     {item.isConnected ? (
-                      <Chip label='CONNECTED' size='small' color='success' variant='tonal' sx={{ fontWeight: 600, fontSize: '0.75rem' }} />
+                      <Chip
+                        label='CONNECTED'
+                        size='small'
+                        color='success'
+                        variant='tonal'
+                        sx={{ fontWeight: 600, fontSize: '0.75rem' }}
+                      />
                     ) : (
-                      <Chip label='DISCONNECTED' size='small' color='secondary' variant='tonal' sx={{ fontWeight: 600, fontSize: '0.75rem' }} />
+                      <Chip
+                        label='DISCONNECTED'
+                        size='small'
+                        color='secondary'
+                        variant='tonal'
+                        sx={{ fontWeight: 600, fontSize: '0.75rem' }}
+                      />
                     )}
                   </div>
 
                   <div className='flex flex-col flex-grow gap-2 mt-2'>
-                    <Typography variant='h6' className='font-semibold'>{item.title}</Typography>
+                    <Typography variant='h6' className='font-semibold'>
+                      {item.title}
+                    </Typography>
                     <Typography variant='body2' color='text.secondary' className='flex-grow'>
                       {item.description}
                     </Typography>
@@ -110,7 +127,7 @@ const Connections = () => {
                       disabled={item.isConnected}
                       sx={{
                         textTransform: 'none',
-                        fontWeight: 600,
+                        fontWeight: 600
                       }}
                     >
                       {item.isConnected ? 'Disconnect' : 'Connect Account'}
@@ -124,7 +141,7 @@ const Connections = () => {
           {/* Add Integration Card */}
           <Grid size={{ xs: 12, sm: 6, md: 4 }}>
             <Box
-              sx={(theme) => ({
+              sx={theme => ({
                 height: '100%',
                 minHeight: 250,
                 display: 'flex',
@@ -150,10 +167,18 @@ const Connections = () => {
               })}
               onClick={() => handleConnect('Custom Integration')}
             >
-              <CustomIconButton size='large' variant='tonal' color='secondary' className='mb-4' sx={{ width: 48, height: 48 }}>
+              <CustomIconButton
+                size='large'
+                variant='tonal'
+                color='secondary'
+                className='mb-4'
+                sx={{ width: 48, height: 48 }}
+              >
                 <i className='tabler-plus text-xl' />
               </CustomIconButton>
-              <Typography variant='h6' className='font-semibold mb-2'>Add Integration</Typography>
+              <Typography variant='h6' className='font-semibold mb-2'>
+                Add Integration
+              </Typography>
               <Typography variant='body2' color='text.secondary'>
                 Don&apos;t see what you need? Suggest or build a custom integration.
               </Typography>
@@ -162,7 +187,7 @@ const Connections = () => {
         </Grid>
       </CardContent>
     </Card>
-  )
-}
+  );
+};
 
-export default Connections
+export default Connections;

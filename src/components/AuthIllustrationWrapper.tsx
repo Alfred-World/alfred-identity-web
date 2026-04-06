@@ -1,7 +1,7 @@
-'use client'
+'use client';
 
 // MUI Imports
-import { styled } from '@mui/material/styles'
+import { styled } from '@mui/material/styles';
 
 // Styled Component
 const AuthIllustrationWrapper = styled('div')(({ theme }) => ({
@@ -38,6 +38,6 @@ const AuthIllustrationWrapper = styled('div')(({ theme }) => ({
       )}' fill-opacity='0.08'/%3E%3C/svg%3E")`
     }
   }
-}))
+}));
 
-export default AuthIllustrationWrapper
+export default AuthIllustrationWrapper;

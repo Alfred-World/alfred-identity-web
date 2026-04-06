@@ -35,11 +35,7 @@ import AuthIllustrationWrapper from '@/components/AuthIllustrationWrapper';
 
 // Validation schema
 const schema = object({
-  email: pipe(
-    string(),
-    minLength(1, 'Email is required'),
-    email('Please enter a valid email address')
-  )
+  email: pipe(string(), minLength(1, 'Email is required'), email('Please enter a valid email address'))
 });
 
 type FormData = InferInput<typeof schema>;
@@ -102,7 +98,9 @@ const ForgotPassword = ({ mode: _mode }: { mode: SystemMode }) => {
             </div>
 
             {successMessage && (
-              <Alert severity='success' className='mbe-4'>{successMessage}</Alert>
+              <Alert severity='success' className='mbe-4'>
+                {successMessage}
+              </Alert>
             )}
 
             <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-6'>
@@ -146,4 +144,3 @@ const ForgotPassword = ({ mode: _mode }: { mode: SystemMode }) => {
 };
 
 export default ForgotPassword;
-

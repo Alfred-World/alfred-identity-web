@@ -15,8 +15,7 @@ export const isActiveRoute = (pathname: string, route: string): boolean => {
   // Remove query params from pathname
   const pathWithoutQuery = pathname.split('?')[0];
 
-  
-return pathWithoutQuery === route;
+  return pathWithoutQuery === route;
 };
 
 /**
@@ -29,8 +28,7 @@ return pathWithoutQuery === route;
 export const isRouteMatch = (pathname: string, routePrefix: string): boolean => {
   const pathWithoutQuery = pathname.split('?')[0];
 
-  
-return pathWithoutQuery.startsWith(routePrefix);
+  return pathWithoutQuery.startsWith(routePrefix);
 };
 
 /**
@@ -47,8 +45,7 @@ export const getBasePath = (pathname: string): string => {
     return pathname.replace(localeRegex, '/');
   }
 
-  
-return pathname;
+  return pathname;
 };
 
 /**
@@ -73,15 +70,9 @@ export const getLoginRedirect = (): string => {
  * @returns boolean
  */
 export const isProtectedRoute = (route: string): boolean => {
-  const guestRoutes = [
-    ROUTES.GUEST.LOGIN,
-    ROUTES.GUEST.FORGOT_PASSWORD,
-    ROUTES.GUEST.RESET_PASSWORD,
-    ROUTES.SIGNOUT
-  ];
+  const guestRoutes = [ROUTES.GUEST.LOGIN, ROUTES.GUEST.FORGOT_PASSWORD, ROUTES.GUEST.RESET_PASSWORD, ROUTES.SIGNOUT];
 
-  
-return !guestRoutes.some(guestRoute => route.includes(guestRoute));
+  return !guestRoutes.some(guestRoute => route.includes(guestRoute));
 };
 
 /**
@@ -90,12 +81,7 @@ return !guestRoutes.some(guestRoute => route.includes(guestRoute));
  * @returns boolean
  */
 export const isGuestRoute = (route: string): boolean => {
-  const guestRoutes = [
-    ROUTES.GUEST.LOGIN,
-    ROUTES.GUEST.FORGOT_PASSWORD,
-    ROUTES.GUEST.RESET_PASSWORD
-  ];
+  const guestRoutes = [ROUTES.GUEST.LOGIN, ROUTES.GUEST.FORGOT_PASSWORD, ROUTES.GUEST.RESET_PASSWORD];
 
-  
-return guestRoutes.some(guestRoute => route.includes(guestRoute));
+  return guestRoutes.some(guestRoute => route.includes(guestRoute));
 };

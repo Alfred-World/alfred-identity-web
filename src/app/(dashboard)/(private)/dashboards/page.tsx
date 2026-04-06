@@ -1,7 +1,5 @@
 const DashboardCRM = async () => {
-  return (
-    <></>
-  );
+  return <></>;
 };
 
 export default DashboardCRM;

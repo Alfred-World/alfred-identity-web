@@ -30,4 +30,7 @@ export const NEXT_PUBLIC_APP_URL = assertEnv('NEXT_PUBLIC_APP_URL', process.env.
 export const NEXT_PUBLIC_GATEWAY_URL = assertEnv('NEXT_PUBLIC_GATEWAY_URL', process.env.NEXT_PUBLIC_GATEWAY_URL);
 
 /** OAuth2 client ID for this frontend app */
-export const NEXT_PUBLIC_OAUTH_CLIENT_ID = assertEnv('NEXT_PUBLIC_OAUTH_CLIENT_ID', process.env.NEXT_PUBLIC_OAUTH_CLIENT_ID);
+export const NEXT_PUBLIC_OAUTH_CLIENT_ID = assertEnv(
+  'NEXT_PUBLIC_OAUTH_CLIENT_ID',
+  process.env.NEXT_PUBLIC_OAUTH_CLIENT_ID
+);

@@ -1,9 +1,9 @@
-'use client'
+'use client';
 
 //Mui Imports
-import { styled } from '@mui/material'
-import Button from '@mui/material/Button'
-import type { ButtonProps } from '@mui/material/Button'
+import { styled } from '@mui/material';
+import Button from '@mui/material/Button';
+import type { ButtonProps } from '@mui/material/Button';
 
 const DialogCloseButton = styled(Button)<ButtonProps>({
   top: 0,
@@ -25,6 +25,6 @@ const DialogCloseButton = styled(Button)<ButtonProps>({
   '& i, & svg': {
     fontSize: '1.25rem'
   }
-})
+});
 
-export default DialogCloseButton
+export default DialogCloseButton;

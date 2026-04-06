@@ -43,5 +43,5 @@ export const ROUTES = {
   SETTINGS: {
     ROOT: '/settings',
     ACCOUNT: '/settings/account'
-  },
+  }
 };

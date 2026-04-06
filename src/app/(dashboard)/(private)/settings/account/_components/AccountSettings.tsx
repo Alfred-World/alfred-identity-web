@@ -1,26 +1,26 @@
-'use client'
+'use client';
 
 // React Imports
-import { useState, useEffect } from 'react'
-import type { SyntheticEvent, ReactElement } from 'react'
+import { useState, useEffect } from 'react';
+import type { SyntheticEvent, ReactElement } from 'react';
 
 // Next Imports
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation';
 
 // MUI Imports
-import Grid from '@mui/material/Grid'
-import Tab from '@mui/material/Tab'
-import TabContext from '@mui/lab/TabContext'
-import TabPanel from '@mui/lab/TabPanel'
+import Grid from '@mui/material/Grid';
+import Tab from '@mui/material/Tab';
+import TabContext from '@mui/lab/TabContext';
+import TabPanel from '@mui/lab/TabPanel';
 
 // Component Imports
-import CustomTabList from '@core/components/mui/TabList'
+import CustomTabList from '@core/components/mui/TabList';
 
 // Tab Content Imports
-import AccountTab from './account'
-import SecurityTab from './security'
-import NotificationsTab from './notifications'
-import ConnectionsTab from './connections'
+import AccountTab from './account';
+import SecurityTab from './security';
+import NotificationsTab from './notifications';
+import ConnectionsTab from './connections';
 
 // Vars
 const tabData = [
@@ -28,32 +28,32 @@ const tabData = [
   { label: 'Security', value: 'security', icon: 'tabler-lock' },
   { label: 'Notifications', value: 'notifications', icon: 'tabler-bell' },
   { label: 'Connections', value: 'connections', icon: 'tabler-link' }
-]
+];
 
 const AccountSettings = () => {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const tabParam = searchParams.get('tab')
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get('tab');
 
   // States
-  const [activeTab, setActiveTab] = useState(tabParam || 'account')
+  const [activeTab, setActiveTab] = useState(tabParam || 'account');
 
   useEffect(() => {
     if (tabParam && tabParam !== activeTab) {
-      setActiveTab(tabParam)
+      setActiveTab(tabParam);
     } else if (!tabParam && activeTab !== 'account') {
-      setActiveTab('account')
+      setActiveTab('account');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tabParam])
+  }, [tabParam]);
 
   const handleChange = (_event: SyntheticEvent, value: string) => {
-    setActiveTab(value)
-    const currentParams = new URLSearchParams(Array.from(searchParams.entries()))
+    setActiveTab(value);
+    const currentParams = new URLSearchParams(Array.from(searchParams.entries()));
 
-    currentParams.set('tab', value)
-    router.push(`?${currentParams.toString()}`)
-  }
+    currentParams.set('tab', value);
+    router.push(`?${currentParams.toString()}`);
+  };
 
   // Vars
   const tabContentList: { [key: string]: ReactElement } = {
@@ -61,7 +61,7 @@ const AccountSettings = () => {
     security: <SecurityTab />,
     notifications: <NotificationsTab />,
     connections: <ConnectionsTab />
-  }
+  };
 
   return (
     <TabContext value={activeTab}>
@@ -86,7 +86,7 @@ const AccountSettings = () => {
         </Grid>
       </Grid>
     </TabContext>
-  )
-}
+  );
+};
 
-export default AccountSettings
+export default AccountSettings;

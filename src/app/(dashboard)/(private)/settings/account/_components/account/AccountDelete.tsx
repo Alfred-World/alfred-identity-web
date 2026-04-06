@@ -1,27 +1,27 @@
-'use client'
+'use client';
 
 // React Imports
-import { useState } from 'react'
+import { useState } from 'react';
 
 // MUI Imports
-import Card from '@mui/material/Card'
-import CardHeader from '@mui/material/CardHeader'
-import CardContent from '@mui/material/CardContent'
-import FormControlLabel from '@mui/material/FormControlLabel'
-import Checkbox from '@mui/material/Checkbox'
-import Button from '@mui/material/Button'
-import FormControl from '@mui/material/FormControl'
-import FormHelperText from '@mui/material/FormHelperText'
+import Card from '@mui/material/Card';
+import CardHeader from '@mui/material/CardHeader';
+import CardContent from '@mui/material/CardContent';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
+import Button from '@mui/material/Button';
+import FormControl from '@mui/material/FormControl';
+import FormHelperText from '@mui/material/FormHelperText';
 
 // Third-party Imports
-import { useForm, Controller } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form';
 
 // Component Imports
-import ConfirmationDialog from '@components/dialogs/confirmation-dialog'
+import ConfirmationDialog from '@components/dialogs/confirmation-dialog';
 
 const AccountDelete = () => {
   // States
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
 
   // Hooks
   const {
@@ -29,14 +29,14 @@ const AccountDelete = () => {
     watch,
     handleSubmit,
     formState: { errors }
-  } = useForm({ defaultValues: { checkbox: false } })
+  } = useForm({ defaultValues: { checkbox: false } });
 
   // Vars
-  const checkboxValue = watch('checkbox')
+  const checkboxValue = watch('checkbox');
 
   const onSubmit = () => {
-    setOpen(true)
-  }
+    setOpen(true);
+  };
 
   return (
     <Card>
@@ -61,7 +61,7 @@ const AccountDelete = () => {
         </form>
       </CardContent>
     </Card>
-  )
-}
+  );
+};
 
-export default AccountDelete
+export default AccountDelete;

@@ -47,13 +47,13 @@ const MENU_ITEMS = [
   {
     icon: 'tabler-user',
     label: 'My Profile',
-    route: ROUTES.SETTINGS.ACCOUNT,
+    route: ROUTES.SETTINGS.ACCOUNT
   },
   {
     icon: 'tabler-settings',
     label: 'Settings',
-    route: ROUTES.SETTINGS.ROOT,
-  },
+    route: ROUTES.SETTINGS.ROOT
+  }
 ];
 
 const UserDropdown = () => {
@@ -143,11 +143,7 @@ const UserDropdown = () => {
                   </div>
                   <Divider className='mlb-1' />
                   {MENU_ITEMS.map((item, index) => (
-                    <MenuItem
-                      key={index}
-                      className='mli-2 gap-3'
-                      onClick={e => handleDropdownClose(e, item.route)}
-                    >
+                    <MenuItem key={index} className='mli-2 gap-3' onClick={e => handleDropdownClose(e, item.route)}>
                       <i className={item.icon} />
                       <Typography color='text.primary'>{item.label}</Typography>
                     </MenuItem>

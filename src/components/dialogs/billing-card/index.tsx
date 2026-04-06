@@ -1,26 +1,26 @@
-'use client'
+'use client';
 
 // MUI Imports
-import Dialog from '@mui/material/Dialog'
-import DialogTitle from '@mui/material/DialogTitle'
-import DialogContent from '@mui/material/DialogContent'
-import DialogActions from '@mui/material/DialogActions'
-import Button from '@mui/material/Button'
-import Grid from '@mui/material/Grid'
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
 
 // Component Imports
-import CustomTextField from '@core/components/mui/TextField'
+import CustomTextField from '@core/components/mui/TextField';
 
 type BillingCardProps = {
-  open: boolean
-  setOpen: (open: boolean) => void
+  open: boolean;
+  setOpen: (open: boolean) => void;
   data?: {
-    name?: string
-    cardCvv?: string
-    expiryDate?: string
-    cardNumber?: string
-  }
-}
+    name?: string;
+    cardCvv?: string;
+    expiryDate?: string;
+    cardNumber?: string;
+  };
+};
 
 const BillingCard = ({ open, setOpen, data }: BillingCardProps) => {
   return (
@@ -56,7 +56,7 @@ const BillingCard = ({ open, setOpen, data }: BillingCardProps) => {
         </Button>
       </DialogActions>
     </Dialog>
-  )
-}
+  );
+};
 
-export default BillingCard
+export default BillingCard;

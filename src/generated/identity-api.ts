@@ -792,15 +792,14 @@ export interface TokenResponseDto {
 export interface UpdateApplicationRequest {
   /**
    * Display name for the application
-   * @minLength 0
-   * @maxLength 200
+   * @nullable
    */
-  displayName: string;
+  displayName?: string | null;
   /**
    * Comma-separated list of allowed redirect URIs
-   * @minLength 1
+   * @nullable
    */
-  redirectUris: string;
+  redirectUris?: string | null;
   /**
    * Comma-separated list of allowed post-logout redirect URIs
    * @nullable
@@ -821,7 +820,8 @@ export interface UpdateApplicationStatusRequest {
  * Request to update current user's profile
  */
 export interface UpdateProfileRequest {
-  fullName?: string;
+  /** @nullable */
+  fullName?: string | null;
   /** @nullable */
   phoneNumber?: string | null;
   /**
@@ -832,11 +832,14 @@ export interface UpdateProfileRequest {
 }
 
 export interface UpdateRoleRequest {
-  name?: string;
+  /** @nullable */
+  name?: string | null;
   /** @nullable */
   icon?: string | null;
-  isImmutable?: boolean;
-  isSystem?: boolean;
+  /** @nullable */
+  isImmutable?: boolean | null;
+  /** @nullable */
+  isSystem?: boolean | null;
   /** @nullable */
   permissions?: string[] | null;
 }
@@ -1249,40 +1252,40 @@ export function useGetIdentityAccountMe<
 /**
  * @summary Update current user's profile (full name, phone number, avatar)
  */
-export const getPutIdentityAccountProfileUrl = () => {
+export const getPatchIdentityAccountProfileUrl = () => {
   return `/identity/account/profile`;
 };
 
-export const putIdentityAccountProfile = async (
+export const patchIdentityAccountProfile = async (
   updateProfileRequest: UpdateProfileRequest,
   options?: RequestInit
 ): Promise<ProfileResponseApiResponse> => {
-  return customFetch<ProfileResponseApiResponse>(getPutIdentityAccountProfileUrl(), {
+  return customFetch<ProfileResponseApiResponse>(getPatchIdentityAccountProfileUrl(), {
     ...options,
-    method: 'PUT',
+    method: 'PATCH',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
     body: JSON.stringify(updateProfileRequest)
   });
 };
 
-export const getPutIdentityAccountProfileMutationOptions = <
+export const getPatchIdentityAccountProfileMutationOptions = <
   TError = ErrorType<ApiErrorResponse>,
   TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof putIdentityAccountProfile>>,
+    Awaited<ReturnType<typeof patchIdentityAccountProfile>>,
     TError,
     { data: UpdateProfileRequest },
     TContext
   >;
   request?: SecondParameter<typeof customFetch>;
 }): UseMutationOptions<
-  Awaited<ReturnType<typeof putIdentityAccountProfile>>,
+  Awaited<ReturnType<typeof patchIdentityAccountProfile>>,
   TError,
   { data: UpdateProfileRequest },
   TContext
 > => {
-  const mutationKey = ['putIdentityAccountProfile'];
+  const mutationKey = ['patchIdentityAccountProfile'];
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
       ? options
@@ -1290,30 +1293,30 @@ export const getPutIdentityAccountProfileMutationOptions = <
     : { mutation: { mutationKey }, request: undefined };
 
   const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof putIdentityAccountProfile>>,
+    Awaited<ReturnType<typeof patchIdentityAccountProfile>>,
     { data: UpdateProfileRequest }
   > = props => {
     const { data } = props ?? {};
 
-    return putIdentityAccountProfile(data, requestOptions);
+    return patchIdentityAccountProfile(data, requestOptions);
   };
 
   return { mutationFn, ...mutationOptions };
 };
 
-export type PutIdentityAccountProfileMutationResult = NonNullable<
-  Awaited<ReturnType<typeof putIdentityAccountProfile>>
+export type PatchIdentityAccountProfileMutationResult = NonNullable<
+  Awaited<ReturnType<typeof patchIdentityAccountProfile>>
 >;
-export type PutIdentityAccountProfileMutationBody = UpdateProfileRequest;
-export type PutIdentityAccountProfileMutationError = ErrorType<ApiErrorResponse>;
+export type PatchIdentityAccountProfileMutationBody = UpdateProfileRequest;
+export type PatchIdentityAccountProfileMutationError = ErrorType<ApiErrorResponse>;
 
 /**
  * @summary Update current user's profile (full name, phone number, avatar)
  */
-export const usePutIdentityAccountProfile = <TError = ErrorType<ApiErrorResponse>, TContext = unknown>(
+export const usePatchIdentityAccountProfile = <TError = ErrorType<ApiErrorResponse>, TContext = unknown>(
   options?: {
     mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof putIdentityAccountProfile>>,
+      Awaited<ReturnType<typeof patchIdentityAccountProfile>>,
       TError,
       { data: UpdateProfileRequest },
       TContext
@@ -1322,12 +1325,12 @@ export const usePutIdentityAccountProfile = <TError = ErrorType<ApiErrorResponse
   },
   queryClient?: QueryClient
 ): UseMutationResult<
-  Awaited<ReturnType<typeof putIdentityAccountProfile>>,
+  Awaited<ReturnType<typeof patchIdentityAccountProfile>>,
   TError,
   { data: UpdateProfileRequest },
   TContext
 > => {
-  return useMutation(getPutIdentityAccountProfileMutationOptions(options), queryClient);
+  return useMutation(getPatchIdentityAccountProfileMutationOptions(options), queryClient);
 };
 
 /**
@@ -2445,41 +2448,41 @@ export function useGetIdentityApplicationsId<
 /**
  * @summary Update an existing application
  */
-export const getPutIdentityApplicationsIdUrl = (id: string) => {
+export const getPatchIdentityApplicationsIdUrl = (id: string) => {
   return `/identity/applications/${id}`;
 };
 
-export const putIdentityApplicationsId = async (
+export const patchIdentityApplicationsId = async (
   id: string,
   updateApplicationRequest: UpdateApplicationRequest,
   options?: RequestInit
 ): Promise<ApplicationDtoApiResponse> => {
-  return customFetch<ApplicationDtoApiResponse>(getPutIdentityApplicationsIdUrl(id), {
+  return customFetch<ApplicationDtoApiResponse>(getPatchIdentityApplicationsIdUrl(id), {
     ...options,
-    method: 'PUT',
+    method: 'PATCH',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
     body: JSON.stringify(updateApplicationRequest)
   });
 };
 
-export const getPutIdentityApplicationsIdMutationOptions = <
+export const getPatchIdentityApplicationsIdMutationOptions = <
   TError = ErrorType<ApiErrorResponse>,
   TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof putIdentityApplicationsId>>,
+    Awaited<ReturnType<typeof patchIdentityApplicationsId>>,
     TError,
     { id: string; data: UpdateApplicationRequest },
     TContext
   >;
   request?: SecondParameter<typeof customFetch>;
 }): UseMutationOptions<
-  Awaited<ReturnType<typeof putIdentityApplicationsId>>,
+  Awaited<ReturnType<typeof patchIdentityApplicationsId>>,
   TError,
   { id: string; data: UpdateApplicationRequest },
   TContext
 > => {
-  const mutationKey = ['putIdentityApplicationsId'];
+  const mutationKey = ['patchIdentityApplicationsId'];
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
       ? options
@@ -2487,30 +2490,30 @@ export const getPutIdentityApplicationsIdMutationOptions = <
     : { mutation: { mutationKey }, request: undefined };
 
   const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof putIdentityApplicationsId>>,
+    Awaited<ReturnType<typeof patchIdentityApplicationsId>>,
     { id: string; data: UpdateApplicationRequest }
   > = props => {
     const { id, data } = props ?? {};
 
-    return putIdentityApplicationsId(id, data, requestOptions);
+    return patchIdentityApplicationsId(id, data, requestOptions);
   };
 
   return { mutationFn, ...mutationOptions };
 };
 
-export type PutIdentityApplicationsIdMutationResult = NonNullable<
-  Awaited<ReturnType<typeof putIdentityApplicationsId>>
+export type PatchIdentityApplicationsIdMutationResult = NonNullable<
+  Awaited<ReturnType<typeof patchIdentityApplicationsId>>
 >;
-export type PutIdentityApplicationsIdMutationBody = UpdateApplicationRequest;
-export type PutIdentityApplicationsIdMutationError = ErrorType<ApiErrorResponse>;
+export type PatchIdentityApplicationsIdMutationBody = UpdateApplicationRequest;
+export type PatchIdentityApplicationsIdMutationError = ErrorType<ApiErrorResponse>;
 
 /**
  * @summary Update an existing application
  */
-export const usePutIdentityApplicationsId = <TError = ErrorType<ApiErrorResponse>, TContext = unknown>(
+export const usePatchIdentityApplicationsId = <TError = ErrorType<ApiErrorResponse>, TContext = unknown>(
   options?: {
     mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof putIdentityApplicationsId>>,
+      Awaited<ReturnType<typeof patchIdentityApplicationsId>>,
       TError,
       { id: string; data: UpdateApplicationRequest },
       TContext
@@ -2519,12 +2522,12 @@ export const usePutIdentityApplicationsId = <TError = ErrorType<ApiErrorResponse
   },
   queryClient?: QueryClient
 ): UseMutationResult<
-  Awaited<ReturnType<typeof putIdentityApplicationsId>>,
+  Awaited<ReturnType<typeof patchIdentityApplicationsId>>,
   TError,
   { id: string; data: UpdateApplicationRequest },
   TContext
 > => {
-  return useMutation(getPutIdentityApplicationsIdMutationOptions(options), queryClient);
+  return useMutation(getPatchIdentityApplicationsIdMutationOptions(options), queryClient);
 };
 
 /**
@@ -5023,41 +5026,41 @@ export function useGetIdentityRolesId<
 /**
  * @summary Update an existing role
  */
-export const getPutIdentityRolesIdUrl = (id: string) => {
+export const getPatchIdentityRolesIdUrl = (id: string) => {
   return `/identity/roles/${id}`;
 };
 
-export const putIdentityRolesId = async (
+export const patchIdentityRolesId = async (
   id: string,
   updateRoleRequest: UpdateRoleRequest,
   options?: RequestInit
 ): Promise<RoleDtoApiResponse> => {
-  return customFetch<RoleDtoApiResponse>(getPutIdentityRolesIdUrl(id), {
+  return customFetch<RoleDtoApiResponse>(getPatchIdentityRolesIdUrl(id), {
     ...options,
-    method: 'PUT',
+    method: 'PATCH',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
     body: JSON.stringify(updateRoleRequest)
   });
 };
 
-export const getPutIdentityRolesIdMutationOptions = <
+export const getPatchIdentityRolesIdMutationOptions = <
   TError = ErrorType<ApiErrorResponse>,
   TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof putIdentityRolesId>>,
+    Awaited<ReturnType<typeof patchIdentityRolesId>>,
     TError,
     { id: string; data: UpdateRoleRequest },
     TContext
   >;
   request?: SecondParameter<typeof customFetch>;
 }): UseMutationOptions<
-  Awaited<ReturnType<typeof putIdentityRolesId>>,
+  Awaited<ReturnType<typeof patchIdentityRolesId>>,
   TError,
   { id: string; data: UpdateRoleRequest },
   TContext
 > => {
-  const mutationKey = ['putIdentityRolesId'];
+  const mutationKey = ['patchIdentityRolesId'];
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
       ? options
@@ -5065,28 +5068,28 @@ export const getPutIdentityRolesIdMutationOptions = <
     : { mutation: { mutationKey }, request: undefined };
 
   const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof putIdentityRolesId>>,
+    Awaited<ReturnType<typeof patchIdentityRolesId>>,
     { id: string; data: UpdateRoleRequest }
   > = props => {
     const { id, data } = props ?? {};
 
-    return putIdentityRolesId(id, data, requestOptions);
+    return patchIdentityRolesId(id, data, requestOptions);
   };
 
   return { mutationFn, ...mutationOptions };
 };
 
-export type PutIdentityRolesIdMutationResult = NonNullable<Awaited<ReturnType<typeof putIdentityRolesId>>>;
-export type PutIdentityRolesIdMutationBody = UpdateRoleRequest;
-export type PutIdentityRolesIdMutationError = ErrorType<ApiErrorResponse>;
+export type PatchIdentityRolesIdMutationResult = NonNullable<Awaited<ReturnType<typeof patchIdentityRolesId>>>;
+export type PatchIdentityRolesIdMutationBody = UpdateRoleRequest;
+export type PatchIdentityRolesIdMutationError = ErrorType<ApiErrorResponse>;
 
 /**
  * @summary Update an existing role
  */
-export const usePutIdentityRolesId = <TError = ErrorType<ApiErrorResponse>, TContext = unknown>(
+export const usePatchIdentityRolesId = <TError = ErrorType<ApiErrorResponse>, TContext = unknown>(
   options?: {
     mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof putIdentityRolesId>>,
+      Awaited<ReturnType<typeof patchIdentityRolesId>>,
       TError,
       { id: string; data: UpdateRoleRequest },
       TContext
@@ -5095,12 +5098,12 @@ export const usePutIdentityRolesId = <TError = ErrorType<ApiErrorResponse>, TCon
   },
   queryClient?: QueryClient
 ): UseMutationResult<
-  Awaited<ReturnType<typeof putIdentityRolesId>>,
+  Awaited<ReturnType<typeof patchIdentityRolesId>>,
   TError,
   { id: string; data: UpdateRoleRequest },
   TContext
 > => {
-  return useMutation(getPutIdentityRolesIdMutationOptions(options), queryClient);
+  return useMutation(getPatchIdentityRolesIdMutationOptions(options), queryClient);
 };
 
 /**

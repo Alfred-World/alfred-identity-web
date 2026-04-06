@@ -13,7 +13,6 @@ const isApiEnvelopeFailure = (payload: unknown): payload is ApiErrorResponse => 
   return candidate.success === false && Array.isArray(candidate.errors);
 };
 
-
 /**
  * Gateway base URL (public, build-time inlined).
  * Used for browser redirect URLs (SSO check, logout, etc.) — NOT for API calls.
@@ -34,7 +33,7 @@ let isRedirectingToLogin = false;
  */
 async function redirectToLogin(): Promise<never> {
   if (isRedirectingToLogin) {
-    return new Promise<never>(() => { });
+    return new Promise<never>(() => {});
   }
 
   isRedirectingToLogin = true;
@@ -47,7 +46,7 @@ async function redirectToLogin(): Promise<never> {
 
   window.location.href = '/login?error=session_expired';
 
-  return new Promise<never>(() => { });
+  return new Promise<never>(() => {});
 }
 
 /**
@@ -79,7 +78,7 @@ export const customFetch = async <T>(url: string, options?: RequestInit): Promis
     const fullUrl = url.startsWith('http') ? url : `${serverGatewayUrl}${url}`;
 
     const response = await fetch(fullUrl, { ...options });
-    const body = await response.json() as T;
+    const body = (await response.json()) as T;
 
     if (shouldThrowHookError && (!response.ok || isApiEnvelopeFailure(body))) {
       throw body;
@@ -89,7 +88,7 @@ export const customFetch = async <T>(url: string, options?: RequestInit): Promis
   }
 
   if (isRedirectingToLogin) {
-    return new Promise<never>(() => { });
+    return new Promise<never>(() => {});
   }
 
   // Client-side: route through BFF proxy — converts /identity/users → /api/gateway/identity/users
@@ -97,7 +96,7 @@ export const customFetch = async <T>(url: string, options?: RequestInit): Promis
 
   const response = await fetch(proxyUrl, {
     ...options,
-    credentials: 'include', // Sends HttpOnly session cookie automatically
+    credentials: 'include' // Sends HttpOnly session cookie automatically
   });
 
   // The proxy already handles token refresh server-side.
@@ -112,7 +111,7 @@ export const customFetch = async <T>(url: string, options?: RequestInit): Promis
     }
 
     // Check if the response body indicates a permission error (vs session expired)
-    const body = await response.json() as T;
+    const body = (await response.json()) as T;
     const apiBody = body as { errors?: Array<{ code?: string }> };
     const isPermissionError = apiBody.errors?.some(e => e.code !== 'UNAUTHORIZED');
 
@@ -127,7 +126,7 @@ export const customFetch = async <T>(url: string, options?: RequestInit): Promis
     return redirectToLogin();
   }
 
-  const body = await response.json() as T;
+  const body = (await response.json()) as T;
 
   if (shouldThrowHookError && (!response.ok || isApiEnvelopeFailure(body))) {
     throw body;

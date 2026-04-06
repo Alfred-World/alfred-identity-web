@@ -1,80 +1,80 @@
-'use client'
+'use client';
 
 // React Imports
-import { useState } from 'react'
+import { useState } from 'react';
 
 // MUI Imports
-import Card from '@mui/material/Card'
-import CardHeader from '@mui/material/CardHeader'
-import CardContent from '@mui/material/CardContent'
-import Grid from '@mui/material/Grid'
-import InputAdornment from '@mui/material/InputAdornment'
-import IconButton from '@mui/material/IconButton'
-import Typography from '@mui/material/Typography'
-import Button from '@mui/material/Button'
-import CircularProgress from '@mui/material/CircularProgress'
+import Card from '@mui/material/Card';
+import CardHeader from '@mui/material/CardHeader';
+import CardContent from '@mui/material/CardContent';
+import Grid from '@mui/material/Grid';
+import InputAdornment from '@mui/material/InputAdornment';
+import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import CircularProgress from '@mui/material/CircularProgress';
 
 // Third-party Imports
-import { toast } from 'react-toastify'
+import { toast } from 'react-toastify';
 
 // Generated Imports
-import { usePostIdentityAccountChangePassword } from '@/generated/identity-api'
+import { usePostIdentityAccountChangePassword } from '@/generated/identity-api';
 
 // Component Imports
-import CustomTextField from '@core/components/mui/TextField'
+import CustomTextField from '@core/components/mui/TextField';
 
 // ─── Initial State ─────────────────────────────────────────────────────────
-const INITIAL = { currentPassword: '', newPassword: '', confirmPassword: '' }
+const INITIAL = { currentPassword: '', newPassword: '', confirmPassword: '' };
 
 const ChangePasswordCard = () => {
-  const [form, setForm] = useState(INITIAL)
-  const [isCurrentPasswordShown, setIsCurrentPasswordShown] = useState(false)
-  const [isNewPasswordShown, setIsNewPasswordShown] = useState(false)
-  const [isConfirmPasswordShown, setIsConfirmPasswordShown] = useState(false)
-  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [form, setForm] = useState(INITIAL);
+  const [isCurrentPasswordShown, setIsCurrentPasswordShown] = useState(false);
+  const [isNewPasswordShown, setIsNewPasswordShown] = useState(false);
+  const [isConfirmPasswordShown, setIsConfirmPasswordShown] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const { mutate: changePassword, isPending } = usePostIdentityAccountChangePassword({
     mutation: {
       onSuccess(data) {
         if (data.success) {
-          toast.success('Password changed successfully')
-          setForm(INITIAL)
-          setErrors({})
+          toast.success('Password changed successfully');
+          setForm(INITIAL);
+          setErrors({});
         } else {
-          const apiErrors = data.errors ?? []
+          const apiErrors = data.errors ?? [];
 
-          toast.error(apiErrors[0]?.message ?? 'Failed to change password')
+          toast.error(apiErrors[0]?.message ?? 'Failed to change password');
         }
       },
       onError() {
-        toast.error('An unexpected error occurred')
+        toast.error('An unexpected error occurred');
       }
     }
-  })
+  });
 
   const validate = () => {
-    const newErrors: Record<string, string> = {}
+    const newErrors: Record<string, string> = {};
 
-    if (!form.currentPassword) newErrors.currentPassword = 'Current password is required'
-    if (!form.newPassword) newErrors.newPassword = 'New password is required'
-    else if (form.newPassword.length < 8) newErrors.newPassword = 'Password must be at least 8 characters'
-    if (!form.confirmPassword) newErrors.confirmPassword = 'Please confirm your new password'
-    else if (form.newPassword !== form.confirmPassword) newErrors.confirmPassword = 'Passwords do not match'
-    setErrors(newErrors)
+    if (!form.currentPassword) newErrors.currentPassword = 'Current password is required';
+    if (!form.newPassword) newErrors.newPassword = 'New password is required';
+    else if (form.newPassword.length < 8) newErrors.newPassword = 'Password must be at least 8 characters';
+    if (!form.confirmPassword) newErrors.confirmPassword = 'Please confirm your new password';
+    else if (form.newPassword !== form.confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
+    setErrors(newErrors);
 
-    return Object.keys(newErrors).length === 0
-  }
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = (e: React.SyntheticEvent) => {
-    e.preventDefault()
-    if (!validate()) return
-    changePassword({ data: { oldPassword: form.currentPassword, newPassword: form.newPassword } })
-  }
+    e.preventDefault();
+    if (!validate()) return;
+    changePassword({ data: { oldPassword: form.currentPassword, newPassword: form.newPassword } });
+  };
 
   const field = (key: keyof typeof form, value: string) => {
-    setForm(prev => ({ ...prev, [key]: value }))
-    if (errors[key]) setErrors(prev => ({ ...prev, [key]: '' }))
-  }
+    setForm(prev => ({ ...prev, [key]: value }));
+    if (errors[key]) setErrors(prev => ({ ...prev, [key]: '' }));
+  };
 
   return (
     <Card>
@@ -190,7 +190,10 @@ const ChangePasswordCard = () => {
                 variant='tonal'
                 type='button'
                 color='secondary'
-                onClick={() => { setForm(INITIAL); setErrors({}) }}
+                onClick={() => {
+                  setForm(INITIAL);
+                  setErrors({});
+                }}
                 disabled={isPending}
               >
                 Reset
@@ -200,7 +203,7 @@ const ChangePasswordCard = () => {
         </form>
       </CardContent>
     </Card>
-  )
-}
+  );
+};
 
-export default ChangePasswordCard
+export default ChangePasswordCard;

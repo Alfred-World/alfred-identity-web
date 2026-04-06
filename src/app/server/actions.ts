@@ -1,7 +1,7 @@
-'use server'
+'use server';
 
-import type { PricingPlanType } from '@/types/pages/pricingTypes'
-import type { InvoiceType } from '@/types/apps/invoiceTypes'
+import type { PricingPlanType } from '@/types/pages/pricingTypes';
+import type { InvoiceType } from '@/types/apps/invoiceTypes';
 
 export const getPricingData = async (): Promise<PricingPlanType[]> => {
   return [
@@ -44,9 +44,9 @@ export const getPricingData = async (): Promise<PricingPlanType[]> => {
         'Premium Support'
       ]
     }
-  ]
-}
+  ];
+};
 
 export const getInvoiceData = async (): Promise<InvoiceType[]> => {
-  return []
-}
+  return [];
+};

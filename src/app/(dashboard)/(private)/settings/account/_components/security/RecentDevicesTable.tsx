@@ -1,73 +1,76 @@
-'use client'
+'use client';
 
 // React Imports
-import type { ReactElement } from 'react'
+import type { ReactElement } from 'react';
 
 // MUI Imports
-import Card from '@mui/material/Card'
-import CardHeader from '@mui/material/CardHeader'
-import Typography from '@mui/material/Typography'
-import Button from '@mui/material/Button'
-import CircularProgress from '@mui/material/CircularProgress'
-import Chip from '@mui/material/Chip'
-import Alert from '@mui/material/Alert'
+import Card from '@mui/material/Card';
+import CardHeader from '@mui/material/CardHeader';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import CircularProgress from '@mui/material/CircularProgress';
+import Chip from '@mui/material/Chip';
+import Alert from '@mui/material/Alert';
 
 // Third-party Imports
-import { useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-toastify'
+import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'react-toastify';
 
 // Generated Imports
 import {
   useGetIdentityAccountSessions,
   useDeleteIdentityAccountSessionsId,
   getGetIdentityAccountSessionsQueryKey
-} from '@/generated/identity-api'
+} from '@/generated/identity-api';
 
 // Style Imports
-import tableStyles from '@core/styles/table.module.css'
+import tableStyles from '@core/styles/table.module.css';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 const getBrowserIcon = (device: string | null | undefined): ReactElement => {
-  const d = (device ?? '').toLowerCase()
+  const d = (device ?? '').toLowerCase();
 
-  if (d.includes('iphone') || d.includes('ios')) return <i className='tabler-device-mobile text-[22px] text-error' />
-  if (d.includes('android')) return <i className='tabler-brand-android text-[22px] text-success' />
-  if (d.includes('mac') || d.includes('apple')) return <i className='tabler-brand-apple text-[22px] text-secondary' />
-  if (d.includes('windows')) return <i className='tabler-brand-windows text-[22px] text-info' />
-  if (d.includes('linux')) return <i className='tabler-brand-ubuntu text-[22px] text-warning' />
-  
-return <i className='tabler-device-desktop text-[22px] text-primary' />
-}
+  if (d.includes('iphone') || d.includes('ios')) return <i className='tabler-device-mobile text-[22px] text-error' />;
+  if (d.includes('android')) return <i className='tabler-brand-android text-[22px] text-success' />;
+  if (d.includes('mac') || d.includes('apple')) return <i className='tabler-brand-apple text-[22px] text-secondary' />;
+  if (d.includes('windows')) return <i className='tabler-brand-windows text-[22px] text-info' />;
+  if (d.includes('linux')) return <i className='tabler-brand-ubuntu text-[22px] text-warning' />;
+
+  return <i className='tabler-device-desktop text-[22px] text-primary' />;
+};
 
 const formatDate = (iso: string) => {
-  try { return new Date(iso).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) }
-  catch { return iso }
-}
+  try {
+    return new Date(iso).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+  } catch {
+    return iso;
+  }
+};
 
 const RecentDevicesTable = () => {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   // Fetch sessions
-  const { data: sessionsResponse, isLoading, isError } = useGetIdentityAccountSessions()
+  const { data: sessionsResponse, isLoading, isError } = useGetIdentityAccountSessions();
 
-  const sessions = sessionsResponse?.success ? (sessionsResponse.result ?? []) : []
+  const sessions = sessionsResponse?.success ? (sessionsResponse.result ?? []) : [];
 
   // Revoke session
   const { mutate: revokeSession, variables: revokingVars } = useDeleteIdentityAccountSessionsId({
     mutation: {
       onSuccess(data) {
         if (data.success) {
-          toast.success('Session revoked successfully')
-          queryClient.invalidateQueries({ queryKey: getGetIdentityAccountSessionsQueryKey() })
+          toast.success('Session revoked successfully');
+          queryClient.invalidateQueries({ queryKey: getGetIdentityAccountSessionsQueryKey() });
         } else {
-          toast.error(data.errors?.[0]?.message ?? 'Failed to revoke session')
+          toast.error(data.errors?.[0]?.message ?? 'Failed to revoke session');
         }
       },
       onError() {
-        toast.error('An unexpected error occurred')
+        toast.error('An unexpected error occurred');
       }
     }
-  })
+  });
 
   return (
     <Card>
@@ -158,7 +161,7 @@ const RecentDevicesTable = () => {
         </div>
       )}
     </Card>
-  )
-}
+  );
+};
 
-export default RecentDevicesTable
+export default RecentDevicesTable;

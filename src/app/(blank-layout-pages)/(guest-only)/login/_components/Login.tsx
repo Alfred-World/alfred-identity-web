@@ -54,7 +54,8 @@ const LOGIN_RETURN_URL_STORAGE_KEY = 'identity_login_return_url';
 // ── Map NextAuth error codes to human-readable messages ──────────────────────
 const NEXTAUTH_ERROR_MESSAGES: Record<string, string> = {
   OAuthSignin: 'Could not start the sign-in flow. Please try again.',
-  OAuthCallback: 'Sign-in callback failed. The identity server may have rejected the request (e.g. missing redirect URI).',
+  OAuthCallback:
+    'Sign-in callback failed. The identity server may have rejected the request (e.g. missing redirect URI).',
   OAuthCreateAccount: 'Could not create your account from the identity provider.',
   OAuthAccountNotLinked: 'This email is already linked to another sign-in method.',
   Callback: 'Authentication callback error. Please try again.',
@@ -124,9 +125,7 @@ const Login = ({ mode: _mode }: { mode: SystemMode }) => {
       if (nextAuthError) {
         const errorDescription = searchParams.get('error_description');
 
-        const message = errorDescription
-          || NEXTAUTH_ERROR_MESSAGES[nextAuthError]
-          || NEXTAUTH_ERROR_MESSAGES.Default;
+        const message = errorDescription || NEXTAUTH_ERROR_MESSAGES[nextAuthError] || NEXTAUTH_ERROR_MESSAGES.Default;
 
         // Ensure previous authenticated session is cleared when OAuth fails
         // so UI doesn't bounce to dashboard with stale session.
@@ -252,7 +251,7 @@ const Login = ({ mode: _mode }: { mode: SystemMode }) => {
           <form
             noValidate
             autoComplete='off'
-            action={() => { }}
+            action={() => {}}
             onSubmit={handleSubmit(onSubmit)}
             className='flex flex-col gap-6'
           >
