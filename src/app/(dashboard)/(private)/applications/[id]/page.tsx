@@ -59,17 +59,17 @@ export default function EditApplicationPage({ params }: { params: Promise<{ id: 
     const current: UpdateApplicationRequest = {
       displayName: data.displayName,
       redirectUris: data.redirectUris,
-      postLogoutRedirectUris: data.postLogoutRedirectUris || null,
-      permissions: data.permissions || null
+      postLogoutRedirectUris: data.postLogoutRedirectUris || undefined,
+      permissions: data.permissions || undefined
     };
 
     const original: UpdateApplicationRequest = {
       displayName: result.displayName ?? '',
-      redirectUris: Array.isArray(result.redirectUris) ? result.redirectUris.join(',') : (result.redirectUris ?? null),
+      redirectUris: Array.isArray(result.redirectUris) ? result.redirectUris.join(',') : (result.redirectUris ?? undefined),
       postLogoutRedirectUris: Array.isArray(result.postLogoutRedirectUris)
         ? result.postLogoutRedirectUris.join(',')
-        : (result.postLogoutRedirectUris ?? null),
-      permissions: Array.isArray(result.permissions) ? result.permissions.join(',') : (result.permissions ?? null)
+        : (result.postLogoutRedirectUris ?? undefined),
+      permissions: Array.isArray(result.permissions) ? result.permissions.join(',') : (result.permissions ?? undefined)
     };
 
     const changes = getChangedFields(original, current);

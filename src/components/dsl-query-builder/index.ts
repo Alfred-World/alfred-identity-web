@@ -1,6 +1,13 @@
-// DSL Query Builder - Public Exports
+// Search Filter Builder - Public Exports
 export { DslQueryBuilder } from './DslQueryBuilder';
 export { FilterRow } from './FilterRow';
-export { buildDslQuery } from './buildDslQuery';
+export { buildFilterObject, describeConditions } from './buildFilterObject';
 export { getOperatorsForDataType, getOperatorConfig, operatorsByDataType } from './operators';
-export type { FieldConfig, FilterCondition, DslQueryBuilderProps, DataType, EnumOption } from './types';
+export type {
+  FieldConfig,
+  FilterCondition,
+  FilterObject,
+  DslQueryBuilderProps,
+  DataType,
+  EnumOption
+} from './types';

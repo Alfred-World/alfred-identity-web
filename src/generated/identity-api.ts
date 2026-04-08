@@ -154,6 +154,99 @@ export interface ApplicationDtoApiResponse {
   errors?: ApiError[] | null;
 }
 
+export interface GuidFilterInput {
+  /** @nullable */
+  eq?: string | null;
+  /** @nullable */
+  neq?: string | null;
+  /** @nullable */
+  in?: string[] | null;
+  /** @nullable */
+  nin?: string[] | null;
+}
+
+export interface StringFilterInput {
+  /** @nullable */
+  eq?: string | null;
+  /** @nullable */
+  neq?: string | null;
+  /** @nullable */
+  contains?: string | null;
+  /** @nullable */
+  ncontains?: string | null;
+  /** @nullable */
+  startsWith?: string | null;
+  /** @nullable */
+  nstartsWith?: string | null;
+  /** @nullable */
+  endsWith?: string | null;
+  /** @nullable */
+  nendsWith?: string | null;
+  /** @nullable */
+  in?: string[] | null;
+  /** @nullable */
+  nin?: string[] | null;
+}
+
+export interface BoolFilterInput {
+  /** @nullable */
+  eq?: boolean | null;
+  /** @nullable */
+  neq?: boolean | null;
+}
+
+export interface DateTimeFilterInput {
+  /** @nullable */
+  eq?: string | null;
+  /** @nullable */
+  neq?: string | null;
+  /** @nullable */
+  gt?: string | null;
+  /** @nullable */
+  gte?: string | null;
+  /** @nullable */
+  lt?: string | null;
+  /** @nullable */
+  lte?: string | null;
+}
+
+export interface ApplicationFilterInput {
+  /** @nullable */
+  and?: ApplicationFilterInput[] | null;
+  /** @nullable */
+  or?: ApplicationFilterInput[] | null;
+  id?: GuidFilterInput | null;
+  clientId?: StringFilterInput | null;
+  displayName?: StringFilterInput | null;
+  applicationType?: StringFilterInput | null;
+  clientType?: StringFilterInput | null;
+  isActive?: BoolFilterInput | null;
+  createdAt?: DateTimeFilterInput | null;
+  updatedAt?: DateTimeFilterInput | null;
+}
+
+export type SortDirection = (typeof SortDirection)[keyof typeof SortDirection];
+
+export const SortDirection = {
+  Asc: 'Asc',
+  Desc: 'Desc'
+} as const;
+
+export interface SortField {
+  field?: string;
+  direction?: SortDirection;
+}
+
+export interface ApplicationFilterInputSearchRequest {
+  page?: number;
+  pageSize?: number;
+  filter?: ApplicationFilterInput | null;
+  /** @nullable */
+  order?: SortField[] | null;
+  /** @nullable */
+  view?: string | null;
+}
+
 export interface ApplicationMetadataDto {
   applicationTypes?: string[];
   clientTypes?: string[];
@@ -305,6 +398,15 @@ export interface CreateUserRequest {
   roleIds?: string[] | null;
 }
 
+export interface FieldMeta {
+  name?: string;
+  typeName?: string;
+  operators?: string[];
+  canFilter?: boolean;
+  canSort?: boolean;
+  canSelect?: boolean;
+}
+
 export interface ForgotPasswordRequest {
   email?: string;
 }
@@ -426,6 +528,31 @@ export interface PermissionDtoListApiResponse {
   result?: PermissionDto[] | null;
   /** @nullable */
   errors?: ApiError[] | null;
+}
+
+export interface PermissionFilterInput {
+  /** @nullable */
+  and?: PermissionFilterInput[] | null;
+  /** @nullable */
+  or?: PermissionFilterInput[] | null;
+  id?: GuidFilterInput | null;
+  code?: StringFilterInput | null;
+  name?: StringFilterInput | null;
+  description?: StringFilterInput | null;
+  resource?: StringFilterInput | null;
+  action?: StringFilterInput | null;
+  isActive?: BoolFilterInput | null;
+  createdAt?: DateTimeFilterInput | null;
+}
+
+export interface PermissionFilterInputSearchRequest {
+  page?: number;
+  pageSize?: number;
+  filter?: PermissionFilterInput | null;
+  /** @nullable */
+  order?: SortField[] | null;
+  /** @nullable */
+  view?: string | null;
 }
 
 /**
@@ -560,6 +687,32 @@ export interface RoleDtoApiResponse {
   errors?: ApiError[] | null;
 }
 
+export interface RoleFilterInput {
+  /** @nullable */
+  and?: RoleFilterInput[] | null;
+  /** @nullable */
+  or?: RoleFilterInput[] | null;
+  id?: GuidFilterInput | null;
+  name?: StringFilterInput | null;
+  normalizedName?: StringFilterInput | null;
+  isImmutable?: BoolFilterInput | null;
+  isSystem?: BoolFilterInput | null;
+  icon?: StringFilterInput | null;
+  isDeleted?: BoolFilterInput | null;
+  createdAt?: DateTimeFilterInput | null;
+  updatedAt?: DateTimeFilterInput | null;
+}
+
+export interface RoleFilterInputSearchRequest {
+  page?: number;
+  pageSize?: number;
+  filter?: RoleFilterInput | null;
+  /** @nullable */
+  order?: SortField[] | null;
+  /** @nullable */
+  view?: string | null;
+}
+
 export interface RotateSigningKeyResult {
   success?: boolean;
   newKeyId?: string;
@@ -580,6 +733,32 @@ export interface RotateSigningKeyResultApiResponse {
   /** @nullable */
   message?: string | null;
   result?: RotateSigningKeyResult | null;
+  /** @nullable */
+  errors?: ApiError[] | null;
+}
+
+export type SearchMetadataResponseTypeOperators = { [key: string]: string[] };
+
+export interface SearchMetadataResponse {
+  typeOperators?: SearchMetadataResponseTypeOperators;
+  logicalOperators?: string[];
+  sortDirections?: string[];
+  fields?: FieldMeta[];
+}
+
+/**
+ * Unified API response wrapper for all API responses (success + error).
+- On success: Success=true, Result is populated, Errors is null.
+- On failure: Success=false, Errors is populated, Result is null.
+            
+This enables discriminated union pattern on the frontend:
+  if (data.success) { data.result... } else { data.errors... }
+ */
+export interface SearchMetadataResponseApiResponse {
+  success: boolean;
+  /** @nullable */
+  message?: string | null;
+  result?: SearchMetadataResponse | null;
   /** @nullable */
   errors?: ApiError[] | null;
 }
@@ -790,26 +969,14 @@ export interface TokenResponseDto {
  * Request model for updating an OAuth2 client application
  */
 export interface UpdateApplicationRequest {
-  /**
-   * Display name for the application
-   * @nullable
-   */
-  displayName?: string | null;
-  /**
-   * Comma-separated list of allowed redirect URIs
-   * @nullable
-   */
-  redirectUris?: string | null;
-  /**
-   * Comma-separated list of allowed post-logout redirect URIs
-   * @nullable
-   */
-  postLogoutRedirectUris?: string | null;
-  /**
-   * Comma-separated list of permissions/scopes
-   * @nullable
-   */
-  permissions?: string | null;
+  /** Display name for the application */
+  displayName?: string;
+  /** Comma-separated list of allowed redirect URIs */
+  redirectUris?: string;
+  /** Comma-separated list of allowed post-logout redirect URIs */
+  postLogoutRedirectUris?: string;
+  /** Comma-separated list of permissions/scopes */
+  permissions?: string;
 }
 
 export interface UpdateApplicationStatusRequest {
@@ -820,28 +987,18 @@ export interface UpdateApplicationStatusRequest {
  * Request to update current user's profile
  */
 export interface UpdateProfileRequest {
-  /** @nullable */
-  fullName?: string | null;
-  /** @nullable */
-  phoneNumber?: string | null;
-  /**
-   * Base64 encoded image or URL. Null to keep existing.
-   * @nullable
-   */
-  avatar?: string | null;
+  fullName?: string;
+  phoneNumber?: string;
+  /** Base64 encoded image or URL. Null to keep existing. */
+  avatar?: string;
 }
 
 export interface UpdateRoleRequest {
-  /** @nullable */
-  name?: string | null;
-  /** @nullable */
-  icon?: string | null;
-  /** @nullable */
-  isImmutable?: boolean | null;
-  /** @nullable */
-  isSystem?: boolean | null;
-  /** @nullable */
-  permissions?: string[] | null;
+  name?: string;
+  icon?: string;
+  isImmutable?: boolean;
+  isSystem?: boolean;
+  permissions?: string[];
 }
 
 export interface UserDto {
@@ -907,6 +1064,32 @@ export interface UserDtoApiResponse {
   result?: UserDto | null;
   /** @nullable */
   errors?: ApiError[] | null;
+}
+
+export interface UserFilterInput {
+  /** @nullable */
+  and?: UserFilterInput[] | null;
+  /** @nullable */
+  or?: UserFilterInput[] | null;
+  id?: GuidFilterInput | null;
+  userName?: StringFilterInput | null;
+  email?: StringFilterInput | null;
+  fullName?: StringFilterInput | null;
+  status?: StringFilterInput | null;
+  emailConfirmed?: BoolFilterInput | null;
+  phoneNumber?: StringFilterInput | null;
+  createdAt?: DateTimeFilterInput | null;
+  avatar?: StringFilterInput | null;
+}
+
+export interface UserFilterInputSearchRequest {
+  page?: number;
+  pageSize?: number;
+  filter?: UserFilterInput | null;
+  /** @nullable */
+  order?: SortField[] | null;
+  /** @nullable */
+  view?: string | null;
 }
 
 export type GetIdentityApplicationsParams = {
@@ -2208,6 +2391,205 @@ export const usePostIdentityApplications = <TError = ErrorType<ApiErrorResponse>
 > => {
   return useMutation(getPostIdentityApplicationsMutationOptions(options), queryClient);
 };
+
+/**
+ * @summary Search applications with typed filter (POST)
+ */
+export const getPostIdentityApplicationsSearchUrl = () => {
+  return `/identity/applications/search`;
+};
+
+export const postIdentityApplicationsSearch = async (
+  applicationFilterInputSearchRequest: ApplicationFilterInputSearchRequest,
+  options?: RequestInit
+): Promise<ApplicationDtoApiPagedResponse> => {
+  return customFetch<ApplicationDtoApiPagedResponse>(getPostIdentityApplicationsSearchUrl(), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(applicationFilterInputSearchRequest)
+  });
+};
+
+export const getPostIdentityApplicationsSearchMutationOptions = <
+  TError = ErrorType<ApiErrorResponse>,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postIdentityApplicationsSearch>>,
+    TError,
+    { data: ApplicationFilterInputSearchRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postIdentityApplicationsSearch>>,
+  TError,
+  { data: ApplicationFilterInputSearchRequest },
+  TContext
+> => {
+  const mutationKey = ['postIdentityApplicationsSearch'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postIdentityApplicationsSearch>>,
+    { data: ApplicationFilterInputSearchRequest }
+  > = props => {
+    const { data } = props ?? {};
+
+    return postIdentityApplicationsSearch(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostIdentityApplicationsSearchMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postIdentityApplicationsSearch>>
+>;
+export type PostIdentityApplicationsSearchMutationBody = ApplicationFilterInputSearchRequest;
+export type PostIdentityApplicationsSearchMutationError = ErrorType<ApiErrorResponse>;
+
+/**
+ * @summary Search applications with typed filter (POST)
+ */
+export const usePostIdentityApplicationsSearch = <TError = ErrorType<ApiErrorResponse>, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postIdentityApplicationsSearch>>,
+      TError,
+      { data: ApplicationFilterInputSearchRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof postIdentityApplicationsSearch>>,
+  TError,
+  { data: ApplicationFilterInputSearchRequest },
+  TContext
+> => {
+  return useMutation(getPostIdentityApplicationsSearchMutationOptions(options), queryClient);
+};
+
+/**
+ * @summary Get search metadata for applications
+ */
+export const getGetIdentityApplicationsSearchMetadataUrl = () => {
+  return `/identity/applications/search/metadata`;
+};
+
+export const getIdentityApplicationsSearchMetadata = async (
+  options?: RequestInit
+): Promise<SearchMetadataResponseApiResponse> => {
+  return customFetch<SearchMetadataResponseApiResponse>(getGetIdentityApplicationsSearchMetadataUrl(), {
+    ...options,
+    method: 'GET'
+  });
+};
+
+export const getGetIdentityApplicationsSearchMetadataQueryKey = () => {
+  return [`/identity/applications/search/metadata`] as const;
+};
+
+export const getGetIdentityApplicationsSearchMetadataQueryOptions = <
+  TData = Awaited<ReturnType<typeof getIdentityApplicationsSearchMetadata>>,
+  TError = ErrorType<unknown>
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getIdentityApplicationsSearchMetadata>>, TError, TData>>;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetIdentityApplicationsSearchMetadataQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getIdentityApplicationsSearchMetadata>>> = ({ signal }) =>
+    getIdentityApplicationsSearchMetadata({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, staleTime: 10000, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getIdentityApplicationsSearchMetadata>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetIdentityApplicationsSearchMetadataQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getIdentityApplicationsSearchMetadata>>
+>;
+export type GetIdentityApplicationsSearchMetadataQueryError = ErrorType<unknown>;
+
+export function useGetIdentityApplicationsSearchMetadata<
+  TData = Awaited<ReturnType<typeof getIdentityApplicationsSearchMetadata>>,
+  TError = ErrorType<unknown>
+>(
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getIdentityApplicationsSearchMetadata>>, TError, TData>> &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getIdentityApplicationsSearchMetadata>>,
+          TError,
+          Awaited<ReturnType<typeof getIdentityApplicationsSearchMetadata>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetIdentityApplicationsSearchMetadata<
+  TData = Awaited<ReturnType<typeof getIdentityApplicationsSearchMetadata>>,
+  TError = ErrorType<unknown>
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getIdentityApplicationsSearchMetadata>>, TError, TData>> &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getIdentityApplicationsSearchMetadata>>,
+          TError,
+          Awaited<ReturnType<typeof getIdentityApplicationsSearchMetadata>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetIdentityApplicationsSearchMetadata<
+  TData = Awaited<ReturnType<typeof getIdentityApplicationsSearchMetadata>>,
+  TError = ErrorType<unknown>
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getIdentityApplicationsSearchMetadata>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Get search metadata for applications
+ */
+
+export function useGetIdentityApplicationsSearchMetadata<
+  TData = Awaited<ReturnType<typeof getIdentityApplicationsSearchMetadata>>,
+  TError = ErrorType<unknown>
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getIdentityApplicationsSearchMetadata>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getGetIdentityApplicationsSearchMetadataQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
 
 /**
  * @summary Get application metadata (types, permissions)
@@ -4698,6 +5080,205 @@ export function useGetIdentityPermissions<
 }
 
 /**
+ * @summary Search permissions with typed filter (POST)
+ */
+export const getPostIdentityPermissionsSearchUrl = () => {
+  return `/identity/permissions/search`;
+};
+
+export const postIdentityPermissionsSearch = async (
+  permissionFilterInputSearchRequest: PermissionFilterInputSearchRequest,
+  options?: RequestInit
+): Promise<PermissionDtoApiPagedResponse> => {
+  return customFetch<PermissionDtoApiPagedResponse>(getPostIdentityPermissionsSearchUrl(), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(permissionFilterInputSearchRequest)
+  });
+};
+
+export const getPostIdentityPermissionsSearchMutationOptions = <
+  TError = ErrorType<ApiErrorResponse>,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postIdentityPermissionsSearch>>,
+    TError,
+    { data: PermissionFilterInputSearchRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postIdentityPermissionsSearch>>,
+  TError,
+  { data: PermissionFilterInputSearchRequest },
+  TContext
+> => {
+  const mutationKey = ['postIdentityPermissionsSearch'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postIdentityPermissionsSearch>>,
+    { data: PermissionFilterInputSearchRequest }
+  > = props => {
+    const { data } = props ?? {};
+
+    return postIdentityPermissionsSearch(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostIdentityPermissionsSearchMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postIdentityPermissionsSearch>>
+>;
+export type PostIdentityPermissionsSearchMutationBody = PermissionFilterInputSearchRequest;
+export type PostIdentityPermissionsSearchMutationError = ErrorType<ApiErrorResponse>;
+
+/**
+ * @summary Search permissions with typed filter (POST)
+ */
+export const usePostIdentityPermissionsSearch = <TError = ErrorType<ApiErrorResponse>, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postIdentityPermissionsSearch>>,
+      TError,
+      { data: PermissionFilterInputSearchRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof postIdentityPermissionsSearch>>,
+  TError,
+  { data: PermissionFilterInputSearchRequest },
+  TContext
+> => {
+  return useMutation(getPostIdentityPermissionsSearchMutationOptions(options), queryClient);
+};
+
+/**
+ * @summary Get search metadata for permissions
+ */
+export const getGetIdentityPermissionsSearchMetadataUrl = () => {
+  return `/identity/permissions/search/metadata`;
+};
+
+export const getIdentityPermissionsSearchMetadata = async (
+  options?: RequestInit
+): Promise<SearchMetadataResponseApiResponse> => {
+  return customFetch<SearchMetadataResponseApiResponse>(getGetIdentityPermissionsSearchMetadataUrl(), {
+    ...options,
+    method: 'GET'
+  });
+};
+
+export const getGetIdentityPermissionsSearchMetadataQueryKey = () => {
+  return [`/identity/permissions/search/metadata`] as const;
+};
+
+export const getGetIdentityPermissionsSearchMetadataQueryOptions = <
+  TData = Awaited<ReturnType<typeof getIdentityPermissionsSearchMetadata>>,
+  TError = ErrorType<unknown>
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getIdentityPermissionsSearchMetadata>>, TError, TData>>;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetIdentityPermissionsSearchMetadataQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getIdentityPermissionsSearchMetadata>>> = ({ signal }) =>
+    getIdentityPermissionsSearchMetadata({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, staleTime: 10000, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getIdentityPermissionsSearchMetadata>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetIdentityPermissionsSearchMetadataQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getIdentityPermissionsSearchMetadata>>
+>;
+export type GetIdentityPermissionsSearchMetadataQueryError = ErrorType<unknown>;
+
+export function useGetIdentityPermissionsSearchMetadata<
+  TData = Awaited<ReturnType<typeof getIdentityPermissionsSearchMetadata>>,
+  TError = ErrorType<unknown>
+>(
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getIdentityPermissionsSearchMetadata>>, TError, TData>> &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getIdentityPermissionsSearchMetadata>>,
+          TError,
+          Awaited<ReturnType<typeof getIdentityPermissionsSearchMetadata>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetIdentityPermissionsSearchMetadata<
+  TData = Awaited<ReturnType<typeof getIdentityPermissionsSearchMetadata>>,
+  TError = ErrorType<unknown>
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getIdentityPermissionsSearchMetadata>>, TError, TData>> &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getIdentityPermissionsSearchMetadata>>,
+          TError,
+          Awaited<ReturnType<typeof getIdentityPermissionsSearchMetadata>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetIdentityPermissionsSearchMetadata<
+  TData = Awaited<ReturnType<typeof getIdentityPermissionsSearchMetadata>>,
+  TError = ErrorType<unknown>
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getIdentityPermissionsSearchMetadata>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Get search metadata for permissions
+ */
+
+export function useGetIdentityPermissionsSearchMetadata<
+  TData = Awaited<ReturnType<typeof getIdentityPermissionsSearchMetadata>>,
+  TError = ErrorType<unknown>
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getIdentityPermissionsSearchMetadata>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getGetIdentityPermissionsSearchMetadataQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
  * @summary Get paginated list of roles
  */
 export const getGetIdentityRolesUrl = (params?: GetIdentityRolesParams) => {
@@ -4904,6 +5485,203 @@ export const usePostIdentityRoles = <TError = ErrorType<ApiErrorResponse>, TCont
 ): UseMutationResult<Awaited<ReturnType<typeof postIdentityRoles>>, TError, { data: CreateRoleRequest }, TContext> => {
   return useMutation(getPostIdentityRolesMutationOptions(options), queryClient);
 };
+
+/**
+ * @summary Search roles with typed filter (POST)
+ */
+export const getPostIdentityRolesSearchUrl = () => {
+  return `/identity/roles/search`;
+};
+
+export const postIdentityRolesSearch = async (
+  roleFilterInputSearchRequest: RoleFilterInputSearchRequest,
+  options?: RequestInit
+): Promise<RoleDtoApiPagedResponse> => {
+  return customFetch<RoleDtoApiPagedResponse>(getPostIdentityRolesSearchUrl(), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(roleFilterInputSearchRequest)
+  });
+};
+
+export const getPostIdentityRolesSearchMutationOptions = <
+  TError = ErrorType<ApiErrorResponse>,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postIdentityRolesSearch>>,
+    TError,
+    { data: RoleFilterInputSearchRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postIdentityRolesSearch>>,
+  TError,
+  { data: RoleFilterInputSearchRequest },
+  TContext
+> => {
+  const mutationKey = ['postIdentityRolesSearch'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postIdentityRolesSearch>>,
+    { data: RoleFilterInputSearchRequest }
+  > = props => {
+    const { data } = props ?? {};
+
+    return postIdentityRolesSearch(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostIdentityRolesSearchMutationResult = NonNullable<Awaited<ReturnType<typeof postIdentityRolesSearch>>>;
+export type PostIdentityRolesSearchMutationBody = RoleFilterInputSearchRequest;
+export type PostIdentityRolesSearchMutationError = ErrorType<ApiErrorResponse>;
+
+/**
+ * @summary Search roles with typed filter (POST)
+ */
+export const usePostIdentityRolesSearch = <TError = ErrorType<ApiErrorResponse>, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postIdentityRolesSearch>>,
+      TError,
+      { data: RoleFilterInputSearchRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof postIdentityRolesSearch>>,
+  TError,
+  { data: RoleFilterInputSearchRequest },
+  TContext
+> => {
+  return useMutation(getPostIdentityRolesSearchMutationOptions(options), queryClient);
+};
+
+/**
+ * @summary Get search metadata for roles
+ */
+export const getGetIdentityRolesSearchMetadataUrl = () => {
+  return `/identity/roles/search/metadata`;
+};
+
+export const getIdentityRolesSearchMetadata = async (
+  options?: RequestInit
+): Promise<SearchMetadataResponseApiResponse> => {
+  return customFetch<SearchMetadataResponseApiResponse>(getGetIdentityRolesSearchMetadataUrl(), {
+    ...options,
+    method: 'GET'
+  });
+};
+
+export const getGetIdentityRolesSearchMetadataQueryKey = () => {
+  return [`/identity/roles/search/metadata`] as const;
+};
+
+export const getGetIdentityRolesSearchMetadataQueryOptions = <
+  TData = Awaited<ReturnType<typeof getIdentityRolesSearchMetadata>>,
+  TError = ErrorType<unknown>
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getIdentityRolesSearchMetadata>>, TError, TData>>;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetIdentityRolesSearchMetadataQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getIdentityRolesSearchMetadata>>> = ({ signal }) =>
+    getIdentityRolesSearchMetadata({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, staleTime: 10000, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getIdentityRolesSearchMetadata>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetIdentityRolesSearchMetadataQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getIdentityRolesSearchMetadata>>
+>;
+export type GetIdentityRolesSearchMetadataQueryError = ErrorType<unknown>;
+
+export function useGetIdentityRolesSearchMetadata<
+  TData = Awaited<ReturnType<typeof getIdentityRolesSearchMetadata>>,
+  TError = ErrorType<unknown>
+>(
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getIdentityRolesSearchMetadata>>, TError, TData>> &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getIdentityRolesSearchMetadata>>,
+          TError,
+          Awaited<ReturnType<typeof getIdentityRolesSearchMetadata>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetIdentityRolesSearchMetadata<
+  TData = Awaited<ReturnType<typeof getIdentityRolesSearchMetadata>>,
+  TError = ErrorType<unknown>
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getIdentityRolesSearchMetadata>>, TError, TData>> &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getIdentityRolesSearchMetadata>>,
+          TError,
+          Awaited<ReturnType<typeof getIdentityRolesSearchMetadata>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetIdentityRolesSearchMetadata<
+  TData = Awaited<ReturnType<typeof getIdentityRolesSearchMetadata>>,
+  TError = ErrorType<unknown>
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getIdentityRolesSearchMetadata>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Get search metadata for roles
+ */
+
+export function useGetIdentityRolesSearchMetadata<
+  TData = Awaited<ReturnType<typeof getIdentityRolesSearchMetadata>>,
+  TError = ErrorType<unknown>
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getIdentityRolesSearchMetadata>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getGetIdentityRolesSearchMetadataQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
 
 /**
  * @summary Get role by ID
@@ -5665,6 +6443,205 @@ export const usePostIdentityMgmtUsers = <TError = ErrorType<ApiErrorResponse>, T
 > => {
   return useMutation(getPostIdentityMgmtUsersMutationOptions(options), queryClient);
 };
+
+/**
+ * @summary Search users with typed filter (POST)
+ */
+export const getPostIdentityMgmtUsersSearchUrl = () => {
+  return `/identity/mgmt/users/search`;
+};
+
+export const postIdentityMgmtUsersSearch = async (
+  userFilterInputSearchRequest: UserFilterInputSearchRequest,
+  options?: RequestInit
+): Promise<UserDtoApiPagedResponse> => {
+  return customFetch<UserDtoApiPagedResponse>(getPostIdentityMgmtUsersSearchUrl(), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(userFilterInputSearchRequest)
+  });
+};
+
+export const getPostIdentityMgmtUsersSearchMutationOptions = <
+  TError = ErrorType<ApiErrorResponse>,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postIdentityMgmtUsersSearch>>,
+    TError,
+    { data: UserFilterInputSearchRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postIdentityMgmtUsersSearch>>,
+  TError,
+  { data: UserFilterInputSearchRequest },
+  TContext
+> => {
+  const mutationKey = ['postIdentityMgmtUsersSearch'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postIdentityMgmtUsersSearch>>,
+    { data: UserFilterInputSearchRequest }
+  > = props => {
+    const { data } = props ?? {};
+
+    return postIdentityMgmtUsersSearch(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostIdentityMgmtUsersSearchMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postIdentityMgmtUsersSearch>>
+>;
+export type PostIdentityMgmtUsersSearchMutationBody = UserFilterInputSearchRequest;
+export type PostIdentityMgmtUsersSearchMutationError = ErrorType<ApiErrorResponse>;
+
+/**
+ * @summary Search users with typed filter (POST)
+ */
+export const usePostIdentityMgmtUsersSearch = <TError = ErrorType<ApiErrorResponse>, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postIdentityMgmtUsersSearch>>,
+      TError,
+      { data: UserFilterInputSearchRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof postIdentityMgmtUsersSearch>>,
+  TError,
+  { data: UserFilterInputSearchRequest },
+  TContext
+> => {
+  return useMutation(getPostIdentityMgmtUsersSearchMutationOptions(options), queryClient);
+};
+
+/**
+ * @summary Get search metadata (available fields, operators, types)
+ */
+export const getGetIdentityMgmtUsersSearchMetadataUrl = () => {
+  return `/identity/mgmt/users/search/metadata`;
+};
+
+export const getIdentityMgmtUsersSearchMetadata = async (
+  options?: RequestInit
+): Promise<SearchMetadataResponseApiResponse> => {
+  return customFetch<SearchMetadataResponseApiResponse>(getGetIdentityMgmtUsersSearchMetadataUrl(), {
+    ...options,
+    method: 'GET'
+  });
+};
+
+export const getGetIdentityMgmtUsersSearchMetadataQueryKey = () => {
+  return [`/identity/mgmt/users/search/metadata`] as const;
+};
+
+export const getGetIdentityMgmtUsersSearchMetadataQueryOptions = <
+  TData = Awaited<ReturnType<typeof getIdentityMgmtUsersSearchMetadata>>,
+  TError = ErrorType<unknown>
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getIdentityMgmtUsersSearchMetadata>>, TError, TData>>;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetIdentityMgmtUsersSearchMetadataQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getIdentityMgmtUsersSearchMetadata>>> = ({ signal }) =>
+    getIdentityMgmtUsersSearchMetadata({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, staleTime: 10000, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getIdentityMgmtUsersSearchMetadata>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetIdentityMgmtUsersSearchMetadataQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getIdentityMgmtUsersSearchMetadata>>
+>;
+export type GetIdentityMgmtUsersSearchMetadataQueryError = ErrorType<unknown>;
+
+export function useGetIdentityMgmtUsersSearchMetadata<
+  TData = Awaited<ReturnType<typeof getIdentityMgmtUsersSearchMetadata>>,
+  TError = ErrorType<unknown>
+>(
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getIdentityMgmtUsersSearchMetadata>>, TError, TData>> &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getIdentityMgmtUsersSearchMetadata>>,
+          TError,
+          Awaited<ReturnType<typeof getIdentityMgmtUsersSearchMetadata>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetIdentityMgmtUsersSearchMetadata<
+  TData = Awaited<ReturnType<typeof getIdentityMgmtUsersSearchMetadata>>,
+  TError = ErrorType<unknown>
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getIdentityMgmtUsersSearchMetadata>>, TError, TData>> &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getIdentityMgmtUsersSearchMetadata>>,
+          TError,
+          Awaited<ReturnType<typeof getIdentityMgmtUsersSearchMetadata>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetIdentityMgmtUsersSearchMetadata<
+  TData = Awaited<ReturnType<typeof getIdentityMgmtUsersSearchMetadata>>,
+  TError = ErrorType<unknown>
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getIdentityMgmtUsersSearchMetadata>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Get search metadata (available fields, operators, types)
+ */
+
+export function useGetIdentityMgmtUsersSearchMetadata<
+  TData = Awaited<ReturnType<typeof getIdentityMgmtUsersSearchMetadata>>,
+  TError = ErrorType<unknown>
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getIdentityMgmtUsersSearchMetadata>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getGetIdentityMgmtUsersSearchMetadataQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
 
 /**
  * @summary Get user by ID

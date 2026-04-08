@@ -7,12 +7,14 @@ import Chip from '@mui/material/Chip';
 import IconButton from '@mui/material/IconButton';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 
 import { AdvancedTable } from '@/components/AdvancedTable/AdvancedTable';
-import { useUrlPagination, useUrlSorting } from '@/components/UrlPagination';
+import { useUrlPagination, useUrlSorting, sortStringToSortFields } from '@/components/UrlPagination';
 import type { ColumnConfig } from '@/components/AdvancedTable';
+import { DslQueryBuilder } from '@/components/dsl-query-builder';
+import type { FieldConfig, FilterObject } from '@/components/dsl-query-builder';
 
 import CustomAvatar from '@core/components/mui/Avatar';
 import OptionMenu from '@core/components/option-menu';
@@ -20,14 +22,13 @@ import { customFetch } from '@/libs/custom-instance';
 
 import {
   useDeleteIdentityMgmtUsersUserIdRoles,
-  getGetIdentityMgmtUsersQueryKey,
-  useGetIdentityRoles,
-  useGetIdentityMgmtUsers,
   usePostIdentityMgmtUsersUserIdRoles,
   usePostIdentityMgmtUsersUserIdBan,
-  usePostIdentityMgmtUsersUserIdUnban
+  usePostIdentityMgmtUsersUserIdUnban,
+  postIdentityMgmtUsersSearch,
+  postIdentityRolesSearch
 } from '@/generated/identity-api';
-import type { UserDto } from '@/generated/identity-api';
+import type { UserDto, UserFilterInput } from '@/generated/identity-api';
 
 import AddUserDialog from './AddUserDialog';
 import BanUserDialog from './BanUserDialog';
@@ -61,16 +62,17 @@ const UserList = () => {
   const [roleDialogState, setRoleDialogState] = useState<RoleDialogState | null>(null);
   const [isConfirmingEmail, setIsConfirmingEmail] = useState(false);
   const [isSyncingUsers, setIsSyncingUsers] = useState(false);
+  const [appliedFilter, setAppliedFilter] = useState<FilterObject>(undefined);
 
   const refreshUsers = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: getGetIdentityMgmtUsersQueryKey() });
+    queryClient.invalidateQueries({ queryKey: ['identity', 'users', 'search'] });
   }, [queryClient]);
 
   const syncUsers = useCallback(async () => {
     setIsSyncingUsers(true);
 
     try {
-      await queryClient.invalidateQueries({ queryKey: getGetIdentityMgmtUsersQueryKey() });
+      await queryClient.invalidateQueries({ queryKey: ['identity', 'users', 'search'] });
       toast.success('Users synced successfully');
     } catch {
       toast.error('Failed to sync users');
@@ -119,11 +121,15 @@ const UserList = () => {
   const { mutateAsync: assignRolesToUser, isPending: isAssigningRoles } = usePostIdentityMgmtUsersUserIdRoles();
   const { mutateAsync: revokeRolesFromUser, isPending: isRevokingRoles } = useDeleteIdentityMgmtUsersUserIdRoles();
 
-  const { data: rolesResponse, isLoading: isLoadingRoles } = useGetIdentityRoles({
-    page: 1,
-    pageSize: 200,
-    sort: 'name',
-    view: 'list'
+  const { data: rolesResponse, isLoading: isLoadingRoles } = useQuery({
+    queryKey: ['identity', 'roles', 'list'],
+    queryFn: () =>
+      postIdentityRolesSearch({
+        page: 1,
+        pageSize: 200,
+        order: [{ field: 'name', direction: 'Asc' }],
+        view: 'list'
+      })
   });
 
   const roles = useMemo(() => {
@@ -218,18 +224,29 @@ const UserList = () => {
     [refreshUsers]
   );
 
-  const { page, pageSize, setPage, setPageSize } = useUrlPagination();
+  const { page, pageSize, setPage, setPageSize, resetPage } = useUrlPagination();
   const { sort, sorting, setSorting } = useUrlSorting();
+
+  const order = useMemo(() => sortStringToSortFields(sort), [sort]);
+
+  const searchRequest = useMemo(
+    () => ({
+      page,
+      pageSize,
+      filter: appliedFilter as UserFilterInput,
+      order: order.length > 0 ? order : undefined,
+      view: 'detail' as const
+    }),
+    [page, pageSize, appliedFilter, order]
+  );
 
   const {
     data: usersResponse,
     isLoading,
     error
-  } = useGetIdentityMgmtUsers({
-    page,
-    pageSize,
-    sort,
-    view: 'detail'
+  } = useQuery({
+    queryKey: ['identity', 'users', 'search', searchRequest],
+    queryFn: () => postIdentityMgmtUsersSearch(searchRequest)
   });
 
   const usersLoadError = useMemo(() => {
@@ -499,8 +516,51 @@ const UserList = () => {
     [confirmUserEmail, isBanningUser, isConfirmingEmail, isUnbanningUser, unbanUser]
   );
 
+  // Filter field config for DslQueryBuilder
+  const filterFields: FieldConfig[] = useMemo(
+    () => [
+      { name: 'Full Name', key: 'fullName', dataType: 'string' },
+      { name: 'Email', key: 'email', dataType: 'string' },
+      { name: 'Username', key: 'userName', dataType: 'string' },
+      { name: 'Email Confirmed', key: 'emailConfirmed', dataType: 'bool' },
+      { name: 'Status', key: 'status', dataType: 'string' },
+      { name: 'Created At', key: 'createdAt', dataType: 'date' },
+      {
+        name: 'Role',
+        key: 'roles',
+        dataType: 'string',
+        collectionWrap: { operator: 'some', innerField: 'name' }
+      }
+    ],
+    []
+  );
+
+  const handleSearch = useCallback(
+    (filter: FilterObject) => {
+      setAppliedFilter(filter);
+      resetPage();
+    },
+    [resetPage]
+  );
+
+  const handleFilterReset = useCallback(() => {
+    setAppliedFilter(undefined);
+    resetPage();
+  }, [resetPage]);
+
   return (
     <>
+      <Box sx={{ mb: 3 }}>
+        <DslQueryBuilder
+          fields={filterFields}
+          onSearch={handleSearch}
+          onReset={handleFilterReset}
+          onInitialLoad={handleSearch}
+          title='Filter Users...'
+          syncWithUrl={true}
+        />
+      </Box>
+
       <AdvancedTable
         data={users}
         columns={userFields}

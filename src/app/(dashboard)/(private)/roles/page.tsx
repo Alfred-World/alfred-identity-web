@@ -6,13 +6,13 @@ import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 
 import { Grid, Box } from '@mui/material';
 import { toast } from 'react-toastify';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import RoleList from './_components/RoleList';
 import RolePermissionsDetail from './_components/RolePermissionsDetail';
 import RoleDialog from './_components/RoleDialog';
 import ConfirmationDialog from '@/components/ConfirmationDialog';
-import { getIdentityRoles, useDeleteIdentityRolesId } from '@/generated/identity-api';
+import { postIdentityRolesSearch, useDeleteIdentityRolesId } from '@/generated/identity-api';
 import type { RoleDto } from '@/generated/identity-api';
 
 const RolesPage = () => {
@@ -59,36 +59,25 @@ const RolesPage = () => {
   };
 
   const {
-    data: infiniteRolesData,
+    data: rolesData,
     isLoading: isLoadingRoles,
     isError: isRolesError,
     error: rolesError,
-    fetchNextPage: fetchNextRolesPage,
-    hasNextPage: hasNextRolesPage,
-    isFetchingNextPage: isFetchingNextRolesPage,
     refetch: refetchRoles
-  } = useInfiniteQuery({
-    queryKey: ['roles', 'infinite'],
-    initialPageParam: 1,
-    queryFn: async ({ pageParam = 1 }) => {
-      return await getIdentityRoles({
-        page: pageParam as number,
-        pageSize: 20,
+  } = useQuery({
+    queryKey: ['identity', 'roles', 'search'],
+    queryFn: () =>
+      postIdentityRolesSearch({
+        page: 1,
+        pageSize: 200,
+        order: [{ field: 'name', direction: 'Asc' }],
         view: 'detail'
-      });
-    },
-    getNextPageParam: lastPage => {
-      if (lastPage.success && lastPage.result?.hasNextPage) {
-        return (lastPage.result.page || 0) + 1;
-      }
-
-      return undefined;
-    }
+      })
   });
 
   const roles = useMemo(() => {
-    return infiniteRolesData?.pages.flatMap(page => page.result?.items ?? []) || [];
-  }, [infiniteRolesData]);
+    return rolesData?.success ? rolesData.result?.items ?? [] : [];
+  }, [rolesData]);
 
   useEffect(() => {
     if (isRolesError) {
@@ -168,9 +157,6 @@ const RolesPage = () => {
             onEditRole={handleEditClick}
             onDeleteRole={handleDeleteClick}
             isLoading={isLoadingRoles}
-            fetchNextPage={fetchNextRolesPage}
-            hasNextPage={!!hasNextRolesPage}
-            isFetchingNextPage={isFetchingNextRolesPage}
           />
         </Grid>
 

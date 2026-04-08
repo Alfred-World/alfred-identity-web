@@ -6,14 +6,15 @@ import Link from 'next/link';
 
 import { Box, Grid, Typography, Button, Chip } from '@mui/material';
 import { toast } from 'react-toastify';
+import { useQuery } from '@tanstack/react-query';
 
 import { DslQueryBuilder } from '@/components/dsl-query-builder';
-import type { FieldConfig, FilterCondition } from '@/components/dsl-query-builder';
-import { useUrlPagination, useUrlSorting } from '@/components/UrlPagination';
+import type { FieldConfig, FilterObject } from '@/components/dsl-query-builder';
+import { useUrlPagination, useUrlSorting, sortStringToSortFields } from '@/components/UrlPagination';
 import { AdvancedTable } from '@/components/AdvancedTable';
 import type { ColumnConfig } from '@/components/AdvancedTable';
-import { useGetIdentityApplications } from '@/generated/identity-api';
-import type { ApiErrorResponse, ApplicationDto } from '@/generated/identity-api';
+import { postIdentityApplicationsSearch } from '@/generated/identity-api';
+import type { ApiErrorResponse, ApplicationDto, ApplicationFilterInput } from '@/generated/identity-api';
 
 import { ApplicationListActions } from './_components/ApplicationListActions';
 import { useBreadcrumbs } from '@/contexts/BreadcrumbsContext';
@@ -26,18 +27,28 @@ export default function ApplicationsPage() {
     setBreadcrumbs([{ title: 'Dashboards', href: ROUTES.DASHBOARDS.ROOT }, { title: 'Applications' }]);
   }, [setBreadcrumbs]);
 
-  const [appliedQuery, setAppliedQuery] = useState('');
+  const [appliedFilter, setAppliedFilter] = useState<FilterObject>(undefined);
 
   // Get pagination from URL
   const { page, pageSize, setPage, setPageSize, resetPage } = useUrlPagination();
-  const { sort, sorting, setSorting } = useUrlSorting('-createdAt'); // Default sort by newest
+  const { sort, sorting, setSorting } = useUrlSorting('-createdAt');
 
-  // Fetch applications with the DSL filter and pagination
-  const { data, isLoading, error, refetch } = useGetIdentityApplications({
-    filter: appliedQuery || undefined,
-    page,
-    pageSize,
-    sort
+  const order = useMemo(() => sortStringToSortFields(sort), [sort]);
+
+  // Fetch applications with POST search
+  const searchRequest = useMemo(
+    () => ({
+      page,
+      pageSize,
+      filter: appliedFilter as ApplicationFilterInput,
+      order: order.length > 0 ? order : undefined
+    }),
+    [page, pageSize, appliedFilter, order]
+  );
+
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ['identity', 'applications', 'search', searchRequest],
+    queryFn: () => postIdentityApplicationsSearch(searchRequest)
   });
 
   const result = data?.success ? data.result : null;
@@ -165,19 +176,19 @@ export default function ApplicationsPage() {
   );
 
   const handleSearch = useCallback(
-    (query: string) => {
-      setAppliedQuery(query);
+    (filter: FilterObject) => {
+      setAppliedFilter(filter);
       resetPage(); // Reset to first page on new search
     },
     [resetPage]
   );
 
   const handleReset = useCallback(() => {
-    setAppliedQuery('');
+    setAppliedFilter(undefined);
     resetPage();
   }, [resetPage]);
 
-  const handleChange = useCallback((_conditions: FilterCondition[], _query: string) => {
+  const handleChange = useCallback((_conditions: unknown, _filter: FilterObject) => {
     // Optional: track changes without triggering search
   }, []);
 

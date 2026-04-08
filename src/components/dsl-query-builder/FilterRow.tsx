@@ -67,7 +67,7 @@ const FilterRowInner = ({
     // Reset operator and value when field changes
     onChange(condition.id, {
       field: value,
-      operator: newOperators[0]?.value || '==',
+      operator: newOperators[0]?.value || 'eq',
       value: '',
       secondValue: undefined
     });

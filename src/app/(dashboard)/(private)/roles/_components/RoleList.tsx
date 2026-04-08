@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState } from 'react';
 
 import {
   Box,
@@ -19,8 +19,7 @@ import {
   Skeleton,
   alpha,
   useTheme,
-  IconButton,
-  CircularProgress
+  IconButton
 } from '@mui/material';
 
 import type { RoleDto } from '@/generated/identity-api';
@@ -33,9 +32,6 @@ interface RoleListProps {
   onEditRole: (role: RoleDto) => void;
   onDeleteRole: (role: RoleDto) => void;
   isLoading?: boolean;
-  fetchNextPage: () => void;
-  hasNextPage: boolean;
-  isFetchingNextPage: boolean;
 }
 
 const RoleList = ({
@@ -45,44 +41,10 @@ const RoleList = ({
   onAddClick,
   onEditRole,
   onDeleteRole,
-  isLoading,
-  fetchNextPage,
-  hasNextPage,
-  isFetchingNextPage
+  isLoading
 }: RoleListProps) => {
   const [search, setSearch] = useState('');
   const theme = useTheme();
-  const loadMoreRef = useRef<HTMLDivElement>(null);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-
-  const handleObserver = useCallback(
-    (entries: IntersectionObserverEntry[]) => {
-      const target = entries[0];
-
-      if (target.isIntersecting && hasNextPage && !isFetchingNextPage) {
-        fetchNextPage();
-      }
-    },
-    [hasNextPage, isFetchingNextPage, fetchNextPage]
-  );
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(handleObserver, {
-      root: scrollContainerRef.current,
-      rootMargin: '50px',
-      threshold: 0.1
-    });
-
-    const currentRef = loadMoreRef.current;
-
-    if (currentRef) {
-      observer.observe(currentRef);
-    }
-
-    return () => {
-      if (currentRef) observer.unobserve(currentRef);
-    };
-  }, [handleObserver]);
 
   const filteredRoles = roles.filter(role => role.name?.toLowerCase().includes(search.toLowerCase()));
 
@@ -174,7 +136,6 @@ const RoleList = ({
       <Divider />
 
       <Box
-        ref={scrollContainerRef}
         sx={{
           flexGrow: 1,
           overflowY: 'auto',
@@ -316,19 +277,6 @@ const RoleList = ({
             })}
           </List>
         )}
-        {/* Infinite Scroll Anchor */}
-        <Box
-          ref={loadMoreRef}
-          sx={{
-            py: 2,
-            display: 'flex',
-            justifyContent: 'center',
-            width: '100%',
-            opacity: hasNextPage ? 1 : 0
-          }}
-        >
-          {isFetchingNextPage && <CircularProgress size={24} />}
-        </Box>
       </Box>
 
       <Divider />
