@@ -214,7 +214,7 @@ async function handler(request: NextRequest) {
           secure: isSecure,
           sameSite: 'lax',
           path: '/',
-          maxAge: 30 * 24 * 60 * 60 // 30 days — matches session.maxAge in authOptions
+          maxAge: 24 * 60 * 60 // 1 day — matches session.maxAge in authOptions
         });
 
         return proxyResponse;
@@ -226,8 +226,10 @@ async function handler(request: NextRequest) {
       headers: buildResponseHeaders(response)
     });
   } catch {
+    const message = 'The server is temporarily unavailable. Please try again.'
+
     return NextResponse.json(
-      { success: false, errors: [{ message: 'Gateway unreachable', code: 'BAD_GATEWAY' }] },
+      { success: false, message, errors: [{ message, code: 'BAD_GATEWAY' }] },
       { status: 502 }
     );
   }

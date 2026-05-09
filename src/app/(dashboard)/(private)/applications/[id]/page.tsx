@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { Box, Typography, CircularProgress } from '@mui/material';
 import { toast } from 'react-toastify';
 
-import { useGetIdentityApplicationsId, usePatchIdentityApplicationsId } from '@/generated/identity-api';
+import { useGetIdentityV1ApplicationsId, usePatchIdentityV1ApplicationsId } from '@/generated/identity-api';
 import type { UpdateApplicationRequest } from '@/generated/identity-api';
 import { ApplicationForm } from '../_components/ApplicationForm';
 import type { ApplicationFormSubmitData } from '../_components/ApplicationForm';
@@ -19,9 +19,9 @@ export default function EditApplicationPage({ params }: { params: Promise<{ id: 
   const id = resolvedParams.id;
   const router = useRouter();
 
-  const { data: applicationData, isLoading: isFetching } = useGetIdentityApplicationsId(id);
+  const { data: applicationData, isLoading: isFetching } = useGetIdentityV1ApplicationsId(id);
 
-  const { mutate: updateApplication, isPending: isUpdating } = usePatchIdentityApplicationsId({
+  const { mutate: updateApplication, isPending: isUpdating } = usePatchIdentityV1ApplicationsId({
     mutation: {
       onSuccess: data => {
         if (data?.success) {

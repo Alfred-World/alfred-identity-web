@@ -87,7 +87,7 @@ const AddUserDialog = ({ open, onClose, onSuccess }: AddUserDialogProps) => {
 
   const { mutate: createUser, isPending } = useMutation({
     mutationFn: async (data: FormData) => {
-      return customFetch<UserDtoApiResponse>('/identity/mgmt/users', {
+      return customFetch<UserDtoApiResponse>('/identity/v1/mgmt/users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

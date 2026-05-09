@@ -18,7 +18,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { toast } from 'react-toastify';
 
 // Generated Imports
-import { usePostIdentityAccountChangePassword } from '@/generated/identity-api';
+import { usePostIdentityV1AccountChangePassword } from '@/generated/identity-api';
 
 // Component Imports
 import CustomTextField from '@core/components/mui/TextField';
@@ -33,7 +33,7 @@ const ChangePasswordCard = () => {
   const [isConfirmPasswordShown, setIsConfirmPasswordShown] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const { mutate: changePassword, isPending } = usePostIdentityAccountChangePassword({
+  const { mutate: changePassword, isPending } = usePostIdentityV1AccountChangePassword({
     mutation: {
       onSuccess(data) {
         if (data.success) {

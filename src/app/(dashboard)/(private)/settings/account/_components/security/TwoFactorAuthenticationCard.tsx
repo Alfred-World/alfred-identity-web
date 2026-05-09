@@ -25,11 +25,11 @@ import { QRCodeSVG } from 'qrcode.react';
 
 // Generated Imports
 import {
-  useGetIdentityAccountMe,
-  usePostIdentityAccount2faEnable,
-  usePostIdentityAccount2faConfirm,
-  usePostIdentityAccount2faDisable,
-  getGetIdentityAccountMeQueryKey
+  useGetIdentityV1AccountMe,
+  usePostIdentityV1Account2faEnable,
+  usePostIdentityV1Account2faConfirm,
+  usePostIdentityV1Account2faDisable,
+  getGetIdentityV1AccountMeQueryKey
 } from '@/generated/identity-api';
 import type { InitiateEnableTwoFactorResult } from '@/generated/identity-api';
 
@@ -49,7 +49,7 @@ const EnableTwoFactorDialog = ({ open, onClose, setupData, onConfirmed }: Enable
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
 
-  const { mutate: confirm, isPending } = usePostIdentityAccount2faConfirm({
+  const { mutate: confirm, isPending } = usePostIdentityV1Account2faConfirm({
     mutation: {
       onSuccess(data) {
         if (data.success) {
@@ -166,12 +166,12 @@ const TwoFactorAuthenticationCard = () => {
   const [setupData, setSetupData] = useState<InitiateEnableTwoFactorResult | null>(null);
 
   // Load 2FA status from same profile cache
-  const { data: profileResponse, isLoading } = useGetIdentityAccountMe();
+  const { data: profileResponse, isLoading } = useGetIdentityV1AccountMe();
 
   const twoFactorEnabled = profileResponse?.success ? (profileResponse.result?.twoFactorEnabled ?? false) : false;
 
   // Enable 2FA: initiate
-  const { mutate: initiateEnable, isPending: isInitiating } = usePostIdentityAccount2faEnable({
+  const { mutate: initiateEnable, isPending: isInitiating } = usePostIdentityV1Account2faEnable({
     mutation: {
       onSuccess(data) {
         if (data.success && data.result) {
@@ -188,12 +188,12 @@ const TwoFactorAuthenticationCard = () => {
   });
 
   // Disable 2FA
-  const { mutate: disable2fa, isPending: isDisabling } = usePostIdentityAccount2faDisable({
+  const { mutate: disable2fa, isPending: isDisabling } = usePostIdentityV1Account2faDisable({
     mutation: {
       onSuccess(data) {
         if (data.success) {
           toast.success('Two-factor authentication disabled');
-          queryClient.invalidateQueries({ queryKey: getGetIdentityAccountMeQueryKey() });
+          queryClient.invalidateQueries({ queryKey: getGetIdentityV1AccountMeQueryKey() });
         } else {
           toast.error('Failed to disable two-factor authentication');
         }
@@ -215,7 +215,7 @@ const TwoFactorAuthenticationCard = () => {
   const handleConfirmed = () => {
     setEnableDialogOpen(false);
     setSetupData(null);
-    queryClient.invalidateQueries({ queryKey: getGetIdentityAccountMeQueryKey() });
+    queryClient.invalidateQueries({ queryKey: getGetIdentityV1AccountMeQueryKey() });
   };
 
   return (

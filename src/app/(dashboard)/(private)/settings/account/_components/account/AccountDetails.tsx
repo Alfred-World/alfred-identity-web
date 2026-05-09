@@ -19,9 +19,9 @@ import { toast } from 'react-toastify';
 
 // Generated Imports
 import {
-  useGetIdentityAccountMe,
-  usePatchIdentityAccountProfile,
-  getGetIdentityAccountMeQueryKey
+  useGetIdentityV1AccountMe,
+  usePatchIdentityV1AccountProfile,
+  getGetIdentityV1AccountMeQueryKey
 } from '@/generated/identity-api';
 
 // Component Imports
@@ -38,7 +38,7 @@ const AccountDetails = () => {
   const queryClient = useQueryClient();
 
   // ── Load profile ─────────────────────────────────────────────────────────
-  const { data: profileResponse, isLoading, isError } = useGetIdentityAccountMe();
+  const { data: profileResponse, isLoading, isError } = useGetIdentityV1AccountMe();
 
   const profile = profileResponse?.success ? (profileResponse.result ?? null) : null;
 
@@ -91,11 +91,11 @@ const AccountDetails = () => {
   };
 
   // ── Update profile ────────────────────────────────────────────────────────
-  const { mutate: updateProfile, isPending } = usePatchIdentityAccountProfile({
+  const { mutate: updateProfile, isPending } = usePatchIdentityV1AccountProfile({
     mutation: {
       onSuccess(data) {
         if (data.success) {
-          queryClient.invalidateQueries({ queryKey: getGetIdentityAccountMeQueryKey() });
+          queryClient.invalidateQueries({ queryKey: getGetIdentityV1AccountMeQueryKey() });
           setIsDirty(false);
           setAvatarBase64(null);
           toast.success('Profile updated successfully');

@@ -21,12 +21,12 @@ import OptionMenu from '@core/components/option-menu';
 import { customFetch } from '@/libs/custom-instance';
 
 import {
-  useDeleteIdentityMgmtUsersUserIdRoles,
-  usePostIdentityMgmtUsersUserIdRoles,
-  usePostIdentityMgmtUsersUserIdBan,
-  usePostIdentityMgmtUsersUserIdUnban,
-  postIdentityMgmtUsersSearch,
-  postIdentityRolesSearch
+  useDeleteIdentityV1MgmtUsersUserIdRoles,
+  usePostIdentityV1MgmtUsersUserIdRoles,
+  usePostIdentityV1MgmtUsersUserIdBan,
+  usePostIdentityV1MgmtUsersUserIdUnban,
+  postIdentityV1MgmtUsersSearch,
+  postIdentityV1RolesSearch
 } from '@/generated/identity-api';
 import type { UserDto, UserFilterInput } from '@/generated/identity-api';
 
@@ -81,7 +81,7 @@ const UserList = () => {
     }
   }, [queryClient]);
 
-  const { mutate: banUser, isPending: isBanningUser } = usePostIdentityMgmtUsersUserIdBan({
+  const { mutate: banUser, isPending: isBanningUser } = usePostIdentityV1MgmtUsersUserIdBan({
     mutation: {
       onSuccess: response => {
         if (response.success) {
@@ -100,7 +100,7 @@ const UserList = () => {
     }
   });
 
-  const { mutate: unbanUser, isPending: isUnbanningUser } = usePostIdentityMgmtUsersUserIdUnban({
+  const { mutate: unbanUser, isPending: isUnbanningUser } = usePostIdentityV1MgmtUsersUserIdUnban({
     mutation: {
       onSuccess: response => {
         if (response.success) {
@@ -118,13 +118,13 @@ const UserList = () => {
     }
   });
 
-  const { mutateAsync: assignRolesToUser, isPending: isAssigningRoles } = usePostIdentityMgmtUsersUserIdRoles();
-  const { mutateAsync: revokeRolesFromUser, isPending: isRevokingRoles } = useDeleteIdentityMgmtUsersUserIdRoles();
+  const { mutateAsync: assignRolesToUser, isPending: isAssigningRoles } = usePostIdentityV1MgmtUsersUserIdRoles();
+  const { mutateAsync: revokeRolesFromUser, isPending: isRevokingRoles } = useDeleteIdentityV1MgmtUsersUserIdRoles();
 
   const { data: rolesResponse, isLoading: isLoadingRoles } = useQuery({
     queryKey: ['identity', 'roles', 'list'],
     queryFn: () =>
-      postIdentityRolesSearch({
+      postIdentityV1RolesSearch({
         page: 1,
         pageSize: 200,
         order: [{ field: 'name', direction: 'Asc' }],
@@ -147,8 +147,15 @@ const UserList = () => {
       }
 
       const initialRoleIds = roleDialogState.initialRoleIds;
-      const roleIdsToAdd = selectedRoleIds.filter(roleId => !initialRoleIds.includes(roleId));
-      const roleIdsToRemove = initialRoleIds.filter(roleId => !selectedRoleIds.includes(roleId));
+      const immutableRoleIds = new Set(
+        roles.filter(role => role.isImmutable && role.id).map(role => role.id as string)
+      );
+      const roleIdsToAdd = selectedRoleIds.filter(
+        roleId => !initialRoleIds.includes(roleId) && !immutableRoleIds.has(roleId)
+      );
+      const roleIdsToRemove = initialRoleIds.filter(
+        roleId => !selectedRoleIds.includes(roleId) && !immutableRoleIds.has(roleId)
+      );
 
       if (roleIdsToAdd.length === 0 && roleIdsToRemove.length === 0) {
         setRoleDialogState(null);
@@ -192,7 +199,7 @@ const UserList = () => {
         toast.error(message);
       }
     },
-    [assignRolesToUser, refreshUsers, revokeRolesFromUser, roleDialogState]
+    [assignRolesToUser, refreshUsers, revokeRolesFromUser, roleDialogState, roles]
   );
 
   const confirmUserEmail = useCallback(
@@ -201,7 +208,7 @@ const UserList = () => {
 
       try {
         const response = await customFetch<{ success: boolean; errors?: { message?: string }[] }>(
-          `/identity/mgmt/users/${userId}/confirm-email`,
+          `/identity/v1/mgmt/users/${userId}/confirm-email`,
           {
             method: 'POST'
           }
@@ -246,7 +253,7 @@ const UserList = () => {
     error
   } = useQuery({
     queryKey: ['identity', 'users', 'search', searchRequest],
-    queryFn: () => postIdentityMgmtUsersSearch(searchRequest)
+    queryFn: () => postIdentityV1MgmtUsersSearch(searchRequest)
   });
 
   const usersLoadError = useMemo(() => {

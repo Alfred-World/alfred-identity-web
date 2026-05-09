@@ -12,7 +12,7 @@ import RoleList from './_components/RoleList';
 import RolePermissionsDetail from './_components/RolePermissionsDetail';
 import RoleDialog from './_components/RoleDialog';
 import ConfirmationDialog from '@/components/ConfirmationDialog';
-import { postIdentityRolesSearch, useDeleteIdentityRolesId } from '@/generated/identity-api';
+import { postIdentityV1RolesSearch, useDeleteIdentityV1RolesId } from '@/generated/identity-api';
 import type { RoleDto } from '@/generated/identity-api';
 
 const RolesPage = () => {
@@ -67,7 +67,7 @@ const RolesPage = () => {
   } = useQuery({
     queryKey: ['identity', 'roles', 'search'],
     queryFn: () =>
-      postIdentityRolesSearch({
+      postIdentityV1RolesSearch({
         page: 1,
         pageSize: 200,
         order: [{ field: 'name', direction: 'Asc' }],
@@ -97,7 +97,7 @@ const RolesPage = () => {
   //   }
   // }, [selectedRoleId, roles])
 
-  const { mutate: deleteRole, isPending: isDeleting } = useDeleteIdentityRolesId({
+  const { mutate: deleteRole, isPending: isDeleting } = useDeleteIdentityV1RolesId({
     mutation: {
       onSuccess: data => {
         if (data.success) {

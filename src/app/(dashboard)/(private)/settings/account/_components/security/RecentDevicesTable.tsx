@@ -18,9 +18,9 @@ import { toast } from 'react-toastify';
 
 // Generated Imports
 import {
-  useGetIdentityAccountSessions,
-  useDeleteIdentityAccountSessionsId,
-  getGetIdentityAccountSessionsQueryKey
+  useGetIdentityV1AccountSessions,
+  useDeleteIdentityV1AccountSessionsId,
+  getGetIdentityV1AccountSessionsQueryKey
 } from '@/generated/identity-api';
 
 // Style Imports
@@ -51,17 +51,17 @@ const RecentDevicesTable = () => {
   const queryClient = useQueryClient();
 
   // Fetch sessions
-  const { data: sessionsResponse, isLoading, isError } = useGetIdentityAccountSessions();
+  const { data: sessionsResponse, isLoading, isError } = useGetIdentityV1AccountSessions();
 
   const sessions = sessionsResponse?.success ? (sessionsResponse.result ?? []) : [];
 
   // Revoke session
-  const { mutate: revokeSession, variables: revokingVars } = useDeleteIdentityAccountSessionsId({
+  const { mutate: revokeSession, variables: revokingVars } = useDeleteIdentityV1AccountSessionsId({
     mutation: {
       onSuccess(data) {
         if (data.success) {
           toast.success('Session revoked successfully');
-          queryClient.invalidateQueries({ queryKey: getGetIdentityAccountSessionsQueryKey() });
+          queryClient.invalidateQueries({ queryKey: getGetIdentityV1AccountSessionsQueryKey() });
         } else {
           toast.error(data.errors?.[0]?.message ?? 'Failed to revoke session');
         }

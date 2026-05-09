@@ -13,7 +13,7 @@ import type { FieldConfig, FilterObject } from '@/components/dsl-query-builder';
 import { useUrlPagination, useUrlSorting, sortStringToSortFields } from '@/components/UrlPagination';
 import { AdvancedTable } from '@/components/AdvancedTable';
 import type { ColumnConfig } from '@/components/AdvancedTable';
-import { postIdentityApplicationsSearch } from '@/generated/identity-api';
+import { postIdentityV1ApplicationsSearch } from '@/generated/identity-api';
 import type { ApiErrorResponse, ApplicationDto, ApplicationFilterInput } from '@/generated/identity-api';
 
 import { ApplicationListActions } from './_components/ApplicationListActions';
@@ -48,7 +48,7 @@ export default function ApplicationsPage() {
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['identity', 'applications', 'search', searchRequest],
-    queryFn: () => postIdentityApplicationsSearch(searchRequest)
+    queryFn: () => postIdentityV1ApplicationsSearch(searchRequest)
   });
 
   const result = data?.success ? data.result : null;

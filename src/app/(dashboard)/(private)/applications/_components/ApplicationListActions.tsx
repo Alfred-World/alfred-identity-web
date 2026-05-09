@@ -20,7 +20,7 @@ import {
 
 import { toast } from 'react-toastify';
 
-import { useDeleteIdentityApplicationsId } from '@/generated/identity-api';
+import { useDeleteIdentityV1ApplicationsId } from '@/generated/identity-api';
 
 interface ApplicationListActionsProps {
   id: string;
@@ -34,7 +34,7 @@ export const ApplicationListActions = ({ id, displayName, onDeleteSuccess }: App
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const open = Boolean(anchorEl);
 
-  const { mutate: deleteApplication, isPending } = useDeleteIdentityApplicationsId({
+  const { mutate: deleteApplication, isPending } = useDeleteIdentityV1ApplicationsId({
     mutation: {
       onSuccess: data => {
         if (data.success) {

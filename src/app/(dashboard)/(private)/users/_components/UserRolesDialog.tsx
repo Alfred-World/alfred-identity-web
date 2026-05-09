@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
+import Chip from '@mui/material/Chip';
 import CircularProgress from '@mui/material/CircularProgress';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -54,7 +55,13 @@ const UserRolesDialog = ({
     return roles.filter(role => !!role.id);
   }, [roles]);
 
-  const handleToggleRole = (roleId: string) => {
+  const handleToggleRole = (role: RoleDto) => {
+    const roleId = role.id;
+
+    if (!roleId || role.isImmutable) {
+      return;
+    }
+
     setSelectedRoleIds(prev => (prev.includes(roleId) ? prev.filter(id => id !== roleId) : [...prev, roleId]));
   };
 
@@ -81,14 +88,15 @@ const UserRolesDialog = ({
             {selectableRoles.map(role => {
               const roleId = role.id as string;
               const isSelected = selectedRoleIds.includes(roleId);
+              const isImmutable = !!role.isImmutable;
 
               return (
                 <Grid size={{ xs: 12, sm: 6 }} key={roleId}>
                   <Card
-                    onClick={() => handleToggleRole(roleId)}
+                    onClick={() => handleToggleRole(role)}
                     sx={{
                       p: 2,
-                      cursor: 'pointer',
+                      cursor: isImmutable ? 'not-allowed' : 'pointer',
                       border: '1px solid',
                       borderColor: isSelected ? 'primary.main' : 'divider',
                       bgcolor: isSelected
@@ -97,6 +105,8 @@ const UserRolesDialog = ({
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
+                      gap: 2,
+                      opacity: isImmutable && !isSelected ? 0.72 : 1,
                       transition: 'all 0.2s ease-in-out'
                     }}
                   >
@@ -115,21 +125,21 @@ const UserRolesDialog = ({
                       >
                         <i className={role.icon || 'ri-shield-user-line'} style={{ fontSize: 18 }} />
                       </Box>
-                      <Box>
-                        <Typography variant='subtitle2' fontWeight={600}>
+                      <Box sx={{ minWidth: 0 }}>
+                        <Typography variant='subtitle2' fontWeight={600} noWrap>
                           {role.name || 'Unknown role'}
                         </Typography>
-                        {role.isSystem && (
-                          <Typography variant='caption' color='info.main'>
-                            System Core
-                          </Typography>
-                        )}
+                        <Stack direction='row' spacing={0.75} sx={{ mt: 0.5, flexWrap: 'wrap', rowGap: 0.5 }}>
+                          {role.isSystem && <Chip label='System Core' color='info' variant='tonal' size='small' />}
+                          {isImmutable && <Chip label='Protected' color='warning' variant='tonal' size='small' />}
+                        </Stack>
                       </Box>
                     </Stack>
 
                     <Switch
                       checked={isSelected}
-                      onChange={() => handleToggleRole(roleId)}
+                      disabled={isImmutable}
+                      onChange={() => handleToggleRole(role)}
                       onClick={event => event.stopPropagation()}
                       size='small'
                     />
@@ -141,7 +151,7 @@ const UserRolesDialog = ({
         )}
       </DialogContent>
 
-      <DialogActions sx={{ px: 3, py: 2 }}>
+      <DialogActions sx={{ px: 3, py: 2, mt: 2 }}>
         <Button variant='outlined' color='secondary' disabled={isSaving} onClick={onClose}>
           Cancel
         </Button>

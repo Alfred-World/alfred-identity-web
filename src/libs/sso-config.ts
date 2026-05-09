@@ -9,7 +9,7 @@
 
 import { GATEWAY_URL } from './custom-instance';
 import { NEXT_PUBLIC_APP_URL, NEXT_PUBLIC_OAUTH_CLIENT_ID } from './env';
-import { getIdentityAuthValidateToken, getGetIdentityAuthCheckSsoQueryKey } from '@/generated/identity-api';
+import { getIdentityV1AuthValidateToken, getGetIdentityV1AuthCheckSsoQueryKey } from '@/generated/identity-api';
 
 /**
  * App base URL - used for post-logout redirect
@@ -28,7 +28,7 @@ export const OAUTH_CLIENT_ID = NEXT_PUBLIC_OAUTH_CLIENT_ID;
  */
 export const getSsoCheckUrl = (returnUrl: string) => {
   // Get URL path from generated QueryKey
-  const [urlPath] = getGetIdentityAuthCheckSsoQueryKey({ returnUrl });
+  const [urlPath] = getGetIdentityV1AuthCheckSsoQueryKey({ returnUrl });
 
   return `${GATEWAY_URL}${urlPath}?returnUrl=${encodeURIComponent(returnUrl)}`;
 };
@@ -48,5 +48,5 @@ export const getSsoLogoutUrl = (postLogoutRedirectUri: string = `${APP_URL}/logi
  * @param token - SSO token to validate
  */
 export const validateSsoToken = (token: string) => {
-  return getIdentityAuthValidateToken({ token });
+  return getIdentityV1AuthValidateToken({ token });
 };

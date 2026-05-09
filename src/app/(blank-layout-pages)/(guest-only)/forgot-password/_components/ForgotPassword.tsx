@@ -30,7 +30,7 @@ import DirectionalIcon from '@components/DirectionalIcon';
 import Logo from '@components/layout/shared/Logo';
 
 // Generated API Imports
-import { usePostIdentityAuthForgotPassword } from '@/generated/identity-api';
+import { usePostIdentityV1AuthForgotPassword } from '@/generated/identity-api';
 import AuthIllustrationWrapper from '@/components/AuthIllustrationWrapper';
 
 // Validation schema
@@ -59,7 +59,7 @@ const ForgotPassword = ({ mode: _mode }: { mode: SystemMode }) => {
     }
   });
 
-  const { mutateAsync: forgotPassword } = usePostIdentityAuthForgotPassword();
+  const { mutateAsync: forgotPassword } = usePostIdentityV1AuthForgotPassword();
 
   const onSubmit: SubmitHandler<FieldValues> = async data => {
     setIsSubmitting(true);

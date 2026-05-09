@@ -33,7 +33,7 @@ import DirectionalIcon from '@components/DirectionalIcon';
 import Logo from '@components/layout/shared/Logo';
 
 // Generated API Imports
-import { usePostIdentityAuthResetPassword } from '@/generated/identity-api';
+import { usePostIdentityV1AuthResetPassword } from '@/generated/identity-api';
 
 // Validation schema
 const schema = object({
@@ -69,7 +69,7 @@ const ResetPassword = ({ mode: _mode }: { mode: SystemMode }) => {
     }
   });
 
-  const { mutateAsync: resetPassword } = usePostIdentityAuthResetPassword();
+  const { mutateAsync: resetPassword } = usePostIdentityV1AuthResetPassword();
 
   const onSubmit: SubmitHandler<FieldValues> = async data => {
     // Check if passwords match

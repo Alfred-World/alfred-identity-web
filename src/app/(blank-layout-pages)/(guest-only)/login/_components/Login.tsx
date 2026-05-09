@@ -1,13 +1,10 @@
 'use client';
 
-// React Imports
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-// Next Imports
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 
-// MUI Imports
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
@@ -15,75 +12,86 @@ import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import Checkbox from '@mui/material/Checkbox';
 import Button from '@mui/material/Button';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Divider from '@mui/material/Divider';
 import Alert from '@mui/material/Alert';
+import FormControlLabel from '@mui/material/FormControlLabel';
 
-// Third-party Imports
 import { signIn, signOut } from 'next-auth/react';
 import { Controller, useForm } from 'react-hook-form';
 import { valibotResolver } from '@hookform/resolvers/valibot';
-import { email, object, minLength, string, pipe, nonEmpty } from 'valibot';
+import { boolean, object, minLength, string, pipe, nonEmpty } from 'valibot';
 import type { SubmitHandler } from 'react-hook-form';
 import type { InferInput } from 'valibot';
 
-// Type Imports
 import type { SystemMode } from '@core/types';
 
-// Component Imports
 import AuthIllustrationWrapper from '@components/AuthIllustrationWrapper';
 import CustomTextField from '@core/components/mui/TextField';
 import Loading from '@components/Loading';
 import Logo from '@components/layout/shared/Logo';
 
-// Config Imports
 import themeConfig from '@configs/themeConfig';
 
-// SSO Imports
-import { validateSsoToken } from '@/libs/sso-config';
-import { postIdentityAuthSsoLogin } from '@/generated/identity-api';
-import type { SessionUserInfoDto } from '@/generated/identity-api';
-
-type ErrorType = {
-  message: string[];
-};
+import { NEXT_PUBLIC_APP_URL } from '@/libs/env';
+import type { SsoLoginResponseApiResponse } from '@/generated/identity-api';
 
 type FormData = InferInput<typeof schema>;
+
 const LOGIN_RETURN_URL_STORAGE_KEY = 'identity_login_return_url';
 
-// ── Map NextAuth error codes to human-readable messages ──────────────────────
 const NEXTAUTH_ERROR_MESSAGES: Record<string, string> = {
-  OAuthSignin: 'Could not start the sign-in flow. Please try again.',
-  OAuthCallback:
-    'Sign-in callback failed. The identity server may have rejected the request (e.g. missing redirect URI).',
+  OAuthSignin: 'The sign-in request could not be started. Please try again.',
+  OAuthCallback: 'The application could not complete the authentication callback. Please try again.',
   OAuthCreateAccount: 'Could not create your account from the identity provider.',
   OAuthAccountNotLinked: 'This email is already linked to another sign-in method.',
-  Callback: 'Authentication callback error. Please try again.',
-  AccessDenied: 'Access denied. You do not have permission to sign in.',
-  Verification: 'The verification link has expired or has already been used.',
-  Configuration: 'Server configuration error. Please contact the administrator.',
+  Callback: 'Authentication callback failed. Please try again.',
+  AccessDenied: 'Access denied.',
+  access_denied: 'Access denied.',
+  invalid_client: 'Client application is not registered or inactive.',
+  invalid_request: 'Authentication request is invalid.',
   session_expired: 'Your session has expired. Please sign in again.',
-  Default: 'An unexpected authentication error occurred. Please try again.'
+  Configuration: 'Authentication is temporarily unavailable for this application.',
+  Default: 'Authentication failed. Please try again.'
 };
 
 const schema = object({
-  email: pipe(string(), minLength(1, 'This field is required'), email('Email is invalid')),
+  identity: pipe(string(), nonEmpty('This field is required')),
   password: pipe(
     string(),
     nonEmpty('This field is required'),
     minLength(5, 'Password must be at least 5 characters long')
-  )
+  ),
+  rememberMe: boolean()
 });
 
-const Login = ({ mode: _mode }: { mode: SystemMode }) => {
-  // States
-  const [isPasswordShown, setIsPasswordShown] = useState(false);
-  const [isCheckingSso, setIsCheckingSso] = useState(true);
-  const ssoCheckRef = useRef(false);
-  const [errorState, setErrorState] = useState<ErrorType | null>(null);
+function isGatewayAuthorizeUrl(url: string) {
+  return url.includes('/connect/authorize');
+}
 
-  // Hooks
-  const router = useRouter();
+function buildErrorUrl(searchParams: URLSearchParams) {
+  const params = new URLSearchParams(searchParams.toString());
+
+  if (!params.has('error') && params.has('sso_error')) {
+    params.set('error', params.get('sso_error') || 'invalid_request');
+  }
+
+  if (!params.has('error_description') && params.has('sso_error_description')) {
+    params.set('error_description', params.get('sso_error_description') || 'Authentication failed.');
+  }
+
+  if (!params.has('returnUrl')) {
+    params.set('returnUrl', searchParams.get('returnUrl') || searchParams.get('callbackUrl') || '/dashboards');
+  }
+
+  return `/auth/error?${params.toString()}`;
+}
+
+const Login = ({ mode: _mode }: { mode: SystemMode }) => {
+  const [isPasswordShown, setIsPasswordShown] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const didBootstrapRef = useRef(false);
+
   const searchParams = useSearchParams();
 
   const {
@@ -93,147 +101,104 @@ const Login = ({ mode: _mode }: { mode: SystemMode }) => {
   } = useForm<FormData>({
     resolver: valibotResolver(schema),
     defaultValues: {
-      email: '',
-      password: ''
+      identity: '',
+      password: '',
+      rememberMe: true
     }
   });
 
-  // Handle SSO token from redirect flow (from AuthRedirect -> check-sso -> back here)
-  // Also handle start_oauth param to trigger OAuth flow after SSO login
-  // Also handle NextAuth error param (e.g. OIDC callback failures)
   useEffect(() => {
-    if (ssoCheckRef.current) return;
-    ssoCheckRef.current = true;
+    if (didBootstrapRef.current) return;
+    didBootstrapRef.current = true;
 
-    const handleSsoToken = async () => {
+    const bootstrap = async () => {
+      const authError = searchParams.get('error') || searchParams.get('sso_error');
+
+      if (authError) {
+        await signOut({ redirect: false });
+        sessionStorage.removeItem(LOGIN_RETURN_URL_STORAGE_KEY);
+        window.location.replace(buildErrorUrl(new URLSearchParams(searchParams.toString())));
+
+        return;
+      }
+
       const queryReturnUrl = searchParams.get('returnUrl');
 
       if (queryReturnUrl) {
         sessionStorage.setItem(LOGIN_RETURN_URL_STORAGE_KEY, queryReturnUrl);
       }
 
-      const persistedReturnUrl = sessionStorage.getItem(LOGIN_RETURN_URL_STORAGE_KEY);
-      const ssoToken = searchParams.get('sso_token');
-      const ssoError = searchParams.get('sso_error');
-      const startOAuth = searchParams.get('start_oauth');
-      const nextAuthError = searchParams.get('error');
-      const callbackUrl = searchParams.get('callbackUrl') || persistedReturnUrl || '/dashboards';
-      const redirectTo = searchParams.get('redirectTo') || '/dashboards';
+      const callbackUrl =
+        searchParams.get('callbackUrl') ||
+        queryReturnUrl ||
+        searchParams.get('redirectTo') ||
+        sessionStorage.getItem(LOGIN_RETURN_URL_STORAGE_KEY) ||
+        '/dashboards';
 
-      // ── NextAuth / OIDC error (e.g. OAuthCallback, OAuthSignin) ─────────
-      // Also handles backend redirect errors (error + error_description params)
-      if (nextAuthError) {
-        const errorDescription = searchParams.get('error_description');
+      if (searchParams.get('start_oauth') === 'true') {
+        if (isGatewayAuthorizeUrl(callbackUrl)) {
+          sessionStorage.removeItem(LOGIN_RETURN_URL_STORAGE_KEY);
+          window.location.href = callbackUrl;
 
-        const message = errorDescription || NEXTAUTH_ERROR_MESSAGES[nextAuthError] || NEXTAUTH_ERROR_MESSAGES.Default;
+          return;
+        }
 
-        // Ensure previous authenticated session is cleared when OAuth fails
-        // so UI doesn't bounce to dashboard with stale session.
-        await signOut({ redirect: false });
-        setErrorState({ message: [message] });
-        setIsCheckingSso(false);
-
-        return;
-      }
-
-      // If start_oauth=true, trigger OAuth flow to get access tokens
-      // This happens after SSO login sets the cookie
-      if (startOAuth === 'true') {
         sessionStorage.setItem(LOGIN_RETURN_URL_STORAGE_KEY, callbackUrl);
-
-        // Call signIn with sso-oauth provider - this will redirect to Gateway
-        // Gateway will see SSO cookie and auto-approve, returning with tokens
         signIn('sso-oauth', { callbackUrl });
 
         return;
       }
 
-      // If SSO check returned error, just show login form
-      if (ssoError) {
-        setIsCheckingSso(false);
-
-        return;
-      }
-
-      // If we have an SSO token, exchange it for session
-      if (ssoToken) {
-        try {
-          // Use generated API function via sso-config for type safety
-          const response = await validateSsoToken(ssoToken);
-
-          if (response.success && response.result) {
-            // Sign in using SSO session
-            const user = response.result as SessionUserInfoDto;
-
-            const result = await signIn('sso-session', {
-              redirect: false,
-              userId: user.id?.toString(),
-              email: user.email,
-              name: user.fullName || user.userName || user.email
-            });
-
-            if (result?.ok) {
-              router.replace(redirectTo);
-
-              return;
-            }
-          }
-        } catch {
-          // SSO token exchange failed, show login form
-        }
-      }
-
-      setIsCheckingSso(false);
+      setIsChecking(false);
     };
 
-    handleSsoToken();
-  }, [router, searchParams]);
+    void bootstrap();
+  }, [searchParams]);
 
   const handleClickShowPassword = () => setIsPasswordShown(show => !show);
 
-  const onSubmit: SubmitHandler<FormData> = async (data: FormData) => {
-    try {
-      // Build return URL that will trigger OAuth after SSO cookie is set
-      const ssoAppUrl = process.env.NEXT_PUBLIC_APP_URL!;
+  const onSubmit: SubmitHandler<FormData> = async data => {
+    setIsSubmitting(true);
+    setErrorMessage(null);
 
+    try {
       const finalDestination =
         searchParams.get('returnUrl') || sessionStorage.getItem(LOGIN_RETURN_URL_STORAGE_KEY) || '/dashboards';
 
       sessionStorage.setItem(LOGIN_RETURN_URL_STORAGE_KEY, finalDestination);
 
-      // After exchange-token, redirect to login with start_oauth=true
-      // This will trigger signIn('sso-oauth') to complete the OAuth flow
-      const returnUrl = `${ssoAppUrl}/login?start_oauth=true&callbackUrl=${encodeURIComponent(finalDestination)}`;
+      const returnUrl = isGatewayAuthorizeUrl(finalDestination)
+        ? finalDestination
+        : `${NEXT_PUBLIC_APP_URL}/login?start_oauth=true&callbackUrl=${encodeURIComponent(finalDestination)}`;
 
-      const response = await postIdentityAuthSsoLogin({
-        identity: data.email,
-        password: data.password,
-        rememberMe: true,
-        returnUrl: returnUrl
+      const response = await fetch('/api/identity/sso-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          identity: data.identity,
+          password: data.password,
+          rememberMe: data.rememberMe,
+          returnUrl
+        })
       });
 
-      if (!response.success || !response.result) {
-        setErrorState({ message: [response.errors?.[0].message || 'Login failed'] });
+      const body = (await response.json()) as SsoLoginResponseApiResponse;
+
+      if (!response.ok || !body.success || !body.result?.returnUrl) {
+        setErrorMessage(body.errors?.[0]?.message || body.message || 'Login failed. Please try again.');
 
         return;
       }
 
-      const { returnUrl: exchangeUrl } = response.result;
-
-      if (exchangeUrl) {
-        // Navigate to Gateway exchange-token to set SSO cookie
-        // After that, will redirect back with start_oauth=true
-        window.location.href = exchangeUrl;
-      } else {
-        setErrorState({ message: ['Exchange URL not received'] });
-      }
-    } catch (e: unknown) {
-      setErrorState({ message: [e instanceof Error ? e.message : 'Login failed'] });
+      window.location.href = body.result.returnUrl;
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : 'Login failed. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  // Show loading while checking SSO session
-  if (isCheckingSso) {
+  if (isChecking) {
     return <Loading className='bs-full min-bs-[100dvh]' />;
   }
 
@@ -245,28 +210,17 @@ const Login = ({ mode: _mode }: { mode: SystemMode }) => {
             <Logo />
           </Link>
           <div className='flex flex-col gap-1 mbe-6'>
-            <Typography variant='h4'>{`Welcome to ${themeConfig.templateName}! 👋🏻`}</Typography>
-            <Typography>Please sign-in to your account and start the adventure</Typography>
+            <Typography variant='h4'>{`Welcome to ${themeConfig.templateName}!`}</Typography>
+            <Typography>Please sign in to your account</Typography>
           </div>
-          <form
-            noValidate
-            autoComplete='off'
-            action={() => {}}
-            onSubmit={handleSubmit(onSubmit)}
-            className='flex flex-col gap-6'
-          >
-            {/* ── Error banner (OIDC / NextAuth / login errors) ──────────── */}
-            {errorState && (
-              <Alert severity='error' onClose={() => setErrorState(null)}>
-                {errorState.message.map((msg, i) => (
-                  <Typography key={i} variant='body2'>
-                    {msg}
-                  </Typography>
-                ))}
-              </Alert>
-            )}
+          {errorMessage && (
+            <Alert severity='error' className='mbe-6' onClose={() => setErrorMessage(null)}>
+              {errorMessage}
+            </Alert>
+          )}
+          <form noValidate autoComplete='off' onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-6'>
             <Controller
-              name='email'
+              name='identity'
               control={control}
               rules={{ required: true }}
               render={({ field }) => (
@@ -274,16 +228,15 @@ const Login = ({ mode: _mode }: { mode: SystemMode }) => {
                   {...field}
                   autoFocus
                   fullWidth
-                  type='email'
-                  label='Email'
-                  placeholder='Enter your email'
-                  onChange={e => {
-                    field.onChange(e.target.value);
-                    errorState !== null && setErrorState(null);
+                  label='Email or Username'
+                  placeholder='Enter your email or username'
+                  onChange={event => {
+                    field.onChange(event.target.value);
+                    setErrorMessage(null);
                   }}
-                  {...(errors.email && {
+                  {...(errors.identity && {
                     error: true,
-                    helperText: errors.email.message
+                    helperText: errors.identity.message
                   })}
                 />
               )}
@@ -300,19 +253,15 @@ const Login = ({ mode: _mode }: { mode: SystemMode }) => {
                   placeholder='············'
                   id='login-password'
                   type={isPasswordShown ? 'text' : 'password'}
-                  onChange={e => {
-                    field.onChange(e.target.value);
-                    errorState !== null && setErrorState(null);
+                  onChange={event => {
+                    field.onChange(event.target.value);
+                    setErrorMessage(null);
                   }}
                   slotProps={{
                     input: {
                       endAdornment: (
                         <InputAdornment position='end'>
-                          <IconButton
-                            edge='end'
-                            onClick={handleClickShowPassword}
-                            onMouseDown={e => e.preventDefault()}
-                          >
+                          <IconButton edge='end' onClick={handleClickShowPassword} onMouseDown={event => event.preventDefault()}>
                             <i className={isPasswordShown ? 'tabler-eye-off' : 'tabler-eye'} />
                           </IconButton>
                         </InputAdornment>
@@ -327,12 +276,28 @@ const Login = ({ mode: _mode }: { mode: SystemMode }) => {
               )}
             />
             <div className='flex justify-between items-center gap-x-3 gap-y-1 flex-wrap'>
-              <FormControlLabel control={<Checkbox defaultChecked />} label='Remember me' />
+              <Controller
+                name='rememberMe'
+                control={control}
+                render={({ field }) => (
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={field.value ?? false}
+                        onBlur={field.onBlur}
+                        onChange={(_, checked) => field.onChange(checked)}
+                        inputRef={field.ref}
+                      />
+                    }
+                    label='Remember me'
+                  />
+                )}
+              />
               <Typography className='text-end' color='primary.main' component={Link} href='/forgot-password'>
                 Forgot password?
               </Typography>
             </div>
-            <Button fullWidth variant='contained' type='submit'>
+            <Button fullWidth variant='contained' type='submit' disabled={isSubmitting}>
               Login
             </Button>
             <div className='flex justify-center items-center flex-wrap gap-2'>
@@ -340,21 +305,6 @@ const Login = ({ mode: _mode }: { mode: SystemMode }) => {
               <Typography component={Link} href='/register' color='primary.main'>
                 Create an account
               </Typography>
-            </div>
-            <Divider className='gap-2 text-textPrimary'>or</Divider>
-            <div className='flex justify-center items-center gap-1.5'>
-              <IconButton className='text-facebook' size='small'>
-                <i className='tabler-brand-facebook-filled' />
-              </IconButton>
-              <IconButton className='text-twitter' size='small'>
-                <i className='tabler-brand-twitter-filled' />
-              </IconButton>
-              <IconButton className='text-textPrimary' size='small'>
-                <i className='tabler-brand-github-filled' />
-              </IconButton>
-              <IconButton className='text-error' size='small' onClick={() => signIn('google')}>
-                <i className='tabler-brand-google-filled' />
-              </IconButton>
             </div>
           </form>
         </CardContent>
